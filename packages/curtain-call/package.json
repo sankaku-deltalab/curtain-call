@@ -20,7 +20,7 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "prepare": "run-s build:clean build:tsc",
+    "prepare": "run-s prepare:clean prepare:tsc",
     "prepare:clean": "rimraf dist/",
     "prepare:tsc": "tsc"
   },
