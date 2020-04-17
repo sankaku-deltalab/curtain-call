@@ -1,0 +1,17 @@
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - npm config set unsafe-perm true
+    - npm ci
+    - npx lerna bootstrap
+    - npm run test
+  coverage: /All\sfiles.*?\s+(\d+.\d+)/

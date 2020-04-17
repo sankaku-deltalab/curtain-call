@@ -1,0 +1,46 @@
+{
+  "name": "root",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "create": "run-s \"create:lerna {1}\" \"create:add {1}\" \"create:init {1}\" --",
+    "create:lerna": "lerna create --esModule",
+    "create:add": "run-s \"create:add:ts {1}\" \"create:add:rimraf {1}\" \"create:add:runs {1}\" --",
+    "create:add:ts": "npx lerna add --dev typescript --scope",
+    "create:add:rimraf": "npx lerna add --dev rimraf --scope",
+    "create:add:runs": "npx lerna add --dev npm-run-all --scope",
+    "create:init": "node -r esm init-package.js",
+    "test": "run-s test:clean test:jest",
+    "test:clean": "rimraf coverage",
+    "test:jest": "jest --coverage",
+    "lint": "eslint --ext .ts packages/ --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:sankaku-deltalab/curtain-call.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
+    "@typescript-eslint/typescript-estree": "^2.27.0",
+    "edit-json-file": "^1.4.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "esm": "^3.2.25",
+    "husky": "^4.2.5",
+    "jest": "^25.3.0",
+    "lerna": "^3.20.2",
+    "lint-staged": "^10.1.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.4",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^25.3.1",
+    "typescript": "^3.8.3"
+  }
+}
