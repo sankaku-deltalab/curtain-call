@@ -1,1 +1,1 @@
-export class Scene {}
+export * from "./scene";
