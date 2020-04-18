@@ -10,7 +10,7 @@
     "create:add": "npx lerna add --dev typescript --scope",
     "create:init": "node -r esm init-package.js",
     "publish-all": "run-s publish-all:clean publish-all:lerna",
-    "publish-all:clean": "rimraf packages/*/dist",
+    "publish-all:clean": "rimraf packages/*/dist packages/*/tsconfig.tsbuildinfo",
     "publish-all:lerna": "lerna publish",
     "test": "run-s test:clean test:jest",
     "test:clean": "rimraf coverage",
