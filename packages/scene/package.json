@@ -1,0 +1,39 @@
+{
+  "name": "@curtain-call/scene",
+  "version": "0.1.1",
+  "description": "> TODO: description",
+  "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
+  "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sankaku-deltalab/curtain-call.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "prepare": "run-s prepare:clean prepare:tsc",
+    "prepare:clean": "rimraf dist/",
+    "prepare:tsc": "tsc"
+  },
+  "bugs": {
+    "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.8.3"
+  },
+  "types": "dist/index.d.ts"
+}
