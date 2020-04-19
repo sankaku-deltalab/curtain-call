@@ -31,5 +31,8 @@
   "devDependencies": {
     "typescript": "^3.8.3"
   },
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "trans-vector2d": "^1.0.0"
+  }
 }
