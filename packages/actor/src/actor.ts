@@ -1,9 +1,15 @@
-import * as PIXI from "pixi.js";
+import { DisplayObject } from "@curtain-call/display-object";
 
 export class Actor<T> {
-  readonly container = new PIXI.Container();
+  protected readonly displayObjectsSet = new Set<DisplayObject<T>>();
 
-  update(_owner: T, _deltaSec: number): void {
-    throw new Error("Implement this");
+  displayObjects(): DisplayObject<T>[] {
+    return Array.from(this.displayObjectsSet.values());
+  }
+
+  update(owner: T, deltaSec: number): void {
+    for (const obj of this.displayObjects()) {
+      obj.update(owner, deltaSec);
+    }
   }
 }
