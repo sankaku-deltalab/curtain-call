@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Vector } from "trans-vector2d";
 import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
+import { DisplayObject } from "./display-object-container";
 
 /**
  * Sprite.
@@ -15,23 +16,25 @@ import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
  * sprite.trans.setLocal(Matrix.from({ translation: {x: 1, y: 2} }));
  * sprite.update();
  */
-export class Sprite {
-  /** Transformation of self. */
-  public readonly trans = new Transformation();
+export class Sprite<T> implements DisplayObject<T> {
   private size = Vector.one;
 
   /**
-   * @param pixiSprite Pixi sprite.
+   * @param pixiObj Pixi sprite.
+   * @param trans Transformation of self.
    */
-  constructor(public readonly pixiSprite = new PIXI.Sprite()) {
-    pixiSprite.anchor = new PIXI.Point(0.5, 0.5);
+  constructor(
+    public readonly pixiObj = new PIXI.Sprite(),
+    public readonly trans = new Transformation()
+  ) {
+    pixiObj.anchor = new PIXI.Point(0.5, 0.5);
   }
 
   /**
    * Update pixi sprite transformation.
    */
   update(): void {
-    this.pixiSprite.transform.setFromMatrix(
+    this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );
   }
@@ -43,7 +46,7 @@ export class Sprite {
    * @returns this.
    */
   setTexture(texture: PIXI.Texture): this {
-    this.pixiSprite.texture = texture;
+    this.pixiObj.texture = texture;
     this.updateSpriteSize();
     return this;
   }
@@ -61,7 +64,7 @@ export class Sprite {
   }
 
   private updateSpriteSize(): void {
-    this.pixiSprite.scale.x = this.size.x / this.pixiSprite.texture.width;
-    this.pixiSprite.scale.y = this.size.y / this.pixiSprite.texture.height;
+    this.pixiObj.scale.x = this.size.x / this.pixiObj.texture.width;
+    this.pixiObj.scale.y = this.size.y / this.pixiObj.texture.height;
   }
 }
