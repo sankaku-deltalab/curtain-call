@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Matrix } from "trans-vector2d";
-import { pixiMatrixToMatrix2d, matrix2dToPixiMatrix } from "../dist";
+import { pixiMatrixToMatrix2d, matrix2dToPixiMatrix } from "../src";
 
 describe("@curtain-call/util.matrix-convert", () => {
   it("can convert pixi matrix to matrix 2d", () => {
