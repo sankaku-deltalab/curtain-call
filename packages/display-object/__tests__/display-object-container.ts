@@ -72,6 +72,19 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
     });
   });
 
+  it("can iterate Sprites like Set.forEach", () => {
+    const pixiContainer = pixiConteinerMock();
+    const container = new DisplayObjectContainer(pixiContainer);
+    const sprite = new Sprite();
+    container.add(sprite);
+
+    const callback = jest.fn();
+    container.forEach(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(sprite);
+  });
+
   it("can update with added sprites", () => {
     const pixiContainer = pixiConteinerMock();
     const container = new DisplayObjectContainer(pixiContainer);

@@ -5,8 +5,8 @@ export class DisplayObjects<T> {
   public readonly trans = new Transformation();
   private readonly displayObjectsSet = new Set<DisplayObject<T>>();
 
-  objects(): DisplayObject<T>[] {
-    return Array.from(this.displayObjectsSet.values());
+  forEach(callback: (obj: DisplayObject<T>) => void): void {
+    this.displayObjectsSet.forEach((o) => callback(o));
   }
 
   add(obj: DisplayObject<T>): this {

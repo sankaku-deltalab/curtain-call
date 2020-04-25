@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Actor } from "@curtain-call/actor";
+import { Sprite, DisplayObjectContainer } from "@curtain-call/display-object";
 import { Scene } from "../src";
 
 const containerMock = (): PIXI.Container => {
@@ -12,12 +13,26 @@ const containerMock = (): PIXI.Container => {
 const sceneWithMock = <T>(): {
   sceneHead: PIXI.Container;
   sceneTail: PIXI.Container;
+  pixiDisplayObjectContainer: PIXI.Container;
+  displayObjectContainer: DisplayObjectContainer<Scene<T>>;
   scene: Scene<T>;
 } => {
   const sceneHead = containerMock();
   const sceneTail = containerMock();
-  const scene = new Scene(sceneHead, sceneTail);
-  return { sceneHead, sceneTail, scene };
+  const pixiDisplayObjectContainer = containerMock();
+  const displayObjectContainer = new DisplayObjectContainer<Scene<T>>(
+    pixiDisplayObjectContainer
+  );
+  jest.spyOn(displayObjectContainer, "add");
+  jest.spyOn(displayObjectContainer, "remove");
+  const scene = new Scene(sceneHead, sceneTail, displayObjectContainer);
+  return {
+    sceneHead,
+    sceneTail,
+    scene,
+    pixiDisplayObjectContainer,
+    displayObjectContainer,
+  };
 };
 
 describe("@curtain-call/scene.Scene", () => {
@@ -58,6 +73,42 @@ describe("@curtain-call/scene.Scene", () => {
 
       const actor = new Actor();
       expect(() => scene.removeActor(actor)).toThrowError();
+    });
+  });
+
+  describe("use DisplayObject", () => {
+    const actorMock = <T>(): { actor: Actor<T>; sprite: Sprite<T> } => {
+      const actor = new Actor();
+      const sprite = new Sprite();
+      actor.displayObjects.add(sprite);
+      return { actor, sprite };
+    };
+
+    it("and DisplayObjectContainer's pixi container was added to scene at constructor", () => {
+      const { sceneTail, pixiDisplayObjectContainer } = sceneWithMock();
+
+      expect(sceneTail.addChild).toBeCalledWith(pixiDisplayObjectContainer);
+    });
+
+    it("and add DisplayObject in actor when updated", () => {
+      const { scene, displayObjectContainer } = sceneWithMock();
+      const { actor, sprite } = actorMock();
+
+      scene.addActor(actor);
+      scene.update({}, 0.125);
+
+      expect(displayObjectContainer.add).toBeCalledWith(sprite);
+    });
+
+    it("and remove DisplayObject in actor when actor removed", () => {
+      const { scene, displayObjectContainer } = sceneWithMock();
+      const { actor, sprite } = actorMock();
+
+      scene.addActor(actor);
+      scene.update({}, 0.125);
+      scene.removeActor(actor);
+
+      expect(displayObjectContainer.remove).toBeCalledWith(sprite);
     });
   });
 

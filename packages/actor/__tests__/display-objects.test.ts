@@ -23,17 +23,46 @@ describe("@curtain-call/DisplayObjects", () => {
 
       expect(() => objects.add(obj)).toThrowError();
     });
+  });
 
-    it("and update them", () => {
+  describe("can remove DisplayObject", () => {
+    it("by function", () => {
+      const obj = spriteMock();
+      const objects = new DisplayObjects();
+      objects.add(obj);
+
+      expect(() => objects.remove(obj)).not.toThrowError();
+    });
+
+    it("but throw error when non added object", () => {
       const obj = spriteMock();
       const objects = new DisplayObjects();
 
-      objects.add(obj);
-      const scene = jest.fn();
-      const deltaSec = 0.125;
-      objects.update(scene, deltaSec);
-
-      expect(obj.update).toBeCalledWith(scene, deltaSec);
+      expect(() => objects.remove(obj)).toThrowError();
     });
+  });
+
+  it("can iterate DisplayObject like Set.forEach", () => {
+    const obj = spriteMock();
+    const objects = new DisplayObjects();
+    objects.add(obj);
+
+    const callback = jest.fn();
+    objects.forEach(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(obj);
+  });
+
+  it("can update added DisplayObject", () => {
+    const obj = spriteMock();
+    const objects = new DisplayObjects();
+
+    objects.add(obj);
+    const scene = jest.fn();
+    const deltaSec = 0.125;
+    objects.update(scene, deltaSec);
+
+    expect(obj.update).toBeCalledWith(scene, deltaSec);
   });
 });

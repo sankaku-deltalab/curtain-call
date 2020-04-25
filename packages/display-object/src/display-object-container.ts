@@ -64,4 +64,13 @@ export class DisplayObjectContainer<T> {
   has(obj: DisplayObject<T>): boolean {
     return this.objects.has(obj);
   }
+
+  /**
+   * Iterate containing objects.
+   *
+   * @param callback
+   */
+  forEach(callback: (obj: DisplayObject<T>) => void): void {
+    this.objects.forEach((o) => callback(o));
+  }
 }
