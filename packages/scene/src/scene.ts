@@ -37,7 +37,6 @@ export class Scene<T> {
   addActor(actor: Actor<this>): this {
     if (this.actors.has(actor)) throw new Error("Actor was already added");
     this.actors.add(actor);
-    this.tail.addChild(actor.container);
     return this;
   }
 
@@ -50,7 +49,6 @@ export class Scene<T> {
   removeActor(actor: Actor<this>): this {
     const removed = this.actors.delete(actor);
     if (!removed) throw new Error("Actor was not added");
-    this.tail.removeChild(actor.container);
     return this;
   }
 }

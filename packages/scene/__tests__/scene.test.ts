@@ -26,13 +26,12 @@ describe("@curtain-call/scene.Scene", () => {
   });
 
   describe("can add actor", () => {
-    it("with actor container", () => {
-      const { scene, sceneTail } = sceneWithMock();
+    it("by function", () => {
+      const { scene } = sceneWithMock();
 
       const actor = new Actor();
-      scene.addActor(actor);
 
-      expect(sceneTail.addChild).toBeCalledWith(actor.container);
+      expect(() => scene.addActor(actor)).not.toThrowError();
     });
 
     it("but throw error when add already added actor", () => {
@@ -45,14 +44,13 @@ describe("@curtain-call/scene.Scene", () => {
   });
 
   describe("can remove actor", () => {
-    it("with actor container", () => {
-      const { scene, sceneTail } = sceneWithMock();
+    it("by function", () => {
+      const { scene } = sceneWithMock();
 
       const actor = new Actor();
       scene.addActor(actor);
-      scene.removeActor(actor);
 
-      expect(sceneTail.removeChild).toBeCalledWith(actor.container);
+      expect(() => scene.removeActor(actor)).not.toThrowError();
     });
 
     it("but throw error when remove not added actor", () => {

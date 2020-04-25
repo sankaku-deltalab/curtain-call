@@ -1,15 +1,11 @@
-import { DisplayObject } from "@curtain-call/display-object";
+import { Transformation } from "@curtain-call/util";
+import { DisplayObjects } from "./display-objects";
 
 export class Actor<T> {
-  protected readonly displayObjectsSet = new Set<DisplayObject<T>>();
-
-  displayObjects(): DisplayObject<T>[] {
-    return Array.from(this.displayObjectsSet.values());
-  }
+  public readonly trans = new Transformation();
+  public readonly displayObjects = new DisplayObjects<T>();
 
   update(owner: T, deltaSec: number): void {
-    for (const obj of this.displayObjects()) {
-      obj.update(owner, deltaSec);
-    }
+    this.displayObjects.update(owner, deltaSec);
   }
 }
