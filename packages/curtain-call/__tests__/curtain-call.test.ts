@@ -1,7 +1,7 @@
-// import cc from "../src";
+import { Scene } from "../src";
 
 describe("curtain-call", () => {
-  it("needs tests", () => {
-    // write test
+  it("has Scene", () => {
+    expect(() => new Scene()).not.toThrowError();
   });
 });
