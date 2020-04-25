@@ -54,4 +54,14 @@ export class DisplayObjectContainer<T> {
     this.container.removeChild(obj.pixiObj);
     return this;
   }
+
+  /**
+   * Check self contains object.
+   *
+   * @param obj Checking DisplayObject.
+   * @returns Self contains object.
+   */
+  has(obj: DisplayObject<T>): boolean {
+    return this.objects.has(obj);
+  }
 }

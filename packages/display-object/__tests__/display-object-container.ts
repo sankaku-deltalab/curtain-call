@@ -57,6 +57,19 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
       expect(() => container.remove(sprite)).toThrowError();
     });
+
+    it("and can check added", () => {
+      const pixiContainer = pixiConteinerMock();
+      const container = new DisplayObjectContainer(pixiContainer);
+
+      const sprite = new Sprite();
+
+      container.add(sprite);
+      expect(container.has(sprite)).toBe(true);
+
+      container.remove(sprite);
+      expect(container.has(sprite)).toBe(false);
+    });
   });
 
   it("can update with added sprites", () => {
