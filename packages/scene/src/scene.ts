@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Actor } from "@curtain-call/actor";
+import { Camera } from "@curtain-call/camera";
 import { DisplayObjectContainer } from "@curtain-call/display-object";
 
 /**
@@ -12,13 +13,16 @@ export class Scene<T> {
    * @param head Root of PIXI objects.
    * @param tail Tail of PIXI objects.
    * @param displayObject DisplayObjectContainer.
+   * @param camera Camera.
    */
   constructor(
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container(),
+    public readonly camera = new Camera(),
     private readonly displayObject = new DisplayObjectContainer<Scene<T>>()
   ) {
-    head.addChild(tail);
+    head.addChild(camera.head);
+    camera.tail.addChild(tail);
     tail.addChild(this.displayObject.container);
     this.displayObject = displayObject;
   }

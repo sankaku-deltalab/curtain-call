@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectContainer } from "@curtain-call/display-object";
 import { Scene } from "../src";
+import { Camera } from "@curtain-call/camera/src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -15,23 +16,35 @@ const sceneWithMock = <T>(): {
   sceneTail: PIXI.Container;
   pixiDisplayObjectContainer: PIXI.Container;
   displayObjectContainer: DisplayObjectContainer<Scene<T>>;
+  pixiCameraHead: PIXI.Container;
+  pixiCameraTail: PIXI.Container;
+  camera: Camera;
   scene: Scene<T>;
 } => {
   const sceneHead = containerMock();
   const sceneTail = containerMock();
+
   const pixiDisplayObjectContainer = containerMock();
   const displayObjectContainer = new DisplayObjectContainer<Scene<T>>(
     pixiDisplayObjectContainer
   );
   jest.spyOn(displayObjectContainer, "add");
   jest.spyOn(displayObjectContainer, "remove");
-  const scene = new Scene(sceneHead, sceneTail, displayObjectContainer);
+
+  const pixiCameraHead = containerMock();
+  const pixiCameraTail = containerMock();
+  const camera = new Camera(pixiCameraHead, pixiCameraTail);
+
+  const scene = new Scene(sceneHead, sceneTail, camera, displayObjectContainer);
   return {
     sceneHead,
     sceneTail,
     scene,
     pixiDisplayObjectContainer,
     displayObjectContainer,
+    pixiCameraHead,
+    pixiCameraTail,
+    camera,
   };
 };
 
@@ -110,6 +123,19 @@ describe("@curtain-call/scene.Scene", () => {
 
       expect(displayObjectContainer.remove).toBeCalledWith(sprite);
     });
+  });
+
+  it("use camera", () => {
+    const { scene, camera } = sceneWithMock();
+    const obj = new PIXI.Container();
+    obj.position = new PIXI.Point(1, 2);
+    scene.tail.addChild(obj);
+
+    camera.moveTo({ x: 3, y: 1 });
+    const viewPos = obj.getGlobalPosition();
+
+    expect(viewPos.x).toBeCloseTo(-2);
+    expect(viewPos.y).toBeCloseTo(1);
   });
 
   it("can update added actors", () => {
