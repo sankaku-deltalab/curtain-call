@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { DisplayObjectContainer, Sprite } from "../src";
+import { DisplayObjectManager, Sprite } from "../src";
 
 const pixiConteinerMock = (): PIXI.Container => {
   const pixiContainer = new PIXI.Container();
@@ -8,11 +8,11 @@ const pixiConteinerMock = (): PIXI.Container => {
   return pixiContainer;
 };
 
-describe("@curtain-call/display-object.DisplayObjectContainer", () => {
+describe("@curtain-call/display-object.DisplayObjectManager", () => {
   describe("can add Sprite", () => {
     it("by function", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
       expect(() => container.add(sprite)).not.toThrowError();
@@ -20,7 +20,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
     it("and contain pixi sprite to container", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
       container.add(sprite);
@@ -30,7 +30,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
     it("but throw error when add added sprite", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
       container.add(sprite);
@@ -40,7 +40,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
     it("and can remove added child with sprite", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
       container.add(sprite);
@@ -51,7 +51,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
     it("but throw error when remove non added sprite", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
 
@@ -60,7 +60,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
     it("and can check added", () => {
       const pixiContainer = pixiConteinerMock();
-      const container = new DisplayObjectContainer(pixiContainer);
+      const container = new DisplayObjectManager(pixiContainer);
 
       const sprite = new Sprite();
 
@@ -74,7 +74,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
   it("can iterate Sprites like Set.forEach", () => {
     const pixiContainer = pixiConteinerMock();
-    const container = new DisplayObjectContainer(pixiContainer);
+    const container = new DisplayObjectManager(pixiContainer);
     const sprite = new Sprite();
     container.add(sprite);
 
@@ -87,7 +87,7 @@ describe("@curtain-call/display-object.DisplayObjectContainer", () => {
 
   it("can update with added sprites", () => {
     const pixiContainer = pixiConteinerMock();
-    const container = new DisplayObjectContainer(pixiContainer);
+    const container = new DisplayObjectManager(pixiContainer);
     const sprite = new Sprite();
     jest.spyOn(sprite, "update");
     container.add(sprite);

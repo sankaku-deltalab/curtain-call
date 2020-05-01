@@ -8,9 +8,9 @@ export interface DisplayObject<T> {
 }
 
 /**
- * DisplayObjectContainer contain DisplayObjects with pixi object.
+ * DisplayObjectManager contain DisplayObjects with pixi object.
  */
-export class DisplayObjectContainer<T> {
+export class DisplayObjectManager<T> {
   private readonly objects = new Set<DisplayObject<T>>();
 
   /**

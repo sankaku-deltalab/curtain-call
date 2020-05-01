@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Vector } from "trans-vector2d";
 import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object-container";
+import { DisplayObject } from "./display-object-manager";
 
 /**
  * Sprite.

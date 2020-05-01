@@ -1,2 +1,2 @@
-export * from "./display-object-container";
+export * from "./display-object-manager";
 export * from "./sprite";

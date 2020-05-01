@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
-import { DisplayObjectContainer } from "@curtain-call/display-object";
+import { DisplayObjectManager } from "@curtain-call/display-object";
 
 /**
  * Scene is root of game scene.
@@ -19,7 +19,7 @@ export class Scene<T> {
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container(),
     public readonly camera = new Camera(),
-    private readonly displayObject = new DisplayObjectContainer<Scene<T>>()
+    private readonly displayObject = new DisplayObjectManager<Scene<T>>()
   ) {
     head.addChild(camera.head);
     camera.tail.addChild(tail);
