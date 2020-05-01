@@ -12,7 +12,7 @@ describe("@curtain-call/actor", () => {
 
     it("and trans was attached to actor", () => {
       const actor = new Actor<{}>();
-      actor.trans.setLocal(Matrix.identity.translate({ x: 1, y: 2 }));
+      actor.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
 
       expect(actor.displayObjects.trans).toBeInstanceOf(Transformation);
     });

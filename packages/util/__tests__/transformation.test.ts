@@ -29,44 +29,44 @@ describe("@curtain-call/util.Transformation", () => {
 
     it("and update global Matrix of self when attached", () => {
       const parent = new Transformation().setLocal(
-        Matrix.identity.translate({ x: 1, y: 2 })
+        Matrix.translation({ x: 1, y: 2 })
       );
       const child = new Transformation().setLocal(
-        Matrix.identity.translate({ x: 3, y: 4 })
+        Matrix.translation({ x: 3, y: 4 })
       );
 
       child.attachTo(parent);
 
-      const expectedGlobal = Matrix.identity.translate({ x: 4, y: 6 });
+      const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
     });
 
     it("and update global Matrix of self when parent local was changed", () => {
       const parent = new Transformation();
       const child = new Transformation().setLocal(
-        Matrix.identity.translate({ x: 3, y: 4 })
+        Matrix.translation({ x: 3, y: 4 })
       );
 
-      parent.setLocal(Matrix.identity.translate({ x: 1, y: 2 }));
+      parent.setLocal(Matrix.translation({ x: 1, y: 2 }));
       child.attachTo(parent);
 
-      const expectedGlobal = Matrix.identity.translate({ x: 4, y: 6 });
+      const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
     });
 
     it("and update global Matrix of self when parent attached to other", () => {
       const parent = new Transformation();
       const child = new Transformation().setLocal(
-        Matrix.identity.translate({ x: 3, y: 4 })
+        Matrix.translation({ x: 3, y: 4 })
       );
 
       child.attachTo(parent);
       const parentOfParent = new Transformation().setLocal(
-        Matrix.identity.translate({ x: 1, y: 2 })
+        Matrix.translation({ x: 1, y: 2 })
       );
       parent.attachTo(parentOfParent);
 
-      const expectedGlobal = Matrix.identity.translate({ x: 4, y: 6 });
+      const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
     });
   });

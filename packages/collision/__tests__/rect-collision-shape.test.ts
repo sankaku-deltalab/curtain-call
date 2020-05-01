@@ -12,7 +12,7 @@ describe("@curtain-call/collision.RectCollisionShape", () => {
     const shape = new RectCollisionShape();
     shape.setSize({ x: 1, y: 2 });
     shape.trans.setLocal(
-      Matrix.identity.scale({ x: 5, y: 6 }).translate({ x: 3, y: 4 })
+      Matrix.scaling({ x: 5, y: 6 }).translated({ x: 3, y: 4 })
     );
 
     const expectedNW: [number, number] = [3 - (1 * 5) / 2, 4 - (2 * 6) / 2];

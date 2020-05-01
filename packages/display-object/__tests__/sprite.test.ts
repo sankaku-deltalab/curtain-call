@@ -13,7 +13,7 @@ describe("@curtain-call/display-object.Sprite", () => {
     const pixiSprite = new PIXI.Sprite();
     const sprite = new Sprite(pixiSprite);
 
-    sprite.trans.setLocal(Matrix.identity.translate({ x: 1, y: 2 }));
+    sprite.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
     sprite.update();
 
     expect(pixiSprite.position.x).toBeCloseTo(1);
