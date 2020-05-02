@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
-import { Scene } from "../src";
 import { Camera } from "@curtain-call/camera/src";
+import { Scene } from "../src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -51,6 +51,22 @@ const sceneWithMock = <T>(): {
 describe("@curtain-call/scene.Scene", () => {
   it("can be constructed without args", () => {
     expect(() => new Scene()).not.toThrowError();
+  });
+
+  it("can update drawing base", () => {
+    const { scene } = sceneWithMock();
+    const obj = new PIXI.Container();
+    obj.position = new PIXI.Point(1, 2);
+    scene.tail.addChild(obj);
+
+    scene.updateDrawBase({
+      center: { x: 3, y: 4 },
+      scale: 5,
+    });
+
+    const viewPos = obj.getGlobalPosition();
+    expect(viewPos.x).toBeCloseTo(8);
+    expect(viewPos.y).toBeCloseTo(14);
   });
 
   describe("can add actor", () => {

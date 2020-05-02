@@ -36,6 +36,7 @@
     "@curtain-call/actor": "^0.1.1",
     "@curtain-call/camera": "^0.1.1",
     "@curtain-call/display-object": "^0.1.1",
-    "pixi.js": "^5.2.3"
+    "pixi.js": "^5.2.3",
+    "trans-vector2d": "^2.0.0"
   }
 }

@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { VectorLike } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
@@ -12,8 +13,8 @@ export class Scene<T> {
   /**
    * @param head Root of PIXI objects.
    * @param tail Tail of PIXI objects.
-   * @param displayObject DisplayObjectContainer.
    * @param camera Camera.
+   * @param displayObject DisplayObjectContainer.
    */
   constructor(
     public readonly head = new PIXI.Container(),
@@ -25,6 +26,34 @@ export class Scene<T> {
     camera.tail.addChild(tail);
     tail.addChild(this.displayObject.container);
     this.displayObject = displayObject;
+  }
+
+  /**
+   * Update drawing base.
+   *
+   * @example
+   * const gameHeight = 400;
+   * const gameWidth = 300;
+   * const canvasHeight = window.innerHeight;
+   * const canvasWidth = window.innerWidth;
+   *
+   * const scene = new Scene().updateDrawBase({
+   *   center: { x: canvasWidth / 2, y: canvasHeight / 2 },
+   *   scale: Math.min(canvasHeight / gameHeight, canvasWidth / gameWidth),
+   * });
+   * @param base
+   * @returns this.
+   */
+  updateDrawBase(base: {
+    center?: VectorLike;
+    rotation?: number;
+    scale?: number;
+  }): this {
+    if (base.center)
+      this.head.position = new PIXI.Point(base.center.x, base.center.y);
+    if (base.rotation) this.head.rotation = base.rotation;
+    if (base.scale) this.head.scale = new PIXI.Point(base.scale, base.scale);
+    return this;
   }
 
   /**
