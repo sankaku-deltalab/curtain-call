@@ -11,7 +11,6 @@ import { pixiMatrixToMatrix2d } from "@curtain-call/util";
  */
 export class Scene<T> {
   private readonly actors = new Set<Actor<this>>();
-  private readonly pointerInputReceivers = new Set<PointerInputReceiver>();
 
   /**
    * @param head Root of PIXI objects.
@@ -31,24 +30,6 @@ export class Scene<T> {
     camera.tail.addChild(tail);
     tail.addChild(this.displayObject.container);
     this.displayObject = displayObject;
-
-    pointerInput.event.on("down", (canvasPos) => {
-      const gamePos = this.canvasPosToGamePos(canvasPos);
-      this.pointerInputReceivers.forEach((r) => r.event.emit("down", gamePos));
-    });
-
-    pointerInput.event.on("up", (canvasPos) => {
-      const gamePos = this.canvasPosToGamePos(canvasPos);
-      this.pointerInputReceivers.forEach((r) => r.event.emit("up", gamePos));
-    });
-
-    pointerInput.event.on("move", (canvasSrc, canvasDest) => {
-      const gameSrc = this.canvasPosToGamePos(canvasSrc);
-      const gameDest = this.canvasPosToGamePos(canvasDest);
-      this.pointerInputReceivers.forEach((r) =>
-        r.event.emit("move", gameSrc, gameDest)
-      );
-    });
   }
 
   /**
@@ -129,7 +110,9 @@ export class Scene<T> {
    * @returns this.
    */
   addPointerInputReceiver(receiver: PointerInputReceiver): this {
-    this.pointerInputReceivers.add(receiver);
+    this.pointerInput.addChild(receiver, (canvasPos) =>
+      this.canvasPosToGamePos(canvasPos)
+    );
     return this;
   }
 
@@ -140,7 +123,7 @@ export class Scene<T> {
    * @returns this.
    */
   removePointerInputReceiver(receiver: PointerInputReceiver): this {
-    this.pointerInputReceivers.delete(receiver);
+    this.pointerInput.removeChild(receiver);
     return this;
   }
 
