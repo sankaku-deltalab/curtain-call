@@ -1,10 +1,11 @@
 import { Vector } from "trans-vector2d";
 import { EventEmitter } from "eventemitter3";
+import { PointerInputReceiver } from "./pointer-input-receiver";
 
 /**
  * Receive pointer event from dom element.
  */
-export class PointerInput {
+export class PointerInput extends PointerInputReceiver {
   /** Event. */
   public readonly event = new EventEmitter<{
     down: [Vector];
