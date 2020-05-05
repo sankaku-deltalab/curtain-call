@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Scene } from "@curtain-call/scene";
+import { PointerInput } from "@curtain-call/input";
 
 /**
  * Engine is root of system.
@@ -14,8 +15,13 @@ export class Engine {
    *
    * @param canvas Rendering canvas.
    * @param sizeElement HTML element determine canvas size.
+   * @param pointerInput Pointer input receiver from dom element.
    */
-  constructor(canvas: HTMLCanvasElement, sizeElement: Window | HTMLElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    sizeElement: Window | HTMLElement,
+    public readonly pointerInput = new PointerInput()
+  ) {
     const resolution = window.devicePixelRatio;
     this.app = new PIXI.Application({
       resolution,
@@ -30,6 +36,8 @@ export class Engine {
       const deltaSec = deltaRate / PIXI.settings.TARGET_FPMS / 1000;
       this.scenes.forEach((scene) => scene.update(this, deltaSec));
     });
+
+    this.pointerInput.apply(canvas, canvas);
   }
 
   /**
@@ -61,6 +69,7 @@ export class Engine {
     if (this.scenes.has(scene)) throw new Error("Scene was already added");
     this.scenes.add(scene);
     this.app.stage.addChild(scene.head);
+    this.pointerInput.addChild(scene.pointerInput);
 
     return this;
   }
@@ -75,6 +84,7 @@ export class Engine {
     if (!this.scenes.has(scene)) throw new Error("Scene is not added");
     this.scenes.delete(scene);
     this.app.stage.removeChild(scene.head);
+    this.pointerInput.removeChild(scene.pointerInput);
 
     return this;
   }
