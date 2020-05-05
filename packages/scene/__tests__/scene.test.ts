@@ -4,6 +4,7 @@ import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
 import { Camera } from "@curtain-call/camera/src";
 import { Scene } from "../src";
 import { Vector } from "../../util/node_modules/trans-vector2d/dist";
+import { PointerInputReceiver } from "@curtain-call/input";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -37,6 +38,10 @@ const sceneWithMock = <T>(): {
   const camera = new Camera(pixiCameraHead, pixiCameraTail);
 
   const scene = new Scene(sceneHead, sceneTail, camera, DisplayObjectContainer);
+
+  const engineLikeContainer = new PIXI.Container();
+  engineLikeContainer.addChild(scene.head);
+
   return {
     sceneHead,
     sceneTail,
@@ -176,8 +181,6 @@ describe("@curtain-call/scene.Scene", () => {
   describe("can convert position between canvas and game", () => {
     it("so can convert canvas position to game position", () => {
       const { scene } = sceneWithMock();
-      const engineLikeContainer = new PIXI.Container();
-      engineLikeContainer.addChild(scene.head);
       scene.updateDrawBase({ center: { x: 1, y: 2 } });
 
       const canvasPos = { x: 3, y: 4 };
@@ -188,14 +191,37 @@ describe("@curtain-call/scene.Scene", () => {
 
     it("so can convert game position to canvas position", () => {
       const { scene } = sceneWithMock();
-      const engineLikeContainer = new PIXI.Container();
-      engineLikeContainer.addChild(scene.head);
       scene.updateDrawBase({ center: { x: 1, y: 2 } });
 
       const gamePos = { x: 3, y: 4 };
       const canvasPos = scene.gamePosToCanvasPos(gamePos);
 
       expect(canvasPos).toEqual(new Vector(4, 6));
+    });
+  });
+
+  describe("spread pointer input event", () => {
+    it("to added receivers", () => {
+      const { scene } = sceneWithMock();
+      const receiver = new PointerInputReceiver();
+      jest.spyOn(receiver.event, "emit");
+
+      scene.addPointerInputReceiver(receiver);
+      scene.pointerInput.event.emit("down", Vector.one);
+
+      expect(receiver.event.emit).toBeCalledWith("down", Vector.one);
+    });
+
+    it("and can remove added receivers", () => {
+      const { scene } = sceneWithMock();
+      const receiver = new PointerInputReceiver();
+      jest.spyOn(receiver.event, "emit");
+
+      scene.addPointerInputReceiver(receiver);
+      scene.removePointerInputReceiver(receiver);
+      scene.pointerInput.event.emit("down", Vector.one);
+
+      expect(receiver.event.emit).not.toBeCalled();
     });
   });
 });

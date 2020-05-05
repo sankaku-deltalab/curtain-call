@@ -3,6 +3,7 @@ import { VectorLike, Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
+import { PointerInputReceiver } from "@curtain-call/input";
 import { pixiMatrixToMatrix2d } from "@curtain-call/util";
 
 /**
@@ -10,23 +11,44 @@ import { pixiMatrixToMatrix2d } from "@curtain-call/util";
  */
 export class Scene<T> {
   private readonly actors = new Set<Actor<this>>();
+  private readonly pointerInputReceivers = new Set<PointerInputReceiver>();
 
   /**
    * @param head Root of PIXI objects.
    * @param tail Tail of PIXI objects.
    * @param camera Camera.
    * @param displayObject DisplayObjectContainer.
+   * @param pointerInput PointerInputReceiver.
    */
   constructor(
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container(),
     public readonly camera = new Camera(),
-    private readonly displayObject = new DisplayObjectManager<Scene<T>>()
+    private readonly displayObject = new DisplayObjectManager<Scene<T>>(),
+    public readonly pointerInput = new PointerInputReceiver()
   ) {
     head.addChild(camera.head);
     camera.tail.addChild(tail);
     tail.addChild(this.displayObject.container);
     this.displayObject = displayObject;
+
+    pointerInput.event.on("down", (canvasPos) => {
+      const gamePos = this.canvasPosToGamePos(canvasPos);
+      this.pointerInputReceivers.forEach((r) => r.event.emit("down", gamePos));
+    });
+
+    pointerInput.event.on("up", (canvasPos) => {
+      const gamePos = this.canvasPosToGamePos(canvasPos);
+      this.pointerInputReceivers.forEach((r) => r.event.emit("up", gamePos));
+    });
+
+    pointerInput.event.on("move", (canvasSrc, canvasDest) => {
+      const gameSrc = this.canvasPosToGamePos(canvasSrc);
+      const gameDest = this.canvasPosToGamePos(canvasDest);
+      this.pointerInputReceivers.forEach((r) =>
+        r.event.emit("move", gameSrc, gameDest)
+      );
+    });
   }
 
   /**
@@ -97,6 +119,28 @@ export class Scene<T> {
       this.displayObject.remove(obj);
     });
 
+    return this;
+  }
+
+  /**
+   * Add pointer input receiver.
+   *
+   * @param receiver
+   * @returns this.
+   */
+  addPointerInputReceiver(receiver: PointerInputReceiver): this {
+    this.pointerInputReceivers.add(receiver);
+    return this;
+  }
+
+  /**
+   * Remove pointer input receiver.
+   *
+   * @param receiver
+   * @returns this.
+   */
+  removePointerInputReceiver(receiver: PointerInputReceiver): this {
+    this.pointerInputReceivers.delete(receiver);
     return this;
   }
 
