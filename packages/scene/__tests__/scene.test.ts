@@ -3,6 +3,7 @@ import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
 import { Camera } from "@curtain-call/camera/src";
 import { Scene } from "../src";
+import { Vector } from "../../util/node_modules/trans-vector2d/dist";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -170,5 +171,31 @@ describe("@curtain-call/scene.Scene", () => {
     scene.update({}, deltaSec);
 
     expect(actor.update).toBeCalledWith(scene, deltaSec);
+  });
+
+  describe("can convert position between canvas and game", () => {
+    it("so can convert canvas position to game position", () => {
+      const { scene } = sceneWithMock();
+      const engineLikeContainer = new PIXI.Container();
+      engineLikeContainer.addChild(scene.head);
+      scene.updateDrawBase({ center: { x: 1, y: 2 } });
+
+      const canvasPos = { x: 3, y: 4 };
+      const gamePos = scene.canvasPosToGamePos(canvasPos);
+
+      expect(gamePos).toEqual(new Vector(2, 2));
+    });
+
+    it("so can convert game position to canvas position", () => {
+      const { scene } = sceneWithMock();
+      const engineLikeContainer = new PIXI.Container();
+      engineLikeContainer.addChild(scene.head);
+      scene.updateDrawBase({ center: { x: 1, y: 2 } });
+
+      const gamePos = { x: 3, y: 4 };
+      const canvasPos = scene.gamePosToCanvasPos(gamePos);
+
+      expect(canvasPos).toEqual(new Vector(4, 6));
+    });
   });
 });

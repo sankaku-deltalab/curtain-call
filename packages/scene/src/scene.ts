@@ -1,8 +1,9 @@
 import * as PIXI from "pixi.js";
-import { VectorLike } from "trans-vector2d";
+import { VectorLike, Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
+import { pixiMatrixToMatrix2d } from "../../util/dist";
 
 /**
  * Scene is root of game scene.
@@ -97,6 +98,30 @@ export class Scene<T> {
     });
 
     return this;
+  }
+
+  /**
+   * Convert canvas position to game position.
+   *
+   * @param canvasPos Canvas position.
+   * @returns Game position.
+   */
+  public canvasPosToGamePos(canvasPos: VectorLike): Vector {
+    this.head.updateTransform();
+    const sceneTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+    return sceneTrans.localizePoint(canvasPos);
+  }
+
+  /**
+   * Convert game position to canvas position.
+   *
+   * @param gamePos Game position.
+   * @returns Canvas position.
+   */
+  public gamePosToCanvasPos(gamePos: VectorLike): Vector {
+    this.head.updateTransform();
+    const sceneTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+    return sceneTrans.globalizePoint(gamePos);
   }
 
   private updatePixiDisplayObject(): void {
