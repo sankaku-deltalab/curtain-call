@@ -62,4 +62,18 @@ describe("@curtain-call/collision.Collision", () => {
 
     expect(collision.getBox2Ds()).toEqual([box1, box2]);
   });
+
+  describe("can set is-huge-number", () => {
+    it("and not huge-number at default", () => {
+      const collision = new Collision();
+
+      expect(collision.isHugeNumber()).toBe(false);
+    });
+
+    it("and can change by function", () => {
+      const collision = new Collision().setIsHugeNumber(true);
+
+      expect(collision.isHugeNumber()).toBe(true);
+    });
+  });
 });

@@ -1,3 +1,4 @@
+import { EventEmitter } from "eventemitter3";
 import { Transformation } from "@curtain-call/util";
 import { CollisionShape } from "./collision-shape";
 import { Box2d } from "./common";
@@ -5,7 +6,13 @@ import { Box2d } from "./common";
 /**
  * Collision.
  */
-export class Collision {
+export class Collision<T> {
+  /** Events. */
+  public readonly event = new EventEmitter<{
+    overlapped: [T, Set<Collision<T>>];
+  }>();
+
+  private isHugeNumberInternal = false;
   private readonly shapes = new Set<CollisionShape>();
 
   /**
@@ -50,5 +57,27 @@ export class Collision {
       boxes = [...boxes, ...shape.getBox2Ds()];
     });
     return boxes;
+  }
+
+  /**
+   * Set self is huge number collision.
+   *
+   * Huge number collision will collide with only non-huge number collisions.
+   *
+   * @param isHuge
+   * @return this.
+   */
+  setIsHugeNumber(isHuge: boolean): this {
+    this.isHugeNumberInternal = isHuge;
+    return this;
+  }
+
+  /**
+   * Self is huge number collision.
+   *
+   * @returns this.
+   */
+  isHugeNumber(): boolean {
+    return this.isHugeNumberInternal;
   }
 }

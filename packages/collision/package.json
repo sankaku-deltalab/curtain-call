@@ -36,6 +36,7 @@
   "dependencies": {
     "@curtain-call/util": "^0.1.1",
     "box-intersect": "^1.0.2",
+    "eventemitter3": "^4.0.0",
     "trans-vector2d": "^2.0.0"
   }
 }
