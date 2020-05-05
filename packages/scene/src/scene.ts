@@ -3,7 +3,7 @@ import { VectorLike, Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
-import { pixiMatrixToMatrix2d } from "../../util/dist";
+import { pixiMatrixToMatrix2d } from "@curtain-call/util";
 
 /**
  * Scene is root of game scene.
