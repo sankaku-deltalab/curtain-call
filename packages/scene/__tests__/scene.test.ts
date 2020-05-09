@@ -1,16 +1,24 @@
 import * as PIXI from "pixi.js";
+import { Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
-import { Camera } from "@curtain-call/camera/src";
-import { Scene } from "../src";
-import { Vector } from "../../util/node_modules/trans-vector2d/dist";
+import { Camera } from "@curtain-call/camera";
+import { Updatable } from "@curtain-call/util";
 import { PointerInputReceiver } from "@curtain-call/input";
+import { Scene } from "../src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
   jest.spyOn(container, "addChild");
   jest.spyOn(container, "removeChild");
   return container;
+};
+
+const updatableMock = <T>(): Updatable<T> => {
+  const cls = jest.fn(() => ({
+    update: jest.fn(),
+  }));
+  return new cls();
 };
 
 const sceneWithMock = <T>(): {
@@ -223,5 +231,27 @@ describe("@curtain-call/scene.Scene", () => {
 
       expect(receiver.event.emit).not.toBeCalled();
     });
+  });
+
+  it("can add Updatable objects", () => {
+    const { scene } = sceneWithMock();
+    const updatable = updatableMock();
+
+    const deltaSec = 123;
+    scene.addUpdatable(updatable);
+    scene.update({}, deltaSec);
+
+    expect(updatable.update).toBeCalledWith(scene, deltaSec);
+  });
+
+  it("can remove Updatable objects", () => {
+    const { scene } = sceneWithMock();
+    const updatable = updatableMock();
+
+    const deltaSec = 123;
+    scene.addUpdatable(updatable).removeUpdatable(updatable);
+    scene.update({}, deltaSec);
+
+    expect(updatable.update).not.toBeCalled();
   });
 });

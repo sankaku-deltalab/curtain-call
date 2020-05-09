@@ -4,13 +4,14 @@ import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
 import { PointerInputReceiver } from "@curtain-call/input";
-import { pixiMatrixToMatrix2d } from "@curtain-call/util";
+import { pixiMatrixToMatrix2d, Updatable } from "@curtain-call/util";
 
 /**
  * Scene is root of game scene.
  */
 export class Scene<T> {
   private readonly actors = new Set<Actor<this>>();
+  private readonly updatable = new Set<Updatable<this>>();
 
   /**
    * @param head Root of PIXI objects.
@@ -61,13 +62,13 @@ export class Scene<T> {
   }
 
   /**
-   * Update this and contained actor.
+   * Update this and contained Updatable object.
    *
    * @param _owner Engine like thing.
    * @param deltaSec Update delta seconds.
    */
   update(_owner: T, deltaSec: number): void {
-    this.actors.forEach((actor) => actor.update(this, deltaSec));
+    this.updatable.forEach((up) => up.update(this, deltaSec));
     this.displayObject.update(this, deltaSec);
 
     this.updatePixiDisplayObject();
@@ -82,6 +83,7 @@ export class Scene<T> {
   addActor(actor: Actor<this>): this {
     if (this.actors.has(actor)) throw new Error("Actor was already added");
     this.actors.add(actor);
+    this.addUpdatableInternal(actor);
     return this;
   }
 
@@ -95,11 +97,40 @@ export class Scene<T> {
     const removed = this.actors.delete(actor);
     if (!removed) throw new Error("Actor was not added");
 
+    this.removeUpdatableInternal(actor);
     actor.displayObjects.forEach((obj) => {
       if (!this.displayObject.has(obj)) return;
       this.displayObject.remove(obj);
     });
 
+    return this;
+  }
+
+  /**
+   * Add Updatable object.
+   *
+   * @warn Do not add `Actor`. Use `addActor` instead.
+   * @param updatable Adding Updatable object.
+   * @returns this.
+   */
+  addUpdatable(updatable: Updatable<this>): this {
+    if (updatable instanceof Actor)
+      throw new Error("Do not add Actor as Updatable");
+    this.updatable.add(updatable);
+    return this;
+  }
+
+  /**
+   * Remove Updatable object.
+   *
+   * @warn Do not remove `Actor`. Use `removeActor` instead.
+   * @param updatable Removing Updatable object.
+   * @returns this.
+   */
+  removeUpdatable(updatable: Updatable<this>): this {
+    if (updatable instanceof Actor)
+      throw new Error("Do not remove Actor as Updatable");
+    this.updatable.delete(updatable);
     return this;
   }
 
@@ -149,6 +180,16 @@ export class Scene<T> {
     this.head.updateTransform();
     const sceneTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
     return sceneTrans.globalizePoint(gamePos);
+  }
+
+  private addUpdatableInternal(updatable: Updatable<this>): this {
+    this.updatable.add(updatable);
+    return this;
+  }
+
+  private removeUpdatableInternal(updatable: Updatable<this>): this {
+    this.updatable.delete(updatable);
+    return this;
   }
 
   private updatePixiDisplayObject(): void {
