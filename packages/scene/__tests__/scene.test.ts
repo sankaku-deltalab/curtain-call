@@ -79,7 +79,7 @@ describe("@curtain-call/scene.Scene", () => {
     it("by function", () => {
       const { scene } = sceneWithMock();
 
-      const actor = new Actor();
+      const actor = new Actor<typeof scene>();
 
       expect(() => scene.addActor(actor)).not.toThrowError();
     });
@@ -87,7 +87,7 @@ describe("@curtain-call/scene.Scene", () => {
     it("but throw error when add already added actor", () => {
       const { scene } = sceneWithMock();
 
-      const actor = new Actor();
+      const actor = new Actor<typeof scene>();
       scene.addActor(actor);
       expect(() => scene.addActor(actor)).toThrowError();
     });
@@ -97,7 +97,7 @@ describe("@curtain-call/scene.Scene", () => {
     it("by function", () => {
       const { scene } = sceneWithMock();
 
-      const actor = new Actor();
+      const actor = new Actor<typeof scene>();
       scene.addActor(actor);
 
       expect(() => scene.removeActor(actor)).not.toThrowError();
@@ -106,14 +106,14 @@ describe("@curtain-call/scene.Scene", () => {
     it("but throw error when remove not added actor", () => {
       const { scene } = sceneWithMock();
 
-      const actor = new Actor();
+      const actor = new Actor<typeof scene>();
       expect(() => scene.removeActor(actor)).toThrowError();
     });
   });
 
   describe("use DisplayObject", () => {
     const actorMock = <T>(): { actor: Actor<T>; sprite: Sprite<T> } => {
-      const actor = new Actor();
+      const actor = new Actor<T>();
       const sprite = new Sprite();
       actor.displayObjects.add(sprite);
       return { actor, sprite };
@@ -130,7 +130,7 @@ describe("@curtain-call/scene.Scene", () => {
         scene,
         displayObjectManager: DisplayObjectContainer,
       } = sceneWithMock();
-      const { actor, sprite } = actorMock();
+      const { actor, sprite } = actorMock<typeof scene>();
 
       scene.addActor(actor);
       scene.update({}, 0.125);
@@ -143,7 +143,7 @@ describe("@curtain-call/scene.Scene", () => {
         scene,
         displayObjectManager: DisplayObjectContainer,
       } = sceneWithMock();
-      const { actor, sprite } = actorMock();
+      const { actor, sprite } = actorMock<typeof scene>();
 
       scene.addActor(actor);
       scene.update({}, 0.125);
@@ -168,7 +168,7 @@ describe("@curtain-call/scene.Scene", () => {
 
   it("can update added actors", () => {
     const { scene } = sceneWithMock();
-    const actor = new Actor();
+    const actor = new Actor<typeof scene>();
     jest.spyOn(actor, "update").mockImplementation();
     scene.addActor(actor);
 
