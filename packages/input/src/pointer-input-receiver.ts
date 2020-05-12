@@ -10,6 +10,7 @@ export class PointerInputReceiver {
     down: [Vector];
     up: [Vector];
     move: [Vector, Vector];
+    tap: [ReadonlyArray<Vector>];
   }>();
 
   constructor() {
@@ -26,6 +27,14 @@ export class PointerInputReceiver {
     this.event.on("move", (src, dest) => {
       this.children.forEach((converter, child) => {
         child.event.emit("move", converter(src), converter(dest));
+      });
+    });
+    this.event.on("tap", (positions) => {
+      this.children.forEach((converter, child) => {
+        child.event.emit(
+          "tap",
+          positions.map((pos) => converter(pos))
+        );
       });
     });
   }

@@ -1,19 +1,22 @@
 import { Vector } from "trans-vector2d";
-import { EventEmitter } from "eventemitter3";
 import { PointerInputReceiver } from "./pointer-input-receiver";
+import { TapRecognizer } from "./tap-recognizer";
 
 /**
  * Receive pointer event from dom element.
  */
 export class PointerInput extends PointerInputReceiver {
-  /** Event. */
-  public readonly event = new EventEmitter<{
-    down: [Vector];
-    up: [Vector];
-    move: [Vector, Vector];
-  }>();
+  private prevMovePos = Vector.zero;
 
-  private prevDownPos = Vector.zero;
+  constructor(
+    private readonly date = new Date(),
+    private readonly tapRecognizer = new TapRecognizer()
+  ) {
+    super();
+    this.tapRecognizer.event.on("tap", (positions) => {
+      this.event.emit("tap", positions);
+    });
+  }
 
   /**
    * Add event to element.
@@ -36,23 +39,30 @@ export class PointerInput extends PointerInputReceiver {
     input.addEventListener("pointerdown", (event) => {
       const ev = event as PointerEvent;
       const downPos = Vector.from(ev).add(inputToCanvas);
-      this.prevDownPos = downPos;
+      this.prevMovePos = downPos;
       this.event.emit("down", downPos);
+      this.tapRecognizer.down(downPos, this.nowSec());
     });
 
     input.addEventListener("pointerup", (event) => {
       const ev = event as PointerEvent;
-      this.event.emit("up", Vector.from(ev).add(inputToCanvas));
+      const upPos = Vector.from(ev).add(inputToCanvas);
+      this.event.emit("up", upPos);
+      this.tapRecognizer.up(upPos, this.nowSec());
     });
 
     input.addEventListener("pointermove", (event) => {
       const ev = event as PointerEvent;
-      const src = this.prevDownPos;
+      const src = this.prevMovePos;
       const dest = Vector.from(ev).add(inputToCanvas);
-      this.prevDownPos = dest;
+      this.prevMovePos = dest;
       this.event.emit("move", src, dest);
     });
 
     return this;
+  }
+
+  private nowSec(): number {
+    return this.date.getTime() / 1000;
   }
 }
