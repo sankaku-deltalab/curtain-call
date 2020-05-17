@@ -1,6 +1,6 @@
 import { Graph, alg, Path } from "graphlib";
-import { Level } from "./level";
 import { Asset } from "@curtain-call/asset";
+import { Level } from "./level";
 
 export interface LevelNetwork<T> {
   readonly initialLevel: Level<T>;
