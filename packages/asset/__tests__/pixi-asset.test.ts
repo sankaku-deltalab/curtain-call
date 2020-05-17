@@ -22,7 +22,6 @@ describe("@curtain-call/asset.PixiAsset", () => {
     expect(loader.add).toBeCalledWith("./path/to/pl.jpg", "./path/to/pl.jpg");
     expect(loader.add).toBeCalledWith("./path/to/en.jpg", "./path/to/en.jpg");
     expect(loader.load).toBeCalled();
-    expect(asset.get("player")).toBe("./path/to/pl.jpg");
   });
 
   it("can unload", async () => {
@@ -36,6 +35,18 @@ describe("@curtain-call/asset.PixiAsset", () => {
     asset.unload();
 
     expect(loader.reset).toBeCalled();
+  });
+
+  it("can get resource", async () => {
+    const loader = loaderMock();
+    const asset = new PixiAsset(
+      { player: "./path/to/pl.jpg", enemy: "./path/to/en.jpg" },
+      loader
+    );
+
+    await asset.load();
+
+    expect(asset.get("player")).toBe(loader.resources["player"]);
   });
 
   it("can not get image while unloaded", async () => {
