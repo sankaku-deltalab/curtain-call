@@ -33,7 +33,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "pixi.js": "^5.2.3",
+    "pixi.js": "^5.2.4",
     "trans-vector2d": "^2.0.0"
   }
 }
