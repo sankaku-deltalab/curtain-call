@@ -16,5 +16,40 @@ describe("@curtain-call/actor", () => {
 
       expect(actor.displayObjects.trans).toBeInstanceOf(Transformation);
     });
+
+    it("and update them", () => {
+      const actor = new Actor<{}>();
+      jest.spyOn(actor.displayObjects, "update");
+
+      const scene = jest.fn();
+      const deltaSec = 0.125;
+      actor.update(scene, deltaSec);
+
+      expect(actor.displayObjects.update).toBeCalledWith(scene, deltaSec);
+    });
+  });
+
+  describe("can emit scene event", () => {
+    it("when added", () => {
+      const func = jest.fn();
+      const actor = new Actor();
+      actor.event.on("addedToScene", func);
+
+      const scene = jest.fn();
+      actor.notifyAddedToScene(scene);
+
+      expect(func).toBeCalledWith(scene);
+    });
+
+    it("when removed", () => {
+      const func = jest.fn();
+      const actor = new Actor();
+      actor.event.on("removedFromScene", func);
+
+      const scene = jest.fn();
+      actor.notifyRemovedFromScene(scene);
+
+      expect(func).toBeCalledWith(scene);
+    });
   });
 });
