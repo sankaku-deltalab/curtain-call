@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
+import { Matrix, Vector } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
 import { Sprite } from "../src";
-import { Matrix, Vector } from "@curtain-call/util/node_modules/trans-vector2d";
 
 describe("@curtain-call/display-object.Sprite", () => {
   it("has Transformation", () => {
