@@ -92,6 +92,16 @@ describe("@curtain-call/scene.Scene", () => {
       expect(() => scene.addActor(actor)).not.toThrowError();
     });
 
+    it("and notify it to actor", () => {
+      const { scene } = sceneWithMock();
+
+      const actor = new Actor<typeof scene>();
+      jest.spyOn(actor, "notifyAddedToScene");
+      scene.addActor(actor);
+
+      expect(actor.notifyAddedToScene).toBeCalledWith(scene);
+    });
+
     it("but throw error when add already added actor", () => {
       const { scene } = sceneWithMock();
 
@@ -109,6 +119,17 @@ describe("@curtain-call/scene.Scene", () => {
       scene.addActor(actor);
 
       expect(() => scene.removeActor(actor)).not.toThrowError();
+    });
+
+    it("and notify it to actor", () => {
+      const { scene } = sceneWithMock();
+
+      const actor = new Actor<typeof scene>();
+      jest.spyOn(actor, "notifyRemovedFromScene");
+      scene.addActor(actor);
+      scene.removeActor(actor);
+
+      expect(actor.notifyRemovedFromScene).toBeCalledWith(scene);
     });
 
     it("but throw error when remove not added actor", () => {

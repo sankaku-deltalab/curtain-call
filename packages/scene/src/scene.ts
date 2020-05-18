@@ -84,6 +84,7 @@ export class Scene<T> {
     if (this.actors.has(actor)) throw new Error("Actor was already added");
     this.actors.add(actor);
     this.addUpdatableInternal(actor);
+    actor.notifyAddedToScene(this);
     return this;
   }
 
@@ -102,6 +103,7 @@ export class Scene<T> {
       if (!this.displayObject.has(obj)) return;
       this.displayObject.remove(obj);
     });
+    actor.notifyRemovedFromScene(this);
 
     return this;
   }
