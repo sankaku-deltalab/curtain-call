@@ -5,7 +5,7 @@ import { Mover } from "./mover";
 /**
  * Move by pointer movement.
  */
-export class PointerMover<T, A> implements Mover<T, A> {
+export class PointerMover<T> implements Mover<T> {
   private delta = Vector.zero;
   private scale = 1;
 
@@ -56,17 +56,17 @@ export class PointerMover<T, A> implements Mover<T, A> {
    *
    * @param _scene Scene.
    * @param _deltaSec Delta seconds.
-   * @param _moving Moving Actor.
-   * @returns Transformation delta and movement was done.
+   * @param currentTrans Current transform.
+   * @returns New transformation and movement was done.
    */
   update(
     _scene: T,
     _deltaSec: number,
-    _moving: A
-  ): { done: boolean; deltaMat: Matrix } {
+    currentTrans: Matrix
+  ): { done: boolean; newTrans: Matrix } {
     const delta = this.delta.mlt(this.scale);
     this.delta = Vector.zero;
 
-    return { done: false, deltaMat: Matrix.translation(delta) };
+    return { done: false, newTrans: currentTrans.translated(delta) };
   }
 }

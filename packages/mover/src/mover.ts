@@ -1,17 +1,17 @@
 import { Matrix } from "trans-vector2d";
 
-export interface Mover<T, A> {
+export interface Mover<T> {
   /**
    * Update movement and return transformation delta
    *
    * @param scene Scene.
    * @param deltaSec Delta seconds.
-   * @param moving Moving Actor.
-   * @returns Transformation delta and movement was done.
+   * @param currentTrans Current transform.
+   * @returns New transformation and movement was done.
    */
   update(
     scene: T,
     deltaSec: number,
-    moving: A
-  ): { done: boolean; deltaMat: Matrix };
+    currentTrans: Matrix
+  ): { done: boolean; newTrans: Matrix };
 }
