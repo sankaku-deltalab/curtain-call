@@ -3,7 +3,7 @@ import { MoveRoute, RouteMover } from "../src";
 
 const routeMock = <T>(done: boolean, x: number, y: number): MoveRoute<T> => {
   const cls = jest.fn(() => ({
-    getTransformationAt: jest
+    getPosition: jest
       .fn()
       .mockReturnValue({ done, position: new Vector(x, y) }),
   }));

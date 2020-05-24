@@ -2,9 +2,16 @@ import { Matrix, Vector } from "trans-vector2d";
 import { Mover } from "./mover";
 
 export interface MoveRoute<T> {
-  getTransformationAt(
+  /**
+   * Get route position and route finished.
+   *
+   * @param scene Scene.
+   * @param elapsedSec Elapsed seconds.
+   * @returns Route position and route finished.
+   */
+  getPosition(
     scene: T,
-    secondsFromStart: number
+    elapsedSec: number
   ): { done: boolean; position: Vector };
 }
 
@@ -13,7 +20,7 @@ export interface MoveRoute<T> {
  */
 export class RouteMover<T> implements Mover<T> {
   private route?: MoveRoute<T>;
-  private secondsFromStart = 0;
+  private elapsedSec = 0;
   private isRunning = false;
   private prevPos = Vector.zero;
 
@@ -25,7 +32,7 @@ export class RouteMover<T> implements Mover<T> {
    */
   start(route: MoveRoute<T>): this {
     this.route = route;
-    this.secondsFromStart = 0;
+    this.elapsedSec = 0;
     this.isRunning = true;
     return this;
   }
@@ -53,13 +60,13 @@ export class RouteMover<T> implements Mover<T> {
     if (!this.route || !this.isRunning)
       return { done: true, newTrans: currentTrans };
 
-    const prevTime = this.secondsFromStart;
+    const prevTime = this.elapsedSec;
     const nextTime = prevTime + deltaSec;
 
-    const { done, position } = this.route.getTransformationAt(scene, nextTime);
+    const { done, position } = this.route.getPosition(scene, nextTime);
     const delta = position.sub(this.prevPos);
 
-    this.secondsFromStart = nextTime;
+    this.elapsedSec = nextTime;
     this.prevPos = position;
     return { done, newTrans: currentTrans.translated(delta) };
   }
