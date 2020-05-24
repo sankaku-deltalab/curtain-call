@@ -1,5 +1,5 @@
 import { Level } from "./level";
-import { LevelNetwork } from "./networked-level";
+import { LevelNetwork } from "./networked-levels";
 
 /**
  * Create sequential level network for `NetworkedLevels`.
