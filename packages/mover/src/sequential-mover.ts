@@ -2,7 +2,7 @@ import { Matrix } from "trans-vector2d";
 import { Mover } from "./mover";
 
 /**
- * Compute movement with route.
+ * Use multiple mover sequentially.
  */
 export class SequentialMover<T> implements Mover<T> {
   private movers: readonly Mover<T>[] = [];
