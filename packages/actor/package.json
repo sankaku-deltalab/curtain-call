@@ -35,6 +35,7 @@
   "dependencies": {
     "@curtain-call/display-object": "^0.1.1",
     "@curtain-call/health": "^0.1.1",
+    "@curtain-call/mover": "^0.1.1",
     "@curtain-call/util": "^0.1.1",
     "eventemitter3": "^4.0.4",
     "pixi.js": "^5.2.4",
