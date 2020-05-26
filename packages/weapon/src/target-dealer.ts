@@ -1,11 +1,11 @@
 import { Transformation } from "@curtain-call/util";
 
 export interface TargetDealer<T> {
-  get(scene: T): Transformation | undefined;
+  get(world: T): Transformation | undefined;
 }
 
 export class NonTargetDealer<T> implements TargetDealer<T> {
-  get(_scene: T): undefined {
+  get(_world: T): undefined {
     return undefined;
   }
 }

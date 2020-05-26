@@ -22,13 +22,13 @@ describe("@curtain-call/mover.RouteMover", () => {
 
     mover.start(route);
 
-    const scene = jest.fn();
+    const world = jest.fn();
     const deltaSec = 123;
     const expectedTrans = Matrix.from({
       translation: new Vector(4, 6),
       rotation: 1,
     });
-    expect(mover.update(scene, deltaSec, currentTrans)).toStrictEqual({
+    expect(mover.update(world, deltaSec, currentTrans)).toStrictEqual({
       done: false,
       newTrans: expectedTrans,
     });
@@ -41,9 +41,9 @@ describe("@curtain-call/mover.RouteMover", () => {
     mover.start(route);
     mover.abort();
 
-    const scene = jest.fn();
+    const world = jest.fn();
     const deltaSec = 123;
-    expect(mover.update(scene, deltaSec, currentTrans)).toStrictEqual({
+    expect(mover.update(world, deltaSec, currentTrans)).toStrictEqual({
       done: true,
       newTrans: currentTrans,
     });

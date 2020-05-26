@@ -29,16 +29,16 @@ export interface Level<T> extends Updatable<T> {
   /**
    * Activate level.
    *
-   * @param scene Scene.
+   * @param world World.
    */
-  activate(scene: T): void;
+  activate(world: T): void;
 
   /**
    * Deactivate level.
    *
-   * @param scene
+   * @param world
    */
-  deactivate(scene: T): void;
+  deactivate(world: T): void;
 
   /**
    * Level is activated.
@@ -50,8 +50,8 @@ export interface Level<T> extends Updatable<T> {
   /**
    * Update level.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(scene: T, deltaSec: number): void;
+  update(world: T, deltaSec: number): void;
 }

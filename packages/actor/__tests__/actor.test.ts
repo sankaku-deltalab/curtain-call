@@ -21,11 +21,11 @@ describe("@curtain-call/actor.Actor", () => {
       const actor = new Actor<{}>();
       jest.spyOn(actor.displayObjects, "update");
 
-      const scene = jest.fn();
+      const world = jest.fn();
       const deltaSec = 0.125;
-      actor.update(scene, deltaSec);
+      actor.update(world, deltaSec);
 
-      expect(actor.displayObjects.update).toBeCalledWith(scene, deltaSec);
+      expect(actor.displayObjects.update).toBeCalledWith(world, deltaSec);
     });
   });
   describe("has Movers", () => {
@@ -45,36 +45,36 @@ describe("@curtain-call/actor.Actor", () => {
         newTrans,
       });
 
-      const scene = jest.fn();
+      const world = jest.fn();
       const deltaSec = 0.125;
-      actor.update(scene, deltaSec);
+      actor.update(world, deltaSec);
 
-      expect(actor.movers.update).toBeCalledWith(scene, deltaSec, currentTrans);
+      expect(actor.movers.update).toBeCalledWith(world, deltaSec, currentTrans);
       expect(actor.trans.getLocal()).toEqual(newTrans);
     });
   });
 
-  describe("can emit scene event", () => {
+  describe("can emit world event", () => {
     it("when added", () => {
       const func = jest.fn();
       const actor = new Actor();
-      actor.event.on("addedToScene", func);
+      actor.event.on("addedToWorld", func);
 
-      const scene = jest.fn();
-      actor.notifyAddedToScene(scene);
+      const world = jest.fn();
+      actor.notifyAddedToWorld(world);
 
-      expect(func).toBeCalledWith(scene);
+      expect(func).toBeCalledWith(world);
     });
 
     it("when removed", () => {
       const func = jest.fn();
       const actor = new Actor();
-      actor.event.on("removedFromScene", func);
+      actor.event.on("removedFromWorld", func);
 
-      const scene = jest.fn();
-      actor.notifyRemovedFromScene(scene);
+      const world = jest.fn();
+      actor.notifyRemovedFromWorld(world);
 
-      expect(func).toBeCalledWith(scene);
+      expect(func).toBeCalledWith(world);
     });
   });
 });

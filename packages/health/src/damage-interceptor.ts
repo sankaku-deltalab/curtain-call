@@ -6,7 +6,7 @@ export interface DamageInterceptor<T> {
   /**
    * Take damage to self.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param damage Damage amount.
    * @param dealer Damage dealer dealing directory.
    * @param type Damage type.
@@ -14,7 +14,7 @@ export interface DamageInterceptor<T> {
    * @returns Modified damage.
    */
   interceptDamage(
-    scene: T,
+    world: T,
     damage: number,
     dealer: DamageDealer<T>,
     type: DamageType,

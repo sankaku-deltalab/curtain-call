@@ -17,13 +17,13 @@ export class SequentialMover<T> implements Mover<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    scene: T,
+    world: T,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
@@ -31,7 +31,7 @@ export class SequentialMover<T> implements Mover<T> {
       return { done: true, newTrans: currentTrans };
 
     const r = this.movers[this.currentMoverIndex].update(
-      scene,
+      world,
       deltaSec,
       currentTrans
     );

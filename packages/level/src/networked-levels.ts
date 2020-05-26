@@ -29,7 +29,7 @@ export interface LevelNetwork<T> {
  * ]
  * await level.load();
  *
- * level.activate(scene);
+ * level.activate(world);
  * // await finish level1
  *
  * level.moveTo(result1);
@@ -94,19 +94,19 @@ export class NetworkedLevels<T> implements Level<T> {
   /**
    * Activate level.
    *
-   * @param scene Scene.
+   * @param world World.
    */
-  activate(scene: T): void {
-    this.updateActivatingFor(scene, this.currentLevel);
+  activate(world: T): void {
+    this.updateActivatingFor(world, this.currentLevel);
   }
 
   /**
    * Deactivate level.
    *
-   * @param scene
+   * @param world
    */
-  deactivate(scene: T): void {
-    this.network.levels.forEach((level) => level.deactivate(scene));
+  deactivate(world: T): void {
+    this.network.levels.forEach((level) => level.deactivate(world));
   }
 
   /**
@@ -124,11 +124,11 @@ export class NetworkedLevels<T> implements Level<T> {
   /**
    * Update level.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(scene: T, deltaSec: number): void {
-    this.network.levels.forEach((level) => level.update(scene, deltaSec));
+  update(world: T, deltaSec: number): void {
+    this.network.levels.forEach((level) => level.update(world, deltaSec));
   }
 
   /**
@@ -145,14 +145,14 @@ export class NetworkedLevels<T> implements Level<T> {
   /**
    * Move to level.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param level Destination.
    */
-  moveTo(scene: T, level: Level<T>): void {
+  moveTo(world: T, level: Level<T>): void {
     if (!this.levelSet.has(level)) throw new Error();
     this.currentLevel = level;
     this.updateLoadingFor(level);
-    this.updateActivatingFor(scene, level);
+    this.updateActivatingFor(world, level);
   }
 
   private getNearLevels(src: Level<T>, distance: number): Level<T>[] {
@@ -183,10 +183,10 @@ export class NetworkedLevels<T> implements Level<T> {
     await Promise.all(loadings);
   }
 
-  private updateActivatingFor(scene: T, level: Level<T>): void {
+  private updateActivatingFor(world: T, level: Level<T>): void {
     const distance = this.network.activateDistance;
-    this.getFarLevels(level, distance).forEach((lv) => lv.deactivate(scene));
-    this.getNearLevels(level, distance).map((lv) => lv.activate(scene));
+    this.getFarLevels(level, distance).forEach((lv) => lv.deactivate(world));
+    this.getNearLevels(level, distance).map((lv) => lv.activate(world));
   }
 
   private createGraph(

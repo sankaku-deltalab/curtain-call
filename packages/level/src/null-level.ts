@@ -36,18 +36,18 @@ export class NullLevel<T> implements Level<T> {
   /**
    * Activate level.
    *
-   * @param _scene Scene.
+   * @param _world World.
    */
-  activate(_scene: T): void {
+  activate(_world: T): void {
     this.isActiveInternal = true;
   }
 
   /**
    * Deactivate level.
    *
-   * @param _scene
+   * @param _world
    */
-  deactivate(_scene: T): void {
+  deactivate(_world: T): void {
     this.isActiveInternal = false;
   }
 
@@ -63,8 +63,8 @@ export class NullLevel<T> implements Level<T> {
   /**
    * Update level.
    *
-   * @param _scene Scene.
+   * @param _world World.
    * @param _deltaSec Delta seconds.
    */
-  update(_scene: T, _deltaSec: number): void {}
+  update(_world: T, _deltaSec: number): void {}
 }

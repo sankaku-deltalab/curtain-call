@@ -25,16 +25,16 @@ const damageDealerMock = <T>(): DamageDealer<T> => {
 };
 
 const startArgsMock = <T, A>(
-  scene: T
+  world: T
 ): {
-  scene: T;
+  world: T;
   guntree: gt.Gun;
   muzzles: Map<string, Transformation>;
   bulletGenerator: BulletGenerator<T, A>;
   targetDealer: TargetDealer<T>;
   damageDealer: DamageDealer<T>;
 } => ({
-  scene,
+  world,
   guntree: exampleGun(),
   muzzles: new Map([["center", new Transformation()]]),
   bulletGenerator: bulletGeneratorMock(),
@@ -45,15 +45,15 @@ const startArgsMock = <T, A>(
 describe("@curtain-call/weapon.GunTreeWeapon", () => {
   describe("can fire", () => {
     it("can start firing", () => {
-      const scene = {};
+      const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof scene, typeof bullet>();
+      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
 
-      const args = startArgsMock<typeof scene, typeof bullet>(scene);
+      const args = startArgsMock<typeof world, typeof bullet>(world);
       weapon.start(args);
 
       expect(args.bulletGenerator.generate).toBeCalledWith(
-        scene,
+        world,
         weapon,
         args.muzzles.get("center")?.getGlobal(),
         0,
@@ -66,62 +66,62 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
     });
 
     it("can update firing", () => {
-      const scene = {};
+      const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof scene, typeof bullet>();
+      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = startArgsMock<typeof scene, typeof bullet>(scene);
+      const args = startArgsMock<typeof world, typeof bullet>(world);
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.start(args);
-      expect(weapon.event.emit).toBeCalledWith("fired", scene, bullet);
+      expect(weapon.event.emit).toBeCalledWith("fired", world, bullet);
 
-      weapon.update(scene, 60);
-      expect(weapon.event.emit).toBeCalledWith("finished", scene);
+      weapon.update(world, 60);
+      expect(weapon.event.emit).toBeCalledWith("finished", world);
     });
 
     it("can stop firing", () => {
-      const scene = {};
+      const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof scene, typeof bullet>();
+      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = startArgsMock<typeof scene, typeof bullet>(scene);
+      const args = startArgsMock<typeof world, typeof bullet>(world);
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.start(args);
       weapon.stop();
 
-      weapon.update(scene, 60);
-      expect(weapon.event.emit).toBeCalledWith("finished", scene);
+      weapon.update(world, 60);
+      expect(weapon.event.emit).toBeCalledWith("finished", world);
       expect(weapon.isFiring()).toBe(false);
     });
 
     it("can stop firing", () => {
-      const scene = {};
+      const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof scene, typeof bullet>();
+      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = startArgsMock<typeof scene, typeof bullet>(scene);
+      const args = startArgsMock<typeof world, typeof bullet>(world);
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.start(args);
       weapon.stop();
 
-      weapon.update(scene, 60);
-      expect(weapon.event.emit).toBeCalledWith("finished", scene);
+      weapon.update(world, 60);
+      expect(weapon.event.emit).toBeCalledWith("finished", world);
       expect(weapon.isFiring()).toBe(false);
     });
 
     it("can stop firing immediately", () => {
-      const scene = {};
+      const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof scene, typeof bullet>();
+      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = startArgsMock<typeof scene, typeof bullet>(scene);
+      const args = startArgsMock<typeof world, typeof bullet>(world);
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.start(args);

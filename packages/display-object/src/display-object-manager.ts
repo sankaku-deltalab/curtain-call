@@ -21,7 +21,7 @@ export class DisplayObjectManager<T> {
   /**
    * Update containing objects.
    *
-   * @param owner Updating owner like scene.
+   * @param owner Updating owner like world.
    * @param deltaSec Delta seconds.
    */
   update(owner: T, deltaSec: number): void {

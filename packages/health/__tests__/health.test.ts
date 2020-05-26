@@ -18,17 +18,17 @@ describe("@curtain-call/health.Health", () => {
     const health = new Health().init(initialHealth);
     jest.spyOn(health.event, "emit");
 
-    const scene = {};
+    const world = {};
     const dealer = new DamageDealer();
     const type = { name: "testDamage" };
-    health.takeDamage(scene, damage, dealer, type);
+    health.takeDamage(world, damage, dealer, type);
 
     expect(health.current()).toBe(RemainHealth);
     expect(health.max()).toBe(initialHealth);
     const takenDamage = initialHealth - RemainHealth;
     expect(health.event.emit).toBeCalledWith(
       "takenDamage",
-      scene,
+      world,
       takenDamage,
       dealer,
       type
@@ -45,10 +45,10 @@ describe("@curtain-call/health.Health", () => {
       ({ initialHealth, damage, died }) => {
         const health = new Health().init(initialHealth);
 
-        const scene = {};
+        const world = {};
         const dealer = new DamageDealer();
         const type = { name: "testDamage" };
-        health.takeDamage(scene, damage, dealer, type);
+        health.takeDamage(world, damage, dealer, type);
 
         expect(health.isDead()).toBe(died);
       }
@@ -58,24 +58,24 @@ describe("@curtain-call/health.Health", () => {
       const health = new Health().init(1);
       jest.spyOn(health.event, "emit");
 
-      const scene = {};
+      const world = {};
       const dealer = new DamageDealer();
       const type = { name: "testDamage" };
-      health.takeDamage(scene, 1, dealer, type);
+      health.takeDamage(world, 1, dealer, type);
 
-      expect(health.event.emit).toBeCalledWith("died", scene, dealer, type);
+      expect(health.event.emit).toBeCalledWith("died", world, dealer, type);
     });
 
     it("and damage and died event was not emitted while dead", () => {
       const health = new Health().init(1);
 
-      const scene = {};
+      const world = {};
       const dealer = new DamageDealer();
       const type = { name: "testDamage" };
-      health.takeDamage(scene, 1, dealer, type);
+      health.takeDamage(world, 1, dealer, type);
 
       jest.spyOn(health.event, "emit");
-      health.takeDamage(scene, 1, dealer, type);
+      health.takeDamage(world, 1, dealer, type);
 
       expect(health.event.emit).not.toBeCalled();
     });
@@ -84,10 +84,10 @@ describe("@curtain-call/health.Health", () => {
   it("can die directory", () => {
     const health = new Health().init(1);
 
-    const scene = {};
+    const world = {};
     const dealer = new DamageDealer();
     const type = { name: "testDamage" };
-    health.die(scene, dealer, type);
+    health.die(world, dealer, type);
 
     expect(health.isDead()).toBe(true);
   });
@@ -100,11 +100,11 @@ describe("@curtain-call/health.Health", () => {
   `("can heal damage", ({ initialHealth, damage, healing, RemainHealth }) => {
     const health = new Health().init(initialHealth);
 
-    const scene = {};
+    const world = {};
     const dealer = new DamageDealer();
     const type = { name: "testDamage" };
-    health.takeDamage(scene, damage, dealer, type);
-    health.heal(scene, healing);
+    health.takeDamage(world, damage, dealer, type);
+    health.heal(world, healing);
 
     expect(health.current()).toBe(RemainHealth);
     expect(health.max()).toBe(initialHealth);
@@ -125,13 +125,13 @@ describe("@curtain-call/health.Health", () => {
         .addInterceptor(interceptor);
       jest.spyOn(health.event, "emit");
 
-      const scene = {};
+      const world = {};
       const dealer = new DamageDealer();
       const type = { name: "testDamage" };
-      health.takeDamage(scene, originalDamage, dealer, type);
+      health.takeDamage(world, originalDamage, dealer, type);
 
       expect(interceptor.interceptDamage).toBeCalledWith(
-        scene,
+        world,
         originalDamage,
         dealer,
         type,
@@ -139,7 +139,7 @@ describe("@curtain-call/health.Health", () => {
       );
       expect(health.event.emit).toBeCalledWith(
         "takenDamage",
-        scene,
+        world,
         modifiedDamage,
         dealer,
         type
@@ -158,10 +158,10 @@ describe("@curtain-call/health.Health", () => {
         .removeInterceptor(interceptor);
       jest.spyOn(health.event, "emit");
 
-      const scene = {};
+      const world = {};
       const dealer = new DamageDealer();
       const type = { name: "testDamage" };
-      health.takeDamage(scene, originalDamage, dealer, type);
+      health.takeDamage(world, originalDamage, dealer, type);
 
       expect(interceptor.interceptDamage).not.toBeCalled();
       expect(health.current()).toBe(initialHealth - originalDamage);

@@ -1,7 +1,7 @@
-import { Scene } from "../src";
+import { World } from "../src";
 
 describe("curtain-call", () => {
-  it("has Scene", () => {
-    expect(() => new Scene()).not.toThrowError();
+  it("has World", () => {
+    expect(() => new World()).not.toThrowError();
   });
 });

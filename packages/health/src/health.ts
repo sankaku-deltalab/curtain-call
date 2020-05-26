@@ -31,13 +31,13 @@ export class Health<T> {
   /**
    * Take damage to self.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param damage Damage amount.
    * @param dealer Damage dealer dealing directory.
    * @param type Damage type.
    */
   takeDamage(
-    scene: T,
+    world: T,
     damage: number,
     dealer: DamageDealer<T>,
     type: DamageType
@@ -47,7 +47,7 @@ export class Health<T> {
     let modifiedDamage = damage;
     this.interceptors.forEach((interceptor) => {
       modifiedDamage = interceptor.interceptDamage(
-        scene,
+        world,
         modifiedDamage,
         dealer,
         type,
@@ -56,24 +56,24 @@ export class Health<T> {
     });
 
     const actualDamage = Math.min(modifiedDamage, this.health);
-    this.event.emit("takenDamage", scene, actualDamage, dealer, type);
+    this.event.emit("takenDamage", world, actualDamage, dealer, type);
 
     this.health -= actualDamage;
     if (this.health === 0) {
-      this.event.emit("died", scene, dealer, type);
+      this.event.emit("died", world, dealer, type);
     }
   }
 
   /**
    * Kill self.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param dealer Damage dealer killing self directory.
    * @param type Damage type.
    */
-  die(scene: T, dealer: DamageDealer<T>, type: DamageType): void {
+  die(world: T, dealer: DamageDealer<T>, type: DamageType): void {
     this.health = 0;
-    this.event.emit("died", scene, dealer, type);
+    this.event.emit("died", world, dealer, type);
   }
 
   /**
@@ -97,12 +97,12 @@ export class Health<T> {
   /**
    * Heal health.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param amount Healing amount.
    */
-  heal(scene: T, amount: number): void {
+  heal(world: T, amount: number): void {
     this.health = Math.min(this.healthMax, this.health + amount);
-    this.event.emit("healed", scene, amount);
+    this.event.emit("healed", world, amount);
   }
 
   /**

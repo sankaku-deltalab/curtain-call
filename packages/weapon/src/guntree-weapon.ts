@@ -8,21 +8,21 @@ import { TargetDealer } from "./target-dealer";
 
 class GuntreeOwner<T> implements gt.Owner {
   constructor(
-    private readonly scene: T,
+    private readonly world: T,
     private readonly muzzles: Map<string, Transformation>,
     private readonly targetDealer: TargetDealer<T>
   ) {}
 
   getMuzzleTransform(name: string): Matrix {
-    if (!this.scene || !this.muzzles) throw new Error();
+    if (!this.world || !this.muzzles) throw new Error();
     const muzzle = this.muzzles.get(name);
     if (!muzzle) throw new Error(`Muzzle ${name} is not set`);
     return muzzle.getGlobal();
   }
 
   getEnemyTransform(name: string): Matrix {
-    if (!this.scene || !this.targetDealer) throw new Error();
-    const target = this.targetDealer.get(this.scene);
+    if (!this.world || !this.targetDealer) throw new Error();
+    const target = this.targetDealer.get(this.world);
     if (!target)
       return this.getMuzzleTransform(name).globalize(
         Matrix.translation({ x: 1, y: 0 })
@@ -43,21 +43,21 @@ export class GunTreeWeapon<T, A> {
   }>();
 
   private readonly player = new gt.Player();
-  private scene?: T;
+  private world?: T;
   private bulletGenerator?: BulletGenerator<T, A>;
   private damageDealerInner?: DamageDealer<T>;
 
   constructor() {
     this.player.events.on("fired", (data, bullet) => {
-      if (!this.scene || !this.bulletGenerator || !this.damageDealerInner)
+      if (!this.world || !this.bulletGenerator || !this.damageDealerInner)
         throw new Error();
       const bulletActor = this.generateBullet(data, bullet);
       if (!bulletActor) return;
-      this.event.emit("fired", this.scene, bulletActor);
+      this.event.emit("fired", this.world, bulletActor);
     });
     this.player.events.on("finished", () => {
-      if (!this.scene) throw new Error();
-      this.event.emit("finished", this.scene);
+      if (!this.world) throw new Error();
+      this.event.emit("finished", this.world);
     });
   }
 
@@ -65,14 +65,14 @@ export class GunTreeWeapon<T, A> {
    * Start firing.
    *
    * @param args Arguments for firing.
-   * @param args.scene Scene.
+   * @param args.world World.
    * @param args.guntree Using Guntree gun.
    * @param args.muzzles Muzzle transformations.
    * @param args.bulletGenerator Generator used when fired.
    * @param args.damageDealer Damage dealer would be emitted by bullet DamageDealer.
    */
   start(args: {
-    scene: T;
+    world: T;
     guntree: gt.Gun;
     muzzles: Map<string, Transformation>;
     bulletGenerator: BulletGenerator<T, A>;
@@ -81,12 +81,12 @@ export class GunTreeWeapon<T, A> {
   }): void {
     if (this.player.isRunning()) return;
 
-    this.scene = args.scene;
+    this.world = args.world;
     this.bulletGenerator = args.bulletGenerator;
     this.damageDealerInner = args.damageDealer;
 
     const owner = new GuntreeOwner<T>(
-      args.scene,
+      args.world,
       args.muzzles,
       args.targetDealer
     );
@@ -119,18 +119,18 @@ export class GunTreeWeapon<T, A> {
   /**
    * Update firing process.
    *
-   * @param _scene Scene.
+   * @param _world World.
    * @param deltaSec Delta seconds.
    */
-  update(scene: T, deltaSec: number): void {
-    this.scene = scene;
+  update(world: T, deltaSec: number): void {
+    this.world = world;
     this.player.update(deltaSec);
   }
 
   private generateBullet(data: gt.FireData, _bullet: gt.Bullet): A | undefined {
-    if (!this.scene || !this.bulletGenerator) throw new Error();
+    if (!this.world || !this.bulletGenerator) throw new Error();
     return this.bulletGenerator.generate(
-      this.scene,
+      this.world,
       this,
       Matrix.from(data.transform),
       data.elapsedSec,

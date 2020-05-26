@@ -2,8 +2,8 @@ export interface Updatable<T> {
   /**
    * Update self.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(scene: T, deltaSec: number): void;
+  update(world: T, deltaSec: number): void;
 }

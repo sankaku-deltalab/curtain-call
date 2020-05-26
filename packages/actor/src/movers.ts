@@ -29,13 +29,13 @@ export class Movers<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    scene: T,
+    world: T,
     deltaSec: number,
     currentTrans: Matrix
   ): {
@@ -44,7 +44,7 @@ export class Movers<T> {
   } {
     const result = this.movers.reduce(
       (prev, mov) => {
-        const r = mov.update(scene, deltaSec, prev.newTrans);
+        const r = mov.update(world, deltaSec, prev.newTrans);
         return {
           done: prev.done && r.done,
           newTrans: r.newTrans,

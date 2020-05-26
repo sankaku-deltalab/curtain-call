@@ -6,7 +6,7 @@ const moverMock = <T>(done: boolean, delta: Vector): Mover<T> => {
     update: jest
       .fn()
       .mockImplementation(
-        (scene: T, deltaSec: number, currentTrans: Matrix) => ({
+        (world: T, deltaSec: number, currentTrans: Matrix) => ({
           done,
           newTrans: currentTrans.translated(delta),
         })

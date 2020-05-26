@@ -9,7 +9,7 @@ export interface BulletStyle {
 
 export interface BulletGenerator<T, A> {
   generate(
-    scene: T,
+    world: T,
     weapon: GunTreeWeapon<T, A>,
     trans: Matrix,
     elapsedSec: number,

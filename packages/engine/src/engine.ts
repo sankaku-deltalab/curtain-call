@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { Scene } from "@curtain-call/scene";
+import { World } from "@curtain-call/world";
 import { PointerInput } from "@curtain-call/input";
 
 /**
@@ -9,7 +9,7 @@ import { PointerInput } from "@curtain-call/input";
  */
 export class Engine {
   private readonly app: PIXI.Application;
-  private readonly scenes = new Set<Scene<Engine>>();
+  private readonly worlds = new Set<World<Engine>>();
 
   /**
    *
@@ -34,7 +34,7 @@ export class Engine {
 
     this.app.ticker.add((deltaRate: number): void => {
       const deltaSec = deltaRate / PIXI.settings.TARGET_FPMS / 1000;
-      this.scenes.forEach((scene) => scene.update(this, deltaSec));
+      this.worlds.forEach((world) => world.update(this, deltaSec));
     });
 
     this.pointerInput.apply(canvas, canvas);
@@ -59,32 +59,32 @@ export class Engine {
   }
 
   /**
-   * Add new scene.
-   * Added scene would be updated and rendered.
+   * Add new world.
+   * Added world would be updated and rendered.
    *
-   * @param scene New Scene.
+   * @param world New World.
    * @returns this
    */
-  addScene(scene: Scene<Engine>): this {
-    if (this.scenes.has(scene)) throw new Error("Scene was already added");
-    this.scenes.add(scene);
-    this.app.stage.addChild(scene.head);
-    this.pointerInput.addChild(scene.pointerInput);
+  addWorld(world: World<Engine>): this {
+    if (this.worlds.has(world)) throw new Error("World was already added");
+    this.worlds.add(world);
+    this.app.stage.addChild(world.head);
+    this.pointerInput.addChild(world.pointerInput);
 
     return this;
   }
 
   /**
-   * Remove added scene.
+   * Remove added world.
    *
-   * @param scene Added scene.
+   * @param world Added world.
    * @returns this
    */
-  removeScene(scene: Scene<Engine>): this {
-    if (!this.scenes.has(scene)) throw new Error("Scene is not added");
-    this.scenes.delete(scene);
-    this.app.stage.removeChild(scene.head);
-    this.pointerInput.removeChild(scene.pointerInput);
+  removeWorld(world: World<Engine>): this {
+    if (!this.worlds.has(world)) throw new Error("World is not added");
+    this.worlds.delete(world);
+    this.app.stage.removeChild(world.head);
+    this.pointerInput.removeChild(world.pointerInput);
 
     return this;
   }

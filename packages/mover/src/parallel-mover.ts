@@ -15,19 +15,19 @@ export class ParallelMover<T> implements Mover<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    scene: T,
+    world: T,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
     const r = this.movers.reduce(
       (prevResult, mov) => {
-        const result = mov.update(scene, deltaSec, prevResult.newTrans);
+        const result = mov.update(world, deltaSec, prevResult.newTrans);
         return {
           done: prevResult.done && result.done,
           newTrans: result.newTrans,

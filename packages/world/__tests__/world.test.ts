@@ -5,7 +5,7 @@ import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
 import { Camera } from "@curtain-call/camera";
 import { Updatable } from "@curtain-call/util";
 import { PointerInputReceiver } from "@curtain-call/input";
-import { Scene } from "../src";
+import { World } from "../src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -21,21 +21,21 @@ const updatableMock = <T>(): Updatable<T> => {
   return new cls();
 };
 
-const sceneWithMock = <T>(): {
-  sceneHead: PIXI.Container;
-  sceneTail: PIXI.Container;
+const worldWithMock = <T>(): {
+  worldHead: PIXI.Container;
+  worldTail: PIXI.Container;
   pixiDisplayObjectContainer: PIXI.Container;
-  displayObjectManager: DisplayObjectManager<Scene<T>>;
+  displayObjectManager: DisplayObjectManager<World<T>>;
   pixiCameraHead: PIXI.Container;
   pixiCameraTail: PIXI.Container;
   camera: Camera;
-  scene: Scene<T>;
+  world: World<T>;
 } => {
-  const sceneHead = containerMock();
-  const sceneTail = containerMock();
+  const worldHead = containerMock();
+  const worldTail = containerMock();
 
   const pixiDisplayObjectContainer = containerMock();
-  const DisplayObjectContainer = new DisplayObjectManager<Scene<T>>(
+  const DisplayObjectContainer = new DisplayObjectManager<World<T>>(
     pixiDisplayObjectContainer
   );
   jest.spyOn(DisplayObjectContainer, "add");
@@ -45,15 +45,15 @@ const sceneWithMock = <T>(): {
   const pixiCameraTail = containerMock();
   const camera = new Camera(pixiCameraHead, pixiCameraTail);
 
-  const scene = new Scene(sceneHead, sceneTail, camera, DisplayObjectContainer);
+  const world = new World(worldHead, worldTail, camera, DisplayObjectContainer);
 
   const engineLikeContainer = new PIXI.Container();
-  engineLikeContainer.addChild(scene.head);
+  engineLikeContainer.addChild(world.head);
 
   return {
-    sceneHead,
-    sceneTail,
-    scene,
+    worldHead,
+    worldTail,
+    world,
     pixiDisplayObjectContainer,
     displayObjectManager: DisplayObjectContainer,
     pixiCameraHead,
@@ -62,18 +62,18 @@ const sceneWithMock = <T>(): {
   };
 };
 
-describe("@curtain-call/scene.Scene", () => {
+describe("@curtain-call/world.World", () => {
   it("can be constructed without args", () => {
-    expect(() => new Scene()).not.toThrowError();
+    expect(() => new World()).not.toThrowError();
   });
 
   it("can update drawing base", () => {
-    const { scene } = sceneWithMock();
+    const { world } = worldWithMock();
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
-    scene.tail.addChild(obj);
+    world.tail.addChild(obj);
 
-    scene.updateDrawBase({
+    world.updateDrawBase({
       center: { x: 3, y: 4 },
       scale: 5,
     });
@@ -85,58 +85,58 @@ describe("@curtain-call/scene.Scene", () => {
 
   describe("can add actor", () => {
     it("by function", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
+      const actor = new Actor<typeof world>();
 
-      expect(() => scene.addActor(actor)).not.toThrowError();
+      expect(() => world.addActor(actor)).not.toThrowError();
     });
 
     it("and notify it to actor", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
-      jest.spyOn(actor, "notifyAddedToScene");
-      scene.addActor(actor);
+      const actor = new Actor<typeof world>();
+      jest.spyOn(actor, "notifyAddedToWorld");
+      world.addActor(actor);
 
-      expect(actor.notifyAddedToScene).toBeCalledWith(scene);
+      expect(actor.notifyAddedToWorld).toBeCalledWith(world);
     });
 
     it("but throw error when add already added actor", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
-      scene.addActor(actor);
-      expect(() => scene.addActor(actor)).toThrowError();
+      const actor = new Actor<typeof world>();
+      world.addActor(actor);
+      expect(() => world.addActor(actor)).toThrowError();
     });
   });
 
   describe("can remove actor", () => {
     it("by function", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
-      scene.addActor(actor);
+      const actor = new Actor<typeof world>();
+      world.addActor(actor);
 
-      expect(() => scene.removeActor(actor)).not.toThrowError();
+      expect(() => world.removeActor(actor)).not.toThrowError();
     });
 
     it("and notify it to actor", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
-      jest.spyOn(actor, "notifyRemovedFromScene");
-      scene.addActor(actor);
-      scene.removeActor(actor);
+      const actor = new Actor<typeof world>();
+      jest.spyOn(actor, "notifyRemovedFromWorld");
+      world.addActor(actor);
+      world.removeActor(actor);
 
-      expect(actor.notifyRemovedFromScene).toBeCalledWith(scene);
+      expect(actor.notifyRemovedFromWorld).toBeCalledWith(world);
     });
 
     it("but throw error when remove not added actor", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
 
-      const actor = new Actor<typeof scene>();
-      expect(() => scene.removeActor(actor)).toThrowError();
+      const actor = new Actor<typeof world>();
+      expect(() => world.removeActor(actor)).toThrowError();
     });
   });
 
@@ -148,45 +148,45 @@ describe("@curtain-call/scene.Scene", () => {
       return { actor, sprite };
     };
 
-    it("and DisplayObjectContainer's pixi container was added to scene at constructor", () => {
-      const { sceneTail, pixiDisplayObjectContainer } = sceneWithMock();
+    it("and DisplayObjectContainer's pixi container was added to world at constructor", () => {
+      const { worldTail, pixiDisplayObjectContainer } = worldWithMock();
 
-      expect(sceneTail.addChild).toBeCalledWith(pixiDisplayObjectContainer);
+      expect(worldTail.addChild).toBeCalledWith(pixiDisplayObjectContainer);
     });
 
     it("and add DisplayObject in actor when updated", () => {
       const {
-        scene,
+        world,
         displayObjectManager: DisplayObjectContainer,
-      } = sceneWithMock();
-      const { actor, sprite } = actorMock<typeof scene>();
+      } = worldWithMock();
+      const { actor, sprite } = actorMock<typeof world>();
 
-      scene.addActor(actor);
-      scene.update({}, 0.125);
+      world.addActor(actor);
+      world.update({}, 0.125);
 
       expect(DisplayObjectContainer.add).toBeCalledWith(sprite);
     });
 
     it("and remove DisplayObject in actor when actor removed", () => {
       const {
-        scene,
+        world,
         displayObjectManager: DisplayObjectContainer,
-      } = sceneWithMock();
-      const { actor, sprite } = actorMock<typeof scene>();
+      } = worldWithMock();
+      const { actor, sprite } = actorMock<typeof world>();
 
-      scene.addActor(actor);
-      scene.update({}, 0.125);
-      scene.removeActor(actor);
+      world.addActor(actor);
+      world.update({}, 0.125);
+      world.removeActor(actor);
 
       expect(DisplayObjectContainer.remove).toBeCalledWith(sprite);
     });
   });
 
   it("use camera", () => {
-    const { scene, camera } = sceneWithMock();
+    const { world, camera } = worldWithMock();
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
-    scene.tail.addChild(obj);
+    world.tail.addChild(obj);
 
     camera.moveTo({ x: 3, y: 1 });
     const viewPos = obj.getGlobalPosition();
@@ -196,34 +196,34 @@ describe("@curtain-call/scene.Scene", () => {
   });
 
   it("can update added actors", () => {
-    const { scene } = sceneWithMock();
-    const actor = new Actor<typeof scene>();
+    const { world } = worldWithMock();
+    const actor = new Actor<typeof world>();
     jest.spyOn(actor, "update").mockImplementation();
-    scene.addActor(actor);
+    world.addActor(actor);
 
     const deltaSec = 0.125;
-    scene.update({}, deltaSec);
+    world.update({}, deltaSec);
 
-    expect(actor.update).toBeCalledWith(scene, deltaSec);
+    expect(actor.update).toBeCalledWith(world, deltaSec);
   });
 
   describe("can convert position between canvas and game", () => {
     it("so can convert canvas position to game position", () => {
-      const { scene } = sceneWithMock();
-      scene.updateDrawBase({ center: { x: 1, y: 2 } });
+      const { world } = worldWithMock();
+      world.updateDrawBase({ center: { x: 1, y: 2 } });
 
       const canvasPos = { x: 3, y: 4 };
-      const gamePos = scene.canvasPosToGamePos(canvasPos);
+      const gamePos = world.canvasPosToGamePos(canvasPos);
 
       expect(gamePos).toEqual(new Vector(2, 2));
     });
 
     it("so can convert game position to canvas position", () => {
-      const { scene } = sceneWithMock();
-      scene.updateDrawBase({ center: { x: 1, y: 2 } });
+      const { world } = worldWithMock();
+      world.updateDrawBase({ center: { x: 1, y: 2 } });
 
       const gamePos = { x: 3, y: 4 };
-      const canvasPos = scene.gamePosToCanvasPos(gamePos);
+      const canvasPos = world.gamePosToCanvasPos(gamePos);
 
       expect(canvasPos).toEqual(new Vector(4, 6));
     });
@@ -231,47 +231,47 @@ describe("@curtain-call/scene.Scene", () => {
 
   describe("spread pointer input event", () => {
     it("to added receivers", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
       const receiver = new PointerInputReceiver();
       jest.spyOn(receiver.event, "emit");
 
-      scene.addPointerInputReceiver(receiver);
-      scene.pointerInput.event.emit("down", Vector.one);
+      world.addPointerInputReceiver(receiver);
+      world.pointerInput.event.emit("down", Vector.one);
 
       expect(receiver.event.emit).toBeCalledWith("down", Vector.one);
     });
 
     it("and can remove added receivers", () => {
-      const { scene } = sceneWithMock();
+      const { world } = worldWithMock();
       const receiver = new PointerInputReceiver();
       jest.spyOn(receiver.event, "emit");
 
-      scene.addPointerInputReceiver(receiver);
-      scene.removePointerInputReceiver(receiver);
-      scene.pointerInput.event.emit("down", Vector.one);
+      world.addPointerInputReceiver(receiver);
+      world.removePointerInputReceiver(receiver);
+      world.pointerInput.event.emit("down", Vector.one);
 
       expect(receiver.event.emit).not.toBeCalled();
     });
   });
 
   it("can add Updatable objects", () => {
-    const { scene } = sceneWithMock();
+    const { world } = worldWithMock();
     const updatable = updatableMock();
 
     const deltaSec = 123;
-    scene.addUpdatable(updatable);
-    scene.update({}, deltaSec);
+    world.addUpdatable(updatable);
+    world.update({}, deltaSec);
 
-    expect(updatable.update).toBeCalledWith(scene, deltaSec);
+    expect(updatable.update).toBeCalledWith(world, deltaSec);
   });
 
   it("can remove Updatable objects", () => {
-    const { scene } = sceneWithMock();
+    const { world } = worldWithMock();
     const updatable = updatableMock();
 
     const deltaSec = 123;
-    scene.addUpdatable(updatable).removeUpdatable(updatable);
-    scene.update({}, deltaSec);
+    world.addUpdatable(updatable).removeUpdatable(updatable);
+    world.update({}, deltaSec);
 
     expect(updatable.update).not.toBeCalled();
   });

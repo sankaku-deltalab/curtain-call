@@ -5,12 +5,12 @@ export interface MoveRoute<T> {
   /**
    * Get route position and route finished.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param elapsedSec Elapsed seconds.
    * @returns Route position and route finished.
    */
   getPosition(
-    scene: T,
+    world: T,
     elapsedSec: number
   ): { done: boolean; position: Vector };
 }
@@ -47,13 +47,13 @@ export class RouteMover<T> implements Mover<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    scene: T,
+    world: T,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
@@ -63,7 +63,7 @@ export class RouteMover<T> implements Mover<T> {
     const prevTime = this.elapsedSec;
     const nextTime = prevTime + deltaSec;
 
-    const { done, position } = this.route.getPosition(scene, nextTime);
+    const { done, position } = this.route.getPosition(world, nextTime);
     const delta = position.sub(this.prevPos);
 
     this.elapsedSec = nextTime;

@@ -7,9 +7,9 @@ import { PointerInputReceiver } from "@curtain-call/input";
 import { pixiMatrixToMatrix2d, Updatable } from "@curtain-call/util";
 
 /**
- * Scene is root of game scene.
+ * World is root of game world.
  */
-export class Scene<T> {
+export class World<T> {
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
 
@@ -24,7 +24,7 @@ export class Scene<T> {
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container(),
     public readonly camera = new Camera(),
-    private readonly displayObject = new DisplayObjectManager<Scene<T>>(),
+    private readonly displayObject = new DisplayObjectManager<World<T>>(),
     public readonly pointerInput = new PointerInputReceiver()
   ) {
     head.addChild(camera.head);
@@ -42,7 +42,7 @@ export class Scene<T> {
    * const canvasHeight = window.innerHeight;
    * const canvasWidth = window.innerWidth;
    *
-   * const scene = new Scene().updateDrawBase({
+   * const world = new World().updateDrawBase({
    *   center: { x: canvasWidth / 2, y: canvasHeight / 2 },
    *   scale: Math.min(canvasHeight / gameHeight, canvasWidth / gameWidth),
    * });
@@ -84,7 +84,7 @@ export class Scene<T> {
     if (this.actors.has(actor)) throw new Error("Actor was already added");
     this.actors.add(actor);
     this.addUpdatableInternal(actor);
-    actor.notifyAddedToScene(this);
+    actor.notifyAddedToWorld(this);
     return this;
   }
 
@@ -103,7 +103,7 @@ export class Scene<T> {
       if (!this.displayObject.has(obj)) return;
       this.displayObject.remove(obj);
     });
-    actor.notifyRemovedFromScene(this);
+    actor.notifyRemovedFromWorld(this);
 
     return this;
   }
@@ -168,8 +168,8 @@ export class Scene<T> {
    */
   public canvasPosToGamePos(canvasPos: VectorLike): Vector {
     this.head.updateTransform();
-    const sceneTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
-    return sceneTrans.localizePoint(canvasPos);
+    const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+    return worldTrans.localizePoint(canvasPos);
   }
 
   /**
@@ -180,8 +180,8 @@ export class Scene<T> {
    */
   public gamePosToCanvasPos(gamePos: VectorLike): Vector {
     this.head.updateTransform();
-    const sceneTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
-    return sceneTrans.globalizePoint(gamePos);
+    const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+    return worldTrans.globalizePoint(gamePos);
   }
 
   private addUpdatableInternal(updatable: Updatable<this>): this {

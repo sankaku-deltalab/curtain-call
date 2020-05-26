@@ -53,12 +53,12 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can activate", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(1, 2, 4);
 
-    const scene = jest.fn();
+    const world = jest.fn();
     await networkedLevel.load();
-    networkedLevel.activate(scene);
+    networkedLevel.activate(world);
 
-    expect(levels[0].activate).toBeCalledWith(scene);
-    expect(levels[1].activate).toBeCalledWith(scene);
+    expect(levels[0].activate).toBeCalledWith(world);
+    expect(levels[1].activate).toBeCalledWith(world);
     expect(levels[2].activate).not.toBeCalled();
     expect(levels[3].activate).not.toBeCalled();
   });
@@ -66,28 +66,28 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can deactivate", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(1, 2, 4);
 
-    const scene = jest.fn();
+    const world = jest.fn();
     await networkedLevel.load();
-    networkedLevel.activate(scene);
-    networkedLevel.deactivate(scene);
+    networkedLevel.activate(world);
+    networkedLevel.deactivate(world);
 
-    expect(levels[0].deactivate).toBeCalledWith(scene);
-    expect(levels[1].deactivate).toBeCalledWith(scene);
-    expect(levels[2].deactivate).toBeCalledWith(scene);
-    expect(levels[3].deactivate).toBeCalledWith(scene);
+    expect(levels[0].deactivate).toBeCalledWith(world);
+    expect(levels[1].deactivate).toBeCalledWith(world);
+    expect(levels[2].deactivate).toBeCalledWith(world);
+    expect(levels[3].deactivate).toBeCalledWith(world);
   });
 
   it("can move level", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(0, 1, 4);
 
-    const scene = jest.fn();
+    const world = jest.fn();
     await networkedLevel.load();
-    networkedLevel.activate(scene);
+    networkedLevel.activate(world);
 
-    networkedLevel.moveTo(scene, levels[1]);
+    networkedLevel.moveTo(world, levels[1]);
 
-    expect(levels[0].deactivate).toBeCalledWith(scene);
-    expect(levels[1].activate).toBeCalledWith(scene);
+    expect(levels[0].deactivate).toBeCalledWith(world);
+    expect(levels[1].activate).toBeCalledWith(world);
     expect(levels[2].activate).not.toBeCalled();
     expect(levels[3].activate).not.toBeCalled();
 
@@ -108,12 +108,12 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can update with children", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(0, 1, 4);
 
-    const scene = jest.fn();
+    const world = jest.fn();
     const deltaSec = 0.125;
-    networkedLevel.update(scene, deltaSec);
+    networkedLevel.update(world, deltaSec);
 
     levels.forEach((lv) => {
-      expect(lv.update).toBeCalledWith(scene, deltaSec);
+      expect(lv.update).toBeCalledWith(world, deltaSec);
     });
   });
 });

@@ -54,13 +54,13 @@ export class PointerMover<T> implements Mover<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param _scene Scene.
+   * @param _world World.
    * @param _deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    _scene: T,
+    _world: T,
     _deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {

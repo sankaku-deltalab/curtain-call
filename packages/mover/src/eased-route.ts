@@ -46,12 +46,12 @@ export class EasedRoute<T> implements MoveRoute<T> {
   /**
    * Get route position and route finished.
    *
-   * @param _scene Scene.
+   * @param _world World.
    * @param elapsedSec Elapsed seconds.
    * @returns Route position and route finished.
    */
   getPosition(
-    _scene: T,
+    _world: T,
     elapsedSec: number
   ): { done: boolean; position: Vector } {
     const p = Math.max(0, Math.min(1, elapsedSec / this.durationSec));

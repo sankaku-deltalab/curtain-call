@@ -4,13 +4,13 @@ export interface Mover<T> {
   /**
    * Update movement and return transformation delta
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    scene: T,
+    world: T,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix };

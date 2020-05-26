@@ -3,7 +3,7 @@ import { Box2d } from "./common";
 import { Collision } from "./collision";
 
 export class OverlapChecker<T> {
-  checkOverlap(scene: T, collisions: Collision<T>[]): void {
+  checkOverlap(world: T, collisions: Collision<T>[]): void {
     const collided = new Map(
       collisions.map((c) => [c, new Set<Collision<T>>()])
     );
@@ -38,7 +38,7 @@ export class OverlapChecker<T> {
 
     collided.forEach((colBs, colA) => {
       if (colBs.size === 0) return;
-      colA.event.emit("overlapped", scene, colBs);
+      colA.event.emit("overlapped", world, colBs);
     });
   }
 

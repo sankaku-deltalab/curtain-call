@@ -5,13 +5,13 @@ import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
 
 /**
- * Actor is main object used in Scene.
+ * Actor is main object used in World.
  */
 export class Actor<T> implements Updatable<T> {
   /** Event. */
   public readonly event = new EventEmitter<{
-    addedToScene: [T];
-    removedFromScene: [T];
+    addedToWorld: [T];
+    removedFromWorld: [T];
   }>();
 
   /** Transformation. */
@@ -29,33 +29,33 @@ export class Actor<T> implements Updatable<T> {
   /**
    * Update self.
    *
-   * @param scene Scene.
+   * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(scene: T, deltaSec: number): void {
+  update(world: T, deltaSec: number): void {
     this.trans.setLocal(
-      this.movers.update(scene, deltaSec, this.trans.getLocal()).newTrans
+      this.movers.update(world, deltaSec, this.trans.getLocal()).newTrans
     );
-    this.displayObjects.update(scene, deltaSec);
+    this.displayObjects.update(world, deltaSec);
   }
 
   /**
-   * Notify added to scene.
-   * Called from Scene.
+   * Notify added to world.
+   * Called from World.
    *
-   * @param scene Added Scene.
+   * @param world Added World.
    */
-  notifyAddedToScene(scene: T): void {
-    this.event.emit("addedToScene", scene);
+  notifyAddedToWorld(world: T): void {
+    this.event.emit("addedToWorld", world);
   }
 
   /**
-   * Notify removed from scene.
-   * Called from Scene.
+   * Notify removed from world.
+   * Called from World.
    *
-   * @param scene Removed Scene.
+   * @param world Removed World.
    */
-  notifyRemovedFromScene(scene: T): void {
-    this.event.emit("removedFromScene", scene);
+  notifyRemovedFromWorld(world: T): void {
+    this.event.emit("removedFromWorld", world);
   }
 }

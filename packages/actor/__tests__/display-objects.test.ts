@@ -59,10 +59,10 @@ describe("@curtain-call/DisplayObjects", () => {
     const objects = new DisplayObjects();
 
     objects.add(obj);
-    const scene = jest.fn();
+    const world = jest.fn();
     const deltaSec = 0.125;
-    objects.update(scene, deltaSec);
+    objects.update(world, deltaSec);
 
-    expect(obj.update).toBeCalledWith(scene, deltaSec);
+    expect(obj.update).toBeCalledWith(world, deltaSec);
   });
 });

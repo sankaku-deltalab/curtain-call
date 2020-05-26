@@ -34,7 +34,7 @@
     "@curtain-call/camera": "^0.1.1",
     "@curtain-call/display-object": "^0.1.1",
     "@curtain-call/engine": "^0.1.1",
-    "@curtain-call/scene": "^0.1.1",
+    "@curtain-call/world": "^0.1.1",
     "@curtain-call/util": "^0.1.1"
   }
 }
