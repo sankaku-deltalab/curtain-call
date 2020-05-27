@@ -68,6 +68,7 @@ export class World<T> {
    * @param deltaSec Update delta seconds.
    */
   update(_owner: T, deltaSec: number): void {
+    this.removeDeadUpdatable();
     this.updatable.forEach((up) => up.update(this, deltaSec));
     this.displayObject.update(this, deltaSec);
 
@@ -182,6 +183,17 @@ export class World<T> {
     this.head.updateTransform();
     const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
     return worldTrans.globalizePoint(gamePos);
+  }
+
+  private removeDeadUpdatable(): void {
+    this.updatable.forEach((up) => {
+      if (!up.shouldRemoveSelfFromWorld()) return;
+      if (up instanceof Actor) {
+        this.removeActor(up);
+      } else {
+        this.removeUpdatable(up);
+      }
+    });
   }
 
   private addUpdatableInternal(updatable: Updatable<this>): this {

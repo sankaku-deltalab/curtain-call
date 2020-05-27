@@ -48,6 +48,13 @@ export interface Level<T> extends Updatable<T> {
   isActive(): boolean;
 
   /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldRemoveSelfFromWorld(): boolean;
+
+  /**
    * Update level.
    *
    * @param world World.

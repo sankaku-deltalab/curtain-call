@@ -8,6 +8,8 @@ import { Movers } from "./movers";
  * Actor is main object used in World.
  */
 export class Actor<T> implements Updatable<T> {
+  private shouldRemoveSelf = false;
+
   /** Event. */
   public readonly event = new EventEmitter<{
     addedToWorld: [T];
@@ -25,6 +27,25 @@ export class Actor<T> implements Updatable<T> {
 
   /** Health. */
   public readonly health = new Health<T>();
+
+  /**
+   * Remove self from world at next update.
+   *
+   * @returns Self must remove from world.
+   */
+  removeSelfFromWorld(): this {
+    this.shouldRemoveSelf = true;
+    return this;
+  }
+
+  /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldRemoveSelfFromWorld(): boolean {
+    return this.shouldRemoveSelf;
+  }
 
   /**
    * Update self.

@@ -9,6 +9,7 @@ export const levelMock = <T>(): Level<T> => {
     activate: jest.fn(),
     deactivate: jest.fn(),
     isActive: jest.fn(),
+    shouldRemoveSelfFromWorld: jest.fn().mockReturnValue(false),
     update: jest.fn(),
   }));
   return new cls();

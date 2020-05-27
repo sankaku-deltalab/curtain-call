@@ -16,6 +16,7 @@ const containerMock = (): PIXI.Container => {
 
 const updatableMock = <T>(): Updatable<T> => {
   const cls = jest.fn(() => ({
+    shouldRemoveSelfFromWorld: jest.fn().mockReturnValue(false),
     update: jest.fn(),
   }));
   return new cls();
@@ -274,5 +275,19 @@ describe("@curtain-call/world.World", () => {
     world.update({}, deltaSec);
 
     expect(updatable.update).not.toBeCalled();
+  });
+
+  it("can remove Updatable objects should remove", () => {
+    const { world } = worldWithMock();
+    const updatable1 = updatableMock();
+    const updatable2 = updatableMock();
+    jest.spyOn(updatable2, "shouldRemoveSelfFromWorld").mockReturnValue(true);
+
+    const deltaSec = 123;
+    world.addUpdatable(updatable1).addUpdatable(updatable2);
+    world.update({}, deltaSec);
+
+    expect(updatable1.update).toBeCalled();
+    expect(updatable2.update).not.toBeCalled();
   });
 });

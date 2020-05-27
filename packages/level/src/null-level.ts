@@ -61,6 +61,15 @@ export class NullLevel<T> implements Level<T> {
   }
 
   /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldRemoveSelfFromWorld(): boolean {
+    return false;
+  }
+
+  /**
    * Update level.
    *
    * @param _world World.
