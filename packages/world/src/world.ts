@@ -13,7 +13,7 @@ import {
 /**
  * World is root of game world.
  */
-export class World<T> {
+export class World {
   public readonly backgroundTrans = new Transformation();
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
@@ -29,7 +29,7 @@ export class World<T> {
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container(),
     public readonly camera = new Camera(),
-    private readonly displayObject = new DisplayObjectManager<World<T>>(),
+    private readonly displayObject = new DisplayObjectManager<World>(),
     public readonly pointerInput = new PointerInputReceiver()
   ) {
     head.addChild(camera.head);
@@ -69,10 +69,9 @@ export class World<T> {
   /**
    * Update this and contained Updatable object.
    *
-   * @param _owner Engine like thing.
    * @param deltaSec Update delta seconds.
    */
-  update(_owner: T, deltaSec: number): void {
+  update(deltaSec: number): void {
     this.removeDeadUpdatable();
     this.updatable.forEach((up) => up.update(this, deltaSec));
     this.displayObject.update(this, deltaSec);

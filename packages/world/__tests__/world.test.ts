@@ -26,17 +26,17 @@ const worldWithMock = <T>(): {
   worldHead: PIXI.Container;
   worldTail: PIXI.Container;
   pixiDisplayObjectContainer: PIXI.Container;
-  displayObjectManager: DisplayObjectManager<World<T>>;
+  displayObjectManager: DisplayObjectManager<World>;
   pixiCameraHead: PIXI.Container;
   pixiCameraTail: PIXI.Container;
   camera: Camera;
-  world: World<T>;
+  world: World;
 } => {
   const worldHead = containerMock();
   const worldTail = containerMock();
 
   const pixiDisplayObjectContainer = containerMock();
-  const DisplayObjectContainer = new DisplayObjectManager<World<T>>(
+  const DisplayObjectContainer = new DisplayObjectManager<World>(
     pixiDisplayObjectContainer
   );
   jest.spyOn(DisplayObjectContainer, "add");
@@ -163,7 +163,7 @@ describe("@curtain-call/world.World", () => {
       const { actor, sprite } = actorMock<typeof world>();
 
       world.addActor(actor);
-      world.update({}, 0.125);
+      world.update(0.125);
 
       expect(DisplayObjectContainer.add).toBeCalledWith(sprite);
     });
@@ -176,7 +176,7 @@ describe("@curtain-call/world.World", () => {
       const { actor, sprite } = actorMock<typeof world>();
 
       world.addActor(actor);
-      world.update({}, 0.125);
+      world.update(0.125);
       world.removeActor(actor);
 
       expect(DisplayObjectContainer.remove).toBeCalledWith(sprite);
@@ -203,7 +203,7 @@ describe("@curtain-call/world.World", () => {
     world.addActor(actor);
 
     const deltaSec = 0.125;
-    world.update({}, deltaSec);
+    world.update(deltaSec);
 
     expect(actor.update).toBeCalledWith(world, deltaSec);
   });
@@ -261,7 +261,7 @@ describe("@curtain-call/world.World", () => {
 
     const deltaSec = 123;
     world.addUpdatable(updatable);
-    world.update({}, deltaSec);
+    world.update(deltaSec);
 
     expect(updatable.update).toBeCalledWith(world, deltaSec);
   });
@@ -272,7 +272,7 @@ describe("@curtain-call/world.World", () => {
 
     const deltaSec = 123;
     world.addUpdatable(updatable).removeUpdatable(updatable);
-    world.update({}, deltaSec);
+    world.update(deltaSec);
 
     expect(updatable.update).not.toBeCalled();
   });
@@ -285,7 +285,7 @@ describe("@curtain-call/world.World", () => {
 
     const deltaSec = 123;
     world.addUpdatable(updatable1).addUpdatable(updatable2);
-    world.update({}, deltaSec);
+    world.update(deltaSec);
 
     expect(updatable1.update).toBeCalled();
     expect(updatable2.update).not.toBeCalled();
