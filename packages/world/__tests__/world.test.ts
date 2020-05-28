@@ -3,7 +3,7 @@ import { Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
 import { Camera } from "@curtain-call/camera";
-import { Updatable } from "@curtain-call/util";
+import { Updatable, Transformation } from "@curtain-call/util";
 import { PointerInputReceiver } from "@curtain-call/input";
 import { World } from "../src";
 
@@ -289,5 +289,10 @@ describe("@curtain-call/world.World", () => {
 
     expect(updatable1.update).toBeCalled();
     expect(updatable2.update).not.toBeCalled();
+  });
+
+  it("has Transformation for background actors", () => {
+    const { world } = worldWithMock();
+    expect(world.backgroundTrans).toBeInstanceOf(Transformation);
   });
 });

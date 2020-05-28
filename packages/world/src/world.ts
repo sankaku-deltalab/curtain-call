@@ -4,12 +4,17 @@ import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
 import { PointerInputReceiver } from "@curtain-call/input";
-import { pixiMatrixToMatrix2d, Updatable } from "@curtain-call/util";
+import {
+  pixiMatrixToMatrix2d,
+  Updatable,
+  Transformation,
+} from "@curtain-call/util";
 
 /**
  * World is root of game world.
  */
 export class World<T> {
+  public readonly backgroundTrans = new Transformation();
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
 
