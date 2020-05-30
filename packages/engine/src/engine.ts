@@ -9,7 +9,7 @@ import { PointerInput } from "@curtain-call/input";
  */
 export class Engine {
   private readonly app: PIXI.Application;
-  private readonly worlds = new Set<World<Engine>>();
+  private readonly worlds = new Set<World>();
 
   /**
    *
@@ -34,7 +34,7 @@ export class Engine {
 
     this.app.ticker.add((deltaRate: number): void => {
       const deltaSec = deltaRate / PIXI.settings.TARGET_FPMS / 1000;
-      this.worlds.forEach((world) => world.update(this, deltaSec));
+      this.worlds.forEach((world) => world.update(deltaSec));
     });
 
     this.pointerInput.apply(canvas, canvas);
@@ -65,7 +65,7 @@ export class Engine {
    * @param world New World.
    * @returns this
    */
-  addWorld(world: World<Engine>): this {
+  addWorld(world: World): this {
     if (this.worlds.has(world)) throw new Error("World was already added");
     this.worlds.add(world);
     this.app.stage.addChild(world.head);
@@ -80,7 +80,7 @@ export class Engine {
    * @param world Added world.
    * @returns this
    */
-  removeWorld(world: World<Engine>): this {
+  removeWorld(world: World): this {
     if (!this.worlds.has(world)) throw new Error("World is not added");
     this.worlds.delete(world);
     this.app.stage.removeChild(world.head);
