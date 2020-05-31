@@ -13,12 +13,12 @@ import { Asset } from "./asset";
  *
  * await asset.load();
  *
- * const playerSprite = new PIXI.Sprite(asset.get("player").texture);
+ * const playerTextureResource = asset.get("player");
+ * const playerSprite = new PIXI.Sprite(asset.getTexture("player"));
  * const playerAnim = new PIXI.AnimatedSprite(
- *   asset.get("animPlayer").spritesheet?.animations["player-front"]
+ *   asset.getAnimationTextures("animPlayer", "player-front")
  * );
  *
- * const playerTexturePath = asset.get("player");
  *
  * asset.unload();
  */
@@ -74,6 +74,33 @@ export class PixiAsset<T extends { [key: string]: string }> implements Asset {
     if (!this.isLoaded()) throw new Error("Asset is not loaded");
     const srcPath = this.getPath(src);
     return this.loader.resources[srcPath];
+  }
+
+  /**
+   * Get loaded texture.
+   *
+   * @param src Item key.
+   * @returns Resource.
+   */
+  getTexture(src: keyof T): PIXI.Texture {
+    const resource = this.get(src);
+    return resource.texture;
+  }
+
+  /**
+   * Get loaded animations texture.
+   *
+   * @param src Item key.
+   * @returns Resource.
+   */
+  getAnimationTextures(src: keyof T, imageName: string): PIXI.Texture[] {
+    const resource = this.get(src);
+    const sheet = resource.spritesheet;
+    if (!sheet) throw new Error(`${src} do not has spritesheet`);
+    if (!(imageName in sheet.animations))
+      throw new Error(`${src} spritesheet do not has ${imageName}`);
+
+    return sheet.animations[imageName] as PIXI.Texture[];
   }
 
   private getPath(src: keyof T): string {
