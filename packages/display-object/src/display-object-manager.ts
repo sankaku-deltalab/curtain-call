@@ -4,7 +4,7 @@ import { Transformation } from "@curtain-call/util";
 export interface DisplayObject<T> {
   pixiObj: PIXI.DisplayObject;
   trans: Transformation;
-  update(owner: T, deltaSec: number): void;
+  update(world: T, deltaSec: number): void;
 }
 
 /**
