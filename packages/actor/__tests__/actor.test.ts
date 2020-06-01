@@ -1,6 +1,8 @@
-import { Matrix } from "trans-vector2d";
+import { Matrix, Vector } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
+import { DamageDealer } from "@curtain-call/health";
 import { Actor, DisplayObjects, Movers } from "../src";
+import { moverMock, spriteMock } from "./mock";
 
 describe("@curtain-call/actor.Actor", () => {
   describe("has DisplayObjects", () => {
@@ -76,5 +78,101 @@ describe("@curtain-call/actor.Actor", () => {
 
       expect(func).toBeCalledWith(world);
     });
+  });
+
+  it("has DamageDealer", () => {
+    const actor = new Actor();
+
+    expect(actor.damageDealer).toBeInstanceOf(DamageDealer);
+  });
+
+  it("can move", () => {
+    const actor = new Actor();
+    actor.trans.setLocal(
+      Matrix.from({
+        translation: new Vector(1, 2),
+        rotation: 3,
+        scale: new Vector(4, 5),
+      })
+    );
+
+    actor.moveTo(new Vector(6, 7));
+
+    expect(
+      actor.trans.getLocal().isClosedTo(
+        Matrix.from({
+          translation: new Vector(6, 7),
+          rotation: 3,
+          scale: new Vector(4, 5),
+        })
+      )
+    ).toBe(true);
+  });
+
+  it("can rotate", () => {
+    const actor = new Actor();
+    actor.trans.setLocal(
+      Matrix.from({
+        translation: new Vector(1, 2),
+        rotation: 3,
+        scale: new Vector(4, 5),
+      })
+    );
+
+    actor.rotateTo(6);
+
+    expect(
+      actor.trans.getLocal().isClosedTo(
+        Matrix.from({
+          translation: new Vector(1, 2),
+          rotation: 6,
+          scale: new Vector(4, 5),
+        })
+      )
+    ).toBe(true);
+  });
+
+  it("can attach to other trans", () => {
+    const actor = new Actor();
+    jest.spyOn(actor.trans, "attachTo");
+
+    const parent = new Transformation();
+    actor.attachTo(parent);
+
+    expect(actor.trans.attachTo).toBeCalledWith(parent);
+  });
+
+  it("can init health", () => {
+    const actor = new Actor().healthInitialized(15);
+
+    expect(actor.health.current()).toBe(15);
+    expect(actor.health.max()).toBe(15);
+  });
+
+  it("can init health", () => {
+    const actor = new Actor().healthInitialized(15);
+
+    expect(actor.health.current()).toBe(15);
+    expect(actor.health.max()).toBe(15);
+  });
+
+  it("can add mover", () => {
+    const actor = new Actor();
+    jest.spyOn(actor.movers, "add");
+
+    const mover = moverMock(false, Vector.zero);
+    actor.movedBy(mover);
+
+    expect(actor.movers.add).toBeCalledWith(mover);
+  });
+
+  it("can add DisplayObject", () => {
+    const actor = new Actor();
+    jest.spyOn(actor.displayObjects, "add");
+
+    const sprite = spriteMock();
+    actor.visualizedBy(sprite);
+
+    expect(actor.displayObjects.add).toBeCalledWith(sprite);
   });
 });

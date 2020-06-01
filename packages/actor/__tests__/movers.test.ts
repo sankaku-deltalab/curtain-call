@@ -1,20 +1,6 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { Mover } from "@curtain-call/mover";
 import { Movers } from "../src";
-
-const moverMock = <T>(done: boolean, delta: Vector): Mover<T> => {
-  const cls = jest.fn(() => ({
-    update: jest
-      .fn()
-      .mockImplementation(
-        (world: T, deltaSec: number, currentTrans: Matrix) => ({
-          done,
-          newTrans: currentTrans.translated(delta),
-        })
-      ),
-  }));
-  return new cls();
-};
+import { moverMock } from "./mock";
 
 describe("@curtain-call/actor.Movers", () => {
   it("can use multiple mover", () => {

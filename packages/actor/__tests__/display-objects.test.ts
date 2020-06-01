@@ -1,11 +1,5 @@
-import { Sprite } from "@curtain-call/display-object";
 import { DisplayObjects } from "../src";
-
-const spriteMock = <T>(): Sprite<T> => {
-  const obj = new Sprite();
-  jest.spyOn(obj, "update");
-  return obj;
-};
+import { spriteMock } from "./mock";
 
 describe("@curtain-call/DisplayObjects", () => {
   describe("can add DisplayObject", () => {

@@ -1,6 +1,9 @@
 import { EventEmitter } from "eventemitter3";
+import { Vector, Matrix } from "trans-vector2d";
 import { Transformation, Updatable } from "@curtain-call/util";
-import { Health } from "@curtain-call/health";
+import { Health, DamageDealer } from "@curtain-call/health";
+import { Mover } from "@curtain-call/mover";
+import { DisplayObject } from "@curtain-call/display-object";
 import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
 
@@ -27,6 +30,9 @@ export class Actor<T> implements Updatable<T> {
 
   /** Health. */
   public readonly health = new Health<T>();
+
+  /** Damage dealer. */
+  public readonly damageDealer = new DamageDealer<T>();
 
   /**
    * Remove self from world at next update.
@@ -78,5 +84,73 @@ export class Actor<T> implements Updatable<T> {
    */
   notifyRemovedFromWorld(world: T): void {
     this.event.emit("removedFromWorld", world);
+  }
+
+  /**
+   * Move to specified position.
+   *
+   * @param pos New position. Not delta.
+   * @returns this.
+   */
+  moveTo(pos: Vector): this {
+    const { rotation, scale } = this.trans.getLocal().decompose();
+    this.trans.setLocal(Matrix.from({ translation: pos, rotation, scale }));
+    return this;
+  }
+
+  /**
+   * Rotate to specified angle.
+   *
+   * @param angle New angle. Not delta.
+   * @returns this.
+   */
+  rotateTo(angle: number): this {
+    const { translation, scale } = this.trans.getLocal().decompose();
+    this.trans.setLocal(Matrix.from({ translation, rotation: angle, scale }));
+    return this;
+  }
+
+  /**
+   * Attach self Transformation to other.
+   *
+   * @param parent Parent Transformation.
+   * @returns this.
+   */
+  attachTo(parent: Transformation): this {
+    this.trans.attachTo(parent);
+    return this;
+  }
+
+  /**
+   * Init health.
+   *
+   * @param healthAmount New health and healthMax amount.
+   * @retuns this.
+   */
+  healthInitialized(healthAmount: number): this {
+    this.health.init(healthAmount);
+    return this;
+  }
+
+  /**
+   * Add Mover.
+   *
+   * @param mover Adding Mover.
+   * @returns this.
+   */
+  movedBy(mover: Mover<T>): this {
+    this.movers.add(mover);
+    return this;
+  }
+
+  /**
+   * Add DisplayObject.
+   *
+   * @param displayObject Adding DisplayObject.
+   * @returns this.
+   */
+  visualizedBy(displayObject: DisplayObject<T>): this {
+    this.displayObjects.add(displayObject);
+    return this;
   }
 }
