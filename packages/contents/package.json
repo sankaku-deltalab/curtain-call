@@ -35,7 +35,9 @@
   "dependencies": {
     "@curtain-call/actor": "^0.1.1",
     "@curtain-call/asset": "^0.1.1",
+    "@curtain-call/health": "^0.1.1",
     "@curtain-call/level": "^0.1.1",
+    "@curtain-call/weapon": "^0.1.1",
     "@curtain-call/world": "^0.1.1"
   }
 }
