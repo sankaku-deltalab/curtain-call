@@ -72,6 +72,7 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
    * @param args.guntree Using Guntree gun.
    * @param args.muzzles Muzzle transformations.
    * @param args.bulletGenerator Generator used when fired.
+   * @param args.targetProvider Target provider.
    * @param args.damageDealer Damage dealer would be emitted by bullet DamageDealer.
    */
   init(args: {
