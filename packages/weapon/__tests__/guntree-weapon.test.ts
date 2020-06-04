@@ -1,5 +1,5 @@
 import * as gt from "guntree";
-import { GunTreeWeapon, BulletGenerator, TargetDealer } from "../src";
+import { GunTreeWeapon, BulletGenerator, TargetProvider } from "../src";
 import { Transformation } from "@curtain-call/util";
 import { DamageDealer } from "@curtain-call/health";
 
@@ -12,7 +12,7 @@ const bulletGeneratorMock = <T, A>(): BulletGenerator<T, A> => {
   return new cls();
 };
 
-const targetDealerMock = <T>(): TargetDealer<T> => {
+const targetProviderMock = <T>(): TargetProvider<T> => {
   const cls = jest.fn(() => ({ get: jest.fn() }));
   return new cls();
 };
@@ -31,14 +31,14 @@ const initArgsMock = <T, A>(
   guntree: gt.Gun;
   muzzles: Map<string, Transformation>;
   bulletGenerator: BulletGenerator<T, A>;
-  targetDealer: TargetDealer<T>;
+  targetProvider: TargetProvider<T>;
   damageDealer: DamageDealer<T>;
 } => ({
   world,
   guntree: exampleGun(),
   muzzles: new Map([["center", new Transformation()]]),
   bulletGenerator: bulletGeneratorMock(),
-  targetDealer: targetDealerMock(),
+  targetProvider: targetProviderMock(),
   damageDealer: damageDealerMock(),
 });
 

@@ -4,14 +4,14 @@ import { Transformation } from "@curtain-call/util";
 import { DamageDealer } from "@curtain-call/health";
 import { Matrix } from "trans-vector2d";
 import { BulletGenerator } from "./bullet-generator";
-import { TargetDealer, NonTargetDealer } from "./target-dealer";
+import { TargetProvider, NonTargetProvider } from "./target-provider";
 import { Weapon } from "./weapon";
 
 class GuntreeOwner<T> implements gt.Owner {
   constructor(
     private readonly world: T,
     private readonly muzzles: Map<string, Transformation>,
-    private readonly targetDealer: TargetDealer<T>
+    private readonly targetProvider: TargetProvider<T>
   ) {}
 
   getMuzzleTransform(name: string): Matrix {
@@ -22,8 +22,8 @@ class GuntreeOwner<T> implements gt.Owner {
   }
 
   getEnemyTransform(name: string): Matrix {
-    if (!this.world || !this.targetDealer) throw new Error();
-    const target = this.targetDealer.get(this.world);
+    if (!this.world || !this.targetProvider) throw new Error();
+    const target = this.targetProvider.get(this.world);
     if (!target)
       return this.getMuzzleTransform(name).globalize(
         Matrix.translation({ x: 1, y: 0 })
@@ -49,7 +49,7 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
   private muzzles = new Map<string, Transformation>();
   private bulletGenerator?: BulletGenerator<T, A>;
   private damageDealerInner?: DamageDealer<T>;
-  private targetDealer: TargetDealer<T> = new NonTargetDealer<T>();
+  private targetProvider: TargetProvider<T> = new NonTargetProvider<T>();
 
   constructor() {
     this.player.events.on("fired", (data, bullet) => {
@@ -78,13 +78,13 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
     guntree: gt.Gun;
     muzzles: Map<string, Transformation>;
     bulletGenerator: BulletGenerator<T, A>;
-    targetDealer: TargetDealer<T>;
+    targetProvider: TargetProvider<T>;
     damageDealer: DamageDealer<T>;
   }): this {
     this.guntree = args.guntree;
     this.muzzles = args.muzzles;
     this.bulletGenerator = args.bulletGenerator;
-    this.targetDealer = args.targetDealer;
+    this.targetProvider = args.targetProvider;
     this.damageDealerInner = args.damageDealer;
 
     return this;
@@ -100,7 +100,7 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
 
     this.world = world;
 
-    const owner = new GuntreeOwner<T>(world, this.muzzles, this.targetDealer);
+    const owner = new GuntreeOwner<T>(world, this.muzzles, this.targetProvider);
     this.player.start(true, owner, this.guntree);
   }
 
