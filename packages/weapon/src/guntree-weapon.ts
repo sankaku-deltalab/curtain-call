@@ -4,7 +4,8 @@ import { Transformation } from "@curtain-call/util";
 import { DamageDealer } from "@curtain-call/health";
 import { Matrix } from "trans-vector2d";
 import { BulletGenerator } from "./bullet-generator";
-import { TargetDealer } from "./target-dealer";
+import { TargetDealer, NonTargetDealer } from "./target-dealer";
+import { Weapon } from "./weapon";
 
 class GuntreeOwner<T> implements gt.Owner {
   constructor(
@@ -35,7 +36,7 @@ class GuntreeOwner<T> implements gt.Owner {
 /**
  * Fire bullets with Guntree.
  */
-export class GunTreeWeapon<T, A> {
+export class GunTreeWeapon<T, A> implements Weapon<T> {
   /** Events. */
   public readonly event = new EventEmitter<{
     fired: [T, A];
@@ -44,8 +45,11 @@ export class GunTreeWeapon<T, A> {
 
   private readonly player = new gt.Player();
   private world?: T;
+  private guntree: gt.Gun = gt.nop();
+  private muzzles = new Map<string, Transformation>();
   private bulletGenerator?: BulletGenerator<T, A>;
   private damageDealerInner?: DamageDealer<T>;
+  private targetDealer: TargetDealer<T> = new NonTargetDealer<T>();
 
   constructor() {
     this.player.events.on("fired", (data, bullet) => {
@@ -62,35 +66,42 @@ export class GunTreeWeapon<T, A> {
   }
 
   /**
-   * Start firing.
+   * Init weapon.
    *
    * @param args Arguments for firing.
-   * @param args.world World.
    * @param args.guntree Using Guntree gun.
    * @param args.muzzles Muzzle transformations.
    * @param args.bulletGenerator Generator used when fired.
    * @param args.damageDealer Damage dealer would be emitted by bullet DamageDealer.
    */
-  start(args: {
-    world: T;
+  init(args: {
     guntree: gt.Gun;
     muzzles: Map<string, Transformation>;
     bulletGenerator: BulletGenerator<T, A>;
     targetDealer: TargetDealer<T>;
     damageDealer: DamageDealer<T>;
-  }): void {
-    if (this.player.isRunning()) return;
-
-    this.world = args.world;
+  }): this {
+    this.guntree = args.guntree;
+    this.muzzles = args.muzzles;
     this.bulletGenerator = args.bulletGenerator;
+    this.targetDealer = args.targetDealer;
     this.damageDealerInner = args.damageDealer;
 
-    const owner = new GuntreeOwner<T>(
-      args.world,
-      args.muzzles,
-      args.targetDealer
-    );
-    this.player.start(true, owner, args.guntree);
+    return this;
+  }
+
+  /**
+   * Start firing.
+   *
+   * @param world World.
+   */
+  start(world: T): void {
+    if (this.player.isRunning()) return;
+
+    this.world = world;
+
+    const owner = new GuntreeOwner<T>(world, this.muzzles, this.targetDealer);
+    this.player.start(true, owner, this.guntree);
   }
 
   /**
