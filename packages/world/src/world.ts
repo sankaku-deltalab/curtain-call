@@ -4,6 +4,7 @@ import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
 import { DisplayObjectManager } from "@curtain-call/display-object";
 import { PointerInputReceiver } from "@curtain-call/input";
+import { OverlapChecker } from "@curtain-call/collision";
 import {
   pixiMatrixToMatrix2d,
   Updatable,
@@ -17,6 +18,7 @@ export class World {
   public readonly backgroundTrans = new Transformation();
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
+  private readonly overlapChecker = new OverlapChecker<this, Actor<this>>();
 
   /**
    * @param head Root of PIXI objects.
@@ -73,9 +75,10 @@ export class World {
    */
   update(deltaSec: number): void {
     this.removeDeadUpdatable();
-    this.updatable.forEach((up) => up.update(this, deltaSec));
-    this.displayObject.update(this, deltaSec);
 
+    this.updatable.forEach((up) => up.update(this, deltaSec));
+    this.checkCollision();
+    this.displayObject.update(this, deltaSec);
     this.updatePixiDisplayObject();
   }
 
@@ -217,5 +220,10 @@ export class World {
         this.displayObject.add(obj);
       });
     });
+  }
+
+  private checkCollision(): void {
+    const collisions = Array.from(this.actors).map((ac) => ac.collision);
+    this.overlapChecker.checkOverlap(this, collisions);
   }
 }

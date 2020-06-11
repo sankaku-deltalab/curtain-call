@@ -6,6 +6,7 @@ import { Camera } from "@curtain-call/camera";
 import { Updatable, Transformation } from "@curtain-call/util";
 import { PointerInputReceiver } from "@curtain-call/input";
 import { World } from "../src";
+import { RectCollisionShape } from "@curtain-call/collision";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -294,5 +295,37 @@ describe("@curtain-call/world.World", () => {
   it("has Transformation for background actors", () => {
     const { world } = worldWithMock();
     expect(world.backgroundTrans).toBeInstanceOf(Transformation);
+  });
+
+  it("check overlapping when updated", () => {
+    const { world } = worldWithMock();
+    const actor1 = new Actor<typeof world>()
+      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .moveTo({ x: 0, y: 0 });
+    const actor2 = new Actor<typeof world>()
+      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .moveTo({ x: 5, y: 5 });
+    const actor3 = new Actor<typeof world>()
+      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .moveTo({ x: -21, y: -21 });
+    const actors = [actor1, actor2, actor3];
+    actors.forEach((ac) => {
+      jest.spyOn(ac.collision.event, "emit");
+      world.addActor(ac);
+    });
+
+    world.update(1);
+
+    expect(actor1.collision.event.emit).toBeCalledWith(
+      "overlapped",
+      world,
+      new Set([actor2.collision])
+    );
+    expect(actor2.collision.event.emit).toBeCalledWith(
+      "overlapped",
+      world,
+      new Set([actor1.collision])
+    );
+    expect(actor3.collision.event.emit).not.toBeCalled();
   });
 });
