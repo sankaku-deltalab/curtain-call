@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { Vector, Matrix } from "trans-vector2d";
+import { Matrix, VectorLike } from "trans-vector2d";
 import { Transformation, Updatable } from "@curtain-call/util";
 import { Health, DamageDealer } from "@curtain-call/health";
 import { Mover } from "@curtain-call/mover";
@@ -96,7 +96,7 @@ export class Actor<T> implements Updatable<T> {
    * @param pos New position. Not delta.
    * @returns this.
    */
-  moveTo(pos: Vector): this {
+  moveTo(pos: VectorLike): this {
     const { rotation, scale } = this.trans.getLocal().decompose();
     this.trans.setLocal(Matrix.from({ translation: pos, rotation, scale }));
     return this;

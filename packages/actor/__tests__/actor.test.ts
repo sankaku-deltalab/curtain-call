@@ -104,7 +104,7 @@ describe("@curtain-call/actor.Actor", () => {
       })
     );
 
-    actor.moveTo(new Vector(6, 7));
+    actor.moveTo({ x: 6, y: 7 });
 
     expect(
       actor.trans.getLocal().isClosedTo(
