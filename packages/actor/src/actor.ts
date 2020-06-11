@@ -4,6 +4,7 @@ import { Transformation, Updatable } from "@curtain-call/util";
 import { Health, DamageDealer } from "@curtain-call/health";
 import { Mover } from "@curtain-call/mover";
 import { DisplayObject } from "@curtain-call/display-object";
+import { Collision } from "@curtain-call/collision";
 import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
 
@@ -33,6 +34,9 @@ export class Actor<T> implements Updatable<T> {
 
   /** Damage dealer. */
   public readonly damageDealer = new DamageDealer<T>();
+
+  /** Collision. */
+  public readonly collision = new Collision<T, Actor<T>>().ownedBy(this);
 
   /**
    * Remove self from world at next update.

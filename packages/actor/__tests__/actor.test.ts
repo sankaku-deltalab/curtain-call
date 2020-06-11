@@ -1,6 +1,7 @@
 import { Matrix, Vector } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
 import { DamageDealer } from "@curtain-call/health";
+import { Collision } from "@curtain-call/collision";
 import { Actor, DisplayObjects, Movers } from "../src";
 import { moverMock, spriteMock } from "./mock";
 
@@ -84,6 +85,13 @@ describe("@curtain-call/actor.Actor", () => {
     const actor = new Actor();
 
     expect(actor.damageDealer).toBeInstanceOf(DamageDealer);
+  });
+
+  it("has collision owned by self", () => {
+    const actor = new Actor();
+
+    expect(actor.collision).toBeInstanceOf(Collision);
+    expect(actor.collision.owner()).toBe(actor);
   });
 
   it("can move", () => {
