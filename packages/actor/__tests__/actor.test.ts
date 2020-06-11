@@ -88,10 +88,13 @@ describe("@curtain-call/actor.Actor", () => {
   });
 
   it("has collision owned by self", () => {
-    const actor = new Actor();
+    const collision = new Collision<unknown, Actor<unknown>>();
+    jest.spyOn(collision, "attachTo");
+    const actor = new Actor({ collision });
 
     expect(actor.collision).toBeInstanceOf(Collision);
     expect(actor.collision.owner()).toBe(actor);
+    expect(actor.collision.attachTo).toBeCalledWith(actor.trans);
   });
 
   it("can move", () => {

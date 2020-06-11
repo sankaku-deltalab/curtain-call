@@ -21,22 +21,39 @@ export class Actor<T> implements Updatable<T> {
   }>();
 
   /** Transformation. */
-  public readonly trans = new Transformation();
+  public readonly trans: Transformation;
 
   /** DisplayObjects. */
-  public readonly displayObjects = new DisplayObjects<T>();
+  public readonly displayObjects: DisplayObjects<T>;
 
   /** Movers. */
-  public readonly movers = new Movers<T>();
+  public readonly movers: Movers<T>;
 
   /** Health. */
-  public readonly health = new Health<T>();
+  public readonly health: Health<T>;
 
   /** Damage dealer. */
-  public readonly damageDealer = new DamageDealer<T>();
+  public readonly damageDealer: DamageDealer<T>;
 
   /** Collision. */
-  public readonly collision = new Collision<T, Actor<T>>().ownedBy(this);
+  public readonly collision: Collision<T, Actor<T>>;
+
+  constructor(diArgs?: {
+    trans?: Transformation;
+    displayObjects?: DisplayObjects<T>;
+    movers?: Movers<T>;
+    health?: Health<T>;
+    damageDealer?: DamageDealer<T>;
+    collision?: Collision<T, Actor<T>>;
+  }) {
+    this.trans = diArgs?.trans || new Transformation();
+    this.displayObjects = diArgs?.displayObjects || new DisplayObjects<T>();
+    this.movers = diArgs?.movers || new Movers<T>();
+    this.health = diArgs?.health || new Health<T>();
+    this.damageDealer = diArgs?.damageDealer || new DamageDealer<T>();
+    const collision = diArgs?.collision || new Collision<T, Actor<T>>();
+    this.collision = collision.ownedBy(this).attachTo(this.trans);
+  }
 
   /**
    * Remove self from world at next update.
