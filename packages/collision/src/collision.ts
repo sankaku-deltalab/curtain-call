@@ -43,6 +43,17 @@ export class Collision<TWorld, TActor> {
   }
 
   /**
+   * Attach self Transformation to other.
+   *
+   * @param parent Parent Transformation.
+   * @returns this.
+   */
+  attachTo(parent: Transformation): this {
+    this.trans.attachTo(parent);
+    return this;
+  }
+
+  /**
    * Add collision shape.
    *
    * @param shape Adding collision shape.

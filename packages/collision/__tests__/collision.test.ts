@@ -83,4 +83,13 @@ describe("@curtain-call/collision.Collision", () => {
 
     expect(collision.owner()).toBe(owner);
   });
+
+  it("can attach to other", () => {
+    const parent = new Transformation();
+    const trans = new Transformation();
+    jest.spyOn(trans, "attachTo");
+    const collision = new Collision(trans).attachTo(parent);
+
+    expect(collision.trans.attachTo).toBeCalledWith(parent);
+  });
 });
