@@ -76,4 +76,11 @@ describe("@curtain-call/collision.Collision", () => {
       expect(collision.isHugeNumber()).toBe(true);
     });
   });
+
+  it("can owned by actor", () => {
+    const owner = jest.fn();
+    const collision = new Collision().ownedBy(owner);
+
+    expect(collision.owner()).toBe(owner);
+  });
 });

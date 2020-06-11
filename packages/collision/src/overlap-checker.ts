@@ -2,10 +2,10 @@ import boxIntersect from "box-intersect";
 import { Box2d } from "./common";
 import { Collision } from "./collision";
 
-export class OverlapChecker<T> {
-  checkOverlap(world: T, collisions: Collision<T>[]): void {
+export class OverlapChecker<TWorld, TActor> {
+  checkOverlap(world: TWorld, collisions: Collision<TWorld, TActor>[]): void {
     const collided = new Map(
-      collisions.map((c) => [c, new Set<Collision<T>>()])
+      collisions.map((c) => [c, new Set<Collision<TWorld, TActor>>()])
     );
 
     const nonHugeBoxesToCollision = this.box2dToCollisionMapping(
@@ -43,15 +43,14 @@ export class OverlapChecker<T> {
   }
 
   private box2dToCollisionMapping(
-    collisions: Collision<T>[]
-  ): Map<Box2d, Collision<T>> {
-    const colBoxes = collisions.map<[Collision<T>, Box2d[]]>((c) => [
-      c,
-      c.getBox2Ds(),
-    ]);
+    collisions: Collision<TWorld, TActor>[]
+  ): Map<Box2d, Collision<TWorld, TActor>> {
+    const colBoxes = collisions.map<[Collision<TWorld, TActor>, Box2d[]]>(
+      (c) => [c, c.getBox2Ds()]
+    );
     return new Map(
       colBoxes
-        .map<[Box2d, Collision<T>][]>(([col, boxes]) =>
+        .map<[Box2d, Collision<TWorld, TActor>][]>(([col, boxes]) =>
           boxes.map((b) => [b, col])
         )
         .flat()

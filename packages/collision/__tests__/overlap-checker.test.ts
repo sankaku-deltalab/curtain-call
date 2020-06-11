@@ -1,10 +1,10 @@
 import { Collision, Box2d, OverlapChecker } from "../src";
 
-const collisionMock = <T>(
+const collisionMock = <TWorld, TActor>(
   isHuge: boolean,
   boxes: Box2d[] = []
-): Collision<T> => {
-  const collision = new Collision<T>().setIsHugeNumber(isHuge);
+): Collision<TWorld, TActor> => {
+  const collision = new Collision<TWorld, TActor>().setIsHugeNumber(isHuge);
   jest.spyOn(collision, "getBox2Ds").mockReturnValue(boxes);
   jest.spyOn(collision.event, "emit");
   return collision;

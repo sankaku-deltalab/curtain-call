@@ -6,19 +6,41 @@ import { Box2d } from "./common";
 /**
  * Collision.
  */
-export class Collision<T> {
+export class Collision<TWorld, TActor> {
   /** Events. */
   public readonly event = new EventEmitter<{
-    overlapped: [T, Set<Collision<T>>];
+    overlapped: [TWorld, Set<Collision<TWorld, TActor>>];
   }>();
 
   private isHugeNumberInternal = false;
   private readonly shapes = new Set<CollisionShape>();
+  private ownerInternal?: TActor;
 
   /**
    * @param trans Transformation
    */
   constructor(public readonly trans = new Transformation()) {}
+
+  /**
+   * Self owned by actor.
+   *
+   * @param owner Owner actor.
+   * @returns this.
+   */
+  ownedBy(owner: TActor): this {
+    this.ownerInternal = owner;
+    return this;
+  }
+
+  /**
+   * Get owner.
+   *
+   * @returns Owner.
+   */
+  owner(): TActor {
+    if (!this.ownerInternal) throw new Error("Not owned yet");
+    return this.ownerInternal;
+  }
 
   /**
    * Add collision shape.
