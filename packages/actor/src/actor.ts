@@ -4,7 +4,7 @@ import { Transformation, Updatable } from "@curtain-call/util";
 import { Health, DamageDealer } from "@curtain-call/health";
 import { Mover } from "@curtain-call/mover";
 import { DisplayObject } from "@curtain-call/display-object";
-import { Collision } from "@curtain-call/collision";
+import { Collision, CollisionShape } from "@curtain-call/collision";
 import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
 
@@ -155,6 +155,17 @@ export class Actor<T> implements Updatable<T> {
    */
   visualizedBy(displayObject: DisplayObject<T>): this {
     this.displayObjects.add(displayObject);
+    return this;
+  }
+
+  /**
+   * Add CollisionShape.
+   *
+   * @param collisionShape Adding CollisionShape.
+   * @returns this.
+   */
+  collideWith(collisionShape: CollisionShape): this {
+    this.collision.add(collisionShape);
     return this;
   }
 }

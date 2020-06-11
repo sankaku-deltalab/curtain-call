@@ -1,7 +1,7 @@
 import { Matrix, Vector } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
 import { DamageDealer } from "@curtain-call/health";
-import { Collision } from "@curtain-call/collision";
+import { Collision, RectCollisionShape } from "@curtain-call/collision";
 import { Actor, DisplayObjects, Movers } from "../src";
 import { moverMock, spriteMock } from "./mock";
 
@@ -182,5 +182,15 @@ describe("@curtain-call/actor.Actor", () => {
     actor.visualizedBy(sprite);
 
     expect(actor.displayObjects.add).toBeCalledWith(sprite);
+  });
+
+  it("can add CollisionShape", () => {
+    const actor = new Actor();
+    jest.spyOn(actor.collision, "add");
+
+    const collisionShape = new RectCollisionShape();
+    actor.collideWith(collisionShape);
+
+    expect(actor.collision.add).toBeCalledWith(collisionShape);
   });
 });
