@@ -17,7 +17,7 @@ export class Collision<TWorld, TActor> {
   private readonly shapes = new Set<CollisionShape>();
   private ownerInternal?: TActor;
   private collisionGroup = CollisionGroupPresets.all;
-  private enable = true;
+  private enabled = true;
 
   /**
    * @param trans Transformation
@@ -156,7 +156,7 @@ export class Collision<TWorld, TActor> {
    * @returns this.
    */
   setEnable(newEnable: boolean): this {
-    this.enable = newEnable;
+    this.enabled = newEnable;
     return this;
   }
 
@@ -165,7 +165,7 @@ export class Collision<TWorld, TActor> {
    *
    * @returns This can collide with others.
    */
-  isEnable(): boolean {
-    return this.enable;
+  isEnabled(): boolean {
+    return this.enabled;
   }
 }

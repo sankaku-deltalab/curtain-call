@@ -4,7 +4,7 @@ import { Collision } from "./collision";
 
 export class OverlapChecker<TWorld, TActor> {
   checkOverlap(world: TWorld, collisions: Collision<TWorld, TActor>[]): void {
-    const cols = collisions.filter((col) => col.isEnable());
+    const cols = collisions.filter((col) => col.isEnabled());
 
     const collided = new Map(
       cols.map((c) => [c, new Set<Collision<TWorld, TActor>>()])
