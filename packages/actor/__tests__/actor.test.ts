@@ -4,6 +4,7 @@ import { DamageDealer } from "@curtain-call/health";
 import { Collision, RectCollisionShape } from "@curtain-call/collision";
 import { Actor, DisplayObjects, Movers } from "../src";
 import { moverMock, spriteMock } from "./mock";
+import { CollisionGroupPresets } from "@curtain-call/collision/src/collision-group";
 
 describe("@curtain-call/actor.Actor", () => {
   describe("has DisplayObjects", () => {
@@ -195,5 +196,26 @@ describe("@curtain-call/actor.Actor", () => {
     actor.collideWith(collisionShape);
 
     expect(actor.collision.add).toBeCalledWith(collisionShape);
+  });
+
+  it("can set CollisionGroup", () => {
+    const actor = new Actor();
+
+    const group = CollisionGroupPresets.item;
+    actor.setCollisionGroup(group);
+
+    expect(actor.collision.group()).toBe(group);
+  });
+
+  it.each`
+    enabled
+    ${true}
+    ${false}
+  `("can set collision enable or disable", ({ enabled }) => {
+    const actor = new Actor();
+
+    actor.setCollisionEnabled(enabled);
+
+    expect(actor.collision.isEnabled()).toBe(enabled);
   });
 });

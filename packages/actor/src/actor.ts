@@ -7,6 +7,7 @@ import { DisplayObject } from "@curtain-call/display-object";
 import { Collision, CollisionShape } from "@curtain-call/collision";
 import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
+import { CollisionGroup } from "@curtain-call/collision/dist/collision-group";
 
 /**
  * Actor is main object used in World.
@@ -183,6 +184,28 @@ export class Actor<T> implements Updatable<T> {
    */
   collideWith(collisionShape: CollisionShape): this {
     this.collision.add(collisionShape);
+    return this;
+  }
+
+  /**
+   * Set CollisionGroup to collision.
+   *
+   * @param group New collision group.
+   * @returns this.
+   */
+  setCollisionGroup(group: CollisionGroup): this {
+    this.collision.setGroup(group);
+    return this;
+  }
+
+  /**
+   * Enable or disable collision.
+   *
+   * @param enable Enable collision if true.
+   * @returns this.
+   */
+  setCollisionEnabled(enable: boolean): this {
+    this.collision.setEnable(enable);
     return this;
   }
 }
