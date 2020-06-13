@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import { Transformation } from "@curtain-call/util";
 import { CollisionShape } from "./collision-shape";
+import { CollisionGroup, CollisionGroupPresets } from "./collision-group";
 import { Box2d } from "./common";
 
 /**
@@ -15,6 +16,8 @@ export class Collision<TWorld, TActor> {
   private isHugeNumberInternal = false;
   private readonly shapes = new Set<CollisionShape>();
   private ownerInternal?: TActor;
+  private collisionGroup = CollisionGroupPresets.all;
+  private enable = true;
 
   /**
    * @param trans Transformation
@@ -112,5 +115,57 @@ export class Collision<TWorld, TActor> {
    */
   isHugeNumber(): boolean {
     return this.isHugeNumberInternal;
+  }
+
+  /**
+   * Get this CollisionGroup.
+   *
+   * @returns Group of this.
+   */
+  group(): CollisionGroup {
+    return this.collisionGroup;
+  }
+
+  /**
+   * Set this CollisionGroup.
+   *
+   * @param newGroup New group of this.
+   * @returns this.
+   */
+  setGroup(newGroup: CollisionGroup): this {
+    this.collisionGroup = newGroup;
+    return this;
+  }
+
+  /**
+   * Return this can collide with other.
+   *
+   * NOTE: this.isEnable() and other.isEnable() will ignored.
+   *
+   * @param other Other collision.
+   * @return This can collide with other.
+   */
+  canCollideWith(other: Collision<TWorld, TActor>): boolean {
+    return (this.group().mask & other.group().category) !== 0;
+  }
+
+  /**
+   * Set enable.
+   *
+   * @param newEnable Enabling.
+   * @returns this.
+   */
+  setEnable(newEnable: boolean): this {
+    this.enable = newEnable;
+    return this;
+  }
+
+  /**
+   * This collision is enabled.
+   *
+   * @returns This can collide with others.
+   */
+  isEnable(): boolean {
+    return this.enable;
   }
 }

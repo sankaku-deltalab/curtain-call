@@ -4,27 +4,36 @@ import { Collision } from "./collision";
 
 export class OverlapChecker<TWorld, TActor> {
   checkOverlap(world: TWorld, collisions: Collision<TWorld, TActor>[]): void {
+    const cols = collisions.filter((col) => col.isEnable());
+
     const collided = new Map(
-      collisions.map((c) => [c, new Set<Collision<TWorld, TActor>>()])
+      cols.map((c) => [c, new Set<Collision<TWorld, TActor>>()])
     );
 
     const nonHugeBoxesToCollision = this.box2dToCollisionMapping(
-      collisions.filter((c) => !c.isHugeNumber())
+      cols.filter((c) => !c.isHugeNumber())
     );
     const nonHugeBoxes = Array.from(nonHugeBoxesToCollision.keys());
 
     const hugeBoxesToCollision = this.box2dToCollisionMapping(
-      collisions.filter((c) => c.isHugeNumber())
+      cols.filter((c) => c.isHugeNumber())
     );
     const hugeBoxes = Array.from(hugeBoxesToCollision.keys());
+
+    const updateCollided = (
+      a: Collision<TWorld, TActor>,
+      b: Collision<TWorld, TActor>
+    ): void => {
+      if (a.canCollideWith(b)) collided.get(a)?.add(b);
+      if (b.canCollideWith(a)) collided.get(b)?.add(a);
+    };
 
     boxIntersect(nonHugeBoxes, hugeBoxes, (i, j) => {
       const nonHugeCol = nonHugeBoxesToCollision.get(nonHugeBoxes[i]);
       const hugeCol = hugeBoxesToCollision.get(hugeBoxes[j]);
       if (!nonHugeCol || !hugeCol) throw new Error();
 
-      collided.get(nonHugeCol)?.add(hugeCol);
-      collided.get(hugeCol)?.add(nonHugeCol);
+      updateCollided(nonHugeCol, hugeCol);
     });
 
     boxIntersect(nonHugeBoxes, (i, j) => {
@@ -32,8 +41,7 @@ export class OverlapChecker<TWorld, TActor> {
       const nonHugeColB = nonHugeBoxesToCollision.get(nonHugeBoxes[j]);
       if (!nonHugeColA || !nonHugeColB) throw new Error();
 
-      collided.get(nonHugeColA)?.add(nonHugeColB);
-      collided.get(nonHugeColB)?.add(nonHugeColA);
+      updateCollided(nonHugeColA, nonHugeColB);
     });
 
     collided.forEach((colBs, colA) => {
