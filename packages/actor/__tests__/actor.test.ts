@@ -82,6 +82,15 @@ describe("@curtain-call/actor.Actor", () => {
     });
   });
 
+  it("should not remove from world when added to world", () => {
+    const actor = new Actor();
+    actor.removeSelfFromWorld();
+
+    actor.notifyAddedToWorld({});
+
+    expect(actor.shouldRemoveSelfFromWorld()).toBe(false);
+  });
+
   it("has DamageDealer", () => {
     const actor = new Actor();
 

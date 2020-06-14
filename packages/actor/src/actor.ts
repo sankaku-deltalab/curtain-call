@@ -59,6 +59,8 @@ export class Actor<T> implements Updatable<T> {
   /**
    * Remove self from world at next update.
    *
+   * NOTE: If this function called before this added to world, this would be not removed.
+   *
    * @returns Self must remove from world.
    */
   removeSelfFromWorld(): this {
@@ -90,11 +92,12 @@ export class Actor<T> implements Updatable<T> {
 
   /**
    * Notify added to world.
-   * Called from World.
+   * Called from only World.
    *
    * @param world Added World.
    */
   notifyAddedToWorld(world: T): void {
+    this.shouldRemoveSelf = false;
     this.event.emit("addedToWorld", world);
   }
 
