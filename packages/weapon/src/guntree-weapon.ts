@@ -48,13 +48,14 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
   private guntree: gt.Gun = gt.nop();
   private muzzles = new Map<string, Transformation>();
   private bulletGenerator?: BulletGenerator<T, A>;
-  private damageDealerInner?: DamageDealer<T>;
   private targetProvider: TargetProvider<T> = new NonTargetProvider<T>();
 
-  constructor() {
+  /**
+   * @param damageDealer Damage dealer would be emitted when bullet dealt damage.
+   */
+  constructor(public readonly damageDealer = new DamageDealer<T>()) {
     this.player.events.on("fired", (data, bullet) => {
-      if (!this.world || !this.bulletGenerator || !this.damageDealerInner)
-        throw new Error();
+      if (!this.world || !this.bulletGenerator) throw new Error();
       const bulletActor = this.generateBullet(data, bullet);
       if (!bulletActor) return;
       this.event.emit("fired", this.world, bulletActor);
@@ -73,20 +74,17 @@ export class GunTreeWeapon<T, A> implements Weapon<T> {
    * @param args.muzzles Muzzle transformations.
    * @param args.bulletGenerator Generator used when fired.
    * @param args.targetProvider Target provider.
-   * @param args.damageDealer Damage dealer would be emitted by bullet DamageDealer.
    */
   init(args: {
     guntree: gt.Gun;
     muzzles: Map<string, Transformation>;
     bulletGenerator: BulletGenerator<T, A>;
     targetProvider: TargetProvider<T>;
-    damageDealer: DamageDealer<T>;
   }): this {
     this.guntree = args.guntree;
     this.muzzles = args.muzzles;
     this.bulletGenerator = args.bulletGenerator;
     this.targetProvider = args.targetProvider;
-    this.damageDealerInner = args.damageDealer;
 
     return this;
   }

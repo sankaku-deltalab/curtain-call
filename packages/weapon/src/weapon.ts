@@ -1,4 +1,9 @@
+import { DamageDealer } from "@curtain-call/health";
+
 export interface Weapon<T> {
+  /** Damage dealer. */
+  readonly damageDealer: DamageDealer<T>;
+
   /**
    * Start firing.
    *

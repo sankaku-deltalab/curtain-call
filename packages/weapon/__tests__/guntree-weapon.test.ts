@@ -1,7 +1,6 @@
 import * as gt from "guntree";
 import { GunTreeWeapon, BulletGenerator, TargetProvider } from "../src";
 import { Transformation } from "@curtain-call/util";
-import { DamageDealer } from "@curtain-call/health";
 
 const exampleGun = (): gt.Gun => {
   return gt.concat(gt.useMuzzle("center"), gt.fire(gt.bullet()), gt.wait(60));
@@ -17,29 +16,16 @@ const targetProviderMock = <T>(): TargetProvider<T> => {
   return new cls();
 };
 
-const damageDealerMock = <T>(): DamageDealer<T> => {
-  const dd = new DamageDealer<T>();
-  jest.spyOn(dd.event, "emit");
-  jest.spyOn(dd.event, "on");
-  return dd;
-};
-
-const initArgsMock = <T, A>(
-  world: T
-): {
-  world: T;
+const initArgsMock = <T, A>(): {
   guntree: gt.Gun;
   muzzles: Map<string, Transformation>;
   bulletGenerator: BulletGenerator<T, A>;
   targetProvider: TargetProvider<T>;
-  damageDealer: DamageDealer<T>;
 } => ({
-  world,
   guntree: exampleGun(),
   muzzles: new Map([["center", new Transformation()]]),
   bulletGenerator: bulletGeneratorMock(),
   targetProvider: targetProviderMock(),
-  damageDealer: damageDealerMock(),
 });
 
 describe("@curtain-call/weapon.GunTreeWeapon", () => {
@@ -49,7 +35,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
       const bullet = {};
       const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
 
-      const args = initArgsMock<typeof world, typeof bullet>(world);
+      const args = initArgsMock<typeof world, typeof bullet>();
       weapon.init(args).start(world);
 
       expect(args.bulletGenerator.generate).toBeCalledWith(
@@ -71,7 +57,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
       const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = initArgsMock<typeof world, typeof bullet>(world);
+      const args = initArgsMock<typeof world, typeof bullet>();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.init(args).start(world);
@@ -87,7 +73,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
       const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = initArgsMock<typeof world, typeof bullet>(world);
+      const args = initArgsMock<typeof world, typeof bullet>();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.init(args).start(world);
@@ -104,7 +90,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
       const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = initArgsMock<typeof world, typeof bullet>(world);
+      const args = initArgsMock<typeof world, typeof bullet>();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.init(args).start(world);
@@ -121,7 +107,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
       const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
-      const args = initArgsMock<typeof world, typeof bullet>(world);
+      const args = initArgsMock<typeof world, typeof bullet>();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
 
       weapon.init(args).start(world);
