@@ -111,6 +111,29 @@ describe("@curtain-call/world.World", () => {
       world.addActor(actor);
       expect(() => world.addActor(actor)).toThrowError();
     });
+
+    it("and can check actor added", () => {
+      const { world } = worldWithMock();
+
+      const actor = new Actor<typeof world>();
+
+      expect(world.hasActor(actor)).toBe(false);
+
+      world.addActor(actor);
+
+      expect(world.hasActor(actor)).toBe(true);
+    });
+
+    it("and can iterate added actors", () => {
+      const { world } = worldWithMock();
+
+      const actor1 = new Actor<typeof world>();
+      const actor2 = new Actor<typeof world>();
+      world.addActor(actor1).addActor(actor2);
+
+      const actors = Array.from(world.iterateActors());
+      expect(actors).toEqual([actor1, actor2]);
+    });
   });
 
   describe("can remove actor", () => {

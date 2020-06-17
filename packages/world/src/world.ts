@@ -117,6 +117,25 @@ export class World {
   }
 
   /**
+   * Return this has given actor.
+   *
+   * @param actor Checking actor.
+   * @returns This has given actor.
+   */
+  hasActor(actor: Actor<this>): boolean {
+    return this.actors.has(actor);
+  }
+
+  /**
+   * Iterate added actors.
+   *
+   * @returns Added actors iterator.
+   */
+  iterateActors(): IterableIterator<Actor<this>> {
+    return this.actors.values();
+  }
+
+  /**
    * Add Updatable object.
    *
    * @warn Do not add `Actor`. Use `addActor` instead.
