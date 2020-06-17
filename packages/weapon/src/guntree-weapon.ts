@@ -36,7 +36,7 @@ class GuntreeOwner<T> implements gt.Owner {
 /**
  * Fire bullets with Guntree.
  */
-export class GunTreeWeapon<T, A> implements Weapon<T> {
+export class GuntreeWeapon<T, A> implements Weapon<T> {
   /** Events. */
   public readonly event = new EventEmitter<{
     fired: [T, A];

@@ -1,5 +1,5 @@
 import * as gt from "guntree";
-import { GunTreeWeapon, BulletGenerator, TargetProvider } from "../src";
+import { GuntreeWeapon, BulletGenerator, TargetProvider } from "../src";
 import { Transformation } from "@curtain-call/util";
 
 const exampleGun = (): gt.Gun => {
@@ -28,12 +28,12 @@ const initArgsMock = <T, A>(): {
   targetProvider: targetProviderMock(),
 });
 
-describe("@curtain-call/weapon.GunTreeWeapon", () => {
+describe("@curtain-call/weapon.GuntreeWeapon", () => {
   describe("can fire", () => {
     it("can start firing", () => {
       const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
+      const weapon = new GuntreeWeapon<typeof world, typeof bullet>();
 
       const args = initArgsMock<typeof world, typeof bullet>();
       weapon.init(args).start(world);
@@ -54,7 +54,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
     it("can update firing", () => {
       const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
+      const weapon = new GuntreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock<typeof world, typeof bullet>();
@@ -70,7 +70,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
     it("can stop firing", () => {
       const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
+      const weapon = new GuntreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock<typeof world, typeof bullet>();
@@ -87,7 +87,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
     it("can stop firing", () => {
       const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
+      const weapon = new GuntreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock<typeof world, typeof bullet>();
@@ -104,7 +104,7 @@ describe("@curtain-call/weapon.GunTreeWeapon", () => {
     it("can stop firing immediately", () => {
       const world = {};
       const bullet = {};
-      const weapon = new GunTreeWeapon<typeof world, typeof bullet>();
+      const weapon = new GuntreeWeapon<typeof world, typeof bullet>();
       jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock<typeof world, typeof bullet>();

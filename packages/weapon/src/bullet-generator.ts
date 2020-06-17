@@ -1,5 +1,5 @@
 import { VectorLike, Matrix } from "trans-vector2d";
-import { GunTreeWeapon } from "./guntree-weapon";
+import { GuntreeWeapon } from "./guntree-weapon";
 
 export interface BulletStyle {
   spriteSize: VectorLike;
@@ -10,7 +10,7 @@ export interface BulletStyle {
 export interface BulletGenerator<T, A> {
   generate(
     world: T,
-    weapon: GunTreeWeapon<T, A>,
+    weapon: GuntreeWeapon<T, A>,
     trans: Matrix,
     elapsedSec: number,
     params: Map<string, number>,
