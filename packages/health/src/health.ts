@@ -57,10 +57,12 @@ export class Health<T> {
 
     const actualDamage = Math.min(modifiedDamage, this.health);
     this.event.emit("takenDamage", world, actualDamage, dealer, type);
+    dealer.notifyDealtDamage(world, actualDamage, this, type);
 
     this.health -= actualDamage;
     if (this.health === 0) {
       this.event.emit("died", world, dealer, type);
+      dealer.notifyKilled(world, this, type);
     }
   }
 

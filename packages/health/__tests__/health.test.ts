@@ -20,12 +20,19 @@ describe("@curtain-call/health.Health", () => {
 
     const world = {};
     const dealer = new DamageDealer();
+    jest.spyOn(dealer, "notifyDealtDamage");
     const type = { name: "testDamage" };
     health.takeDamage(world, damage, dealer, type);
 
     expect(health.current()).toBe(RemainHealth);
     expect(health.max()).toBe(initialHealth);
     const takenDamage = initialHealth - RemainHealth;
+    expect(dealer.notifyDealtDamage).toBeCalledWith(
+      world,
+      takenDamage,
+      health,
+      type
+    );
     expect(health.event.emit).toBeCalledWith(
       "takenDamage",
       world,
@@ -60,9 +67,11 @@ describe("@curtain-call/health.Health", () => {
 
       const world = {};
       const dealer = new DamageDealer();
+      jest.spyOn(dealer, "notifyKilled");
       const type = { name: "testDamage" };
       health.takeDamage(world, 1, dealer, type);
 
+      expect(dealer.notifyKilled).toBeCalledWith(world, health, type);
       expect(health.event.emit).toBeCalledWith("died", world, dealer, type);
     });
 
