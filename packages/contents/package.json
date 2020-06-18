@@ -35,9 +35,14 @@
   "dependencies": {
     "@curtain-call/actor": "^0.1.1",
     "@curtain-call/asset": "^0.1.1",
+    "@curtain-call/collision": "^0.1.1",
     "@curtain-call/health": "^0.1.1",
     "@curtain-call/level": "^0.1.1",
+    "@curtain-call/mover": "^0.1.1",
+    "@curtain-call/util": "^0.1.1",
     "@curtain-call/weapon": "^0.1.1",
-    "@curtain-call/world": "^0.1.1"
+    "@curtain-call/world": "^0.1.1",
+    "guntree": "^0.9.1",
+    "trans-vector2d": "^2.0.0"
   }
 }

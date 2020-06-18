@@ -1,37 +1,33 @@
-import { Character, Team, NullPlan, Plan } from "../../src";
+import { World } from "@curtain-call/world";
+import { Actor } from "@curtain-call/actor";
 import { DamageDealer } from "@curtain-call/health";
-import { Weapon, NullWeapon } from "@curtain-call/weapon";
+import { GuntreeWeapon, guntree as gt } from "@curtain-call/weapon";
+import { Character, Team, NullPlan, Plan } from "../../src";
 
-const planMock = <T>(): Plan<T> => {
+const planMock = <T extends World = World>(): Plan<T> => {
   const plan = new NullPlan();
   jest.spyOn(plan, "update");
   return plan;
-};
-
-const weaponMock = <T>(): Weapon<T> => {
-  const weapon = new NullWeapon();
-  jest.spyOn(weapon, "update");
-  return weapon;
 };
 
 describe("@curtain-call/contents.Character", () => {
   it("is in noSide team at first", () => {
     const character = new Character();
 
-    expect(character.getTeam()).toBe(Team.noSide);
+    expect(character.team()).toBe(Team.noSide);
   });
 
   it("can join to team", () => {
     const character = new Character().inTeam(Team.playerSide);
 
-    expect(character.getTeam()).toBe(Team.playerSide);
+    expect(character.team()).toBe(Team.playerSide);
   });
 
   it("can set plan", () => {
     const plan = planMock();
     const character = new Character().plannedBy(plan);
 
-    const world = "world";
+    const world = new World();
     const deltaSec = 0.125;
     character.update(world, deltaSec);
 
@@ -50,8 +46,8 @@ describe("@curtain-call/contents.Character", () => {
     const damageTakeCallback = jest.fn();
     character.health.event.on("takenDamage", damageTakeCallback);
 
-    const world = "world";
-    const dealer = new DamageDealer();
+    const world = new World();
+    const dealer = new DamageDealer<World>();
     const damageType = jest.fn();
     character.health.takeDamage(world, 1, dealer, damageType);
 
@@ -63,15 +59,22 @@ describe("@curtain-call/contents.Character", () => {
     );
   });
 
-  it("can arm weapon", () => {
-    const weapon = weaponMock();
-    const character = new Character().armedWith(weapon);
+  it("has Weapon", () => {
+    const character = new Character();
+    expect(character.weapon).toBeInstanceOf(GuntreeWeapon);
+  });
 
-    const world = "world";
-    const deltaSec = 0.125;
-    character.update(world, deltaSec);
+  it("can init Weapon", () => {
+    const weapon = new GuntreeWeapon<World, Actor<World>>();
+    jest.spyOn(weapon, "init");
+    const initArgs = {
+      guntree: gt.nop(),
+      muzzles: new Map(),
+      bulletGenerator: { generate: jest.fn() },
+      targetProvider: { get: jest.fn() },
+    };
+    const character = new Character({ weapon }).initWeapon(initArgs);
 
-    expect(character.getWeapon()).toBe(weapon);
-    expect(weapon.update).toBeCalledWith(world, deltaSec);
+    expect(character.weapon.init).toBeCalledWith(initArgs);
   });
 });

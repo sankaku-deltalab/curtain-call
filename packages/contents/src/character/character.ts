@@ -1,11 +1,20 @@
-import { Actor } from "@curtain-call/actor";
-import { DamageInterceptor } from "@curtain-call/health";
-import { Weapon, NullWeapon } from "@curtain-call/weapon";
+import * as gt from "guntree";
+import { Actor, DisplayObjects, Movers } from "@curtain-call/actor";
+import { DamageInterceptor, Health, DamageDealer } from "@curtain-call/health";
+import {
+  GuntreeWeapon,
+  BulletGenerator,
+  TargetProvider,
+} from "@curtain-call/weapon";
+import { World } from "@curtain-call/world";
+import { Transformation } from "@curtain-call/util";
 import { NullPlan } from "./null-plan";
 import { Plan } from "./plan";
 import { Team } from "../team";
+import { Collision } from "@curtain-call/collision";
 
-class CharacterDamageInterceptor<T> implements DamageInterceptor<T> {
+class CharacterDamageInterceptor<T extends World = World>
+  implements DamageInterceptor<T> {
   constructor(private readonly character: Character<T>) {}
   /**
    * Take damage to self.
@@ -22,15 +31,28 @@ class CharacterDamageInterceptor<T> implements DamageInterceptor<T> {
 /**
  * Character.
  */
-export class Character<T> extends Actor<T> {
-  private team = Team.noSide;
-  private weapon: Weapon<T> = new NullWeapon();
-  private plan: Plan<T> = new NullPlan();
+export class Character<TWorld extends World = World> extends Actor<TWorld> {
+  /** Weapon. */
+  public readonly weapon: GuntreeWeapon<TWorld, Actor<TWorld>>;
+
+  private teamInner = Team.noSide;
+  private plan: Plan<TWorld> = new NullPlan();
   private isImmortalInner = false;
 
-  constructor() {
-    super();
+  constructor(diArgs?: {
+    trans?: Transformation;
+    displayObjects?: DisplayObjects<TWorld>;
+    movers?: Movers<TWorld>;
+    health?: Health<TWorld>;
+    damageDealer?: DamageDealer<TWorld>;
+    collision?: Collision<TWorld, Actor<TWorld>>;
+    weapon?: GuntreeWeapon<TWorld, Actor<TWorld>>;
+  }) {
+    super(diArgs);
+    this.weapon = diArgs?.weapon || new GuntreeWeapon();
+
     this.health.addInterceptor(new CharacterDamageInterceptor(this));
+    this.weapon.damageDealer.chainedFrom(this.damageDealer);
   }
 
   /**
@@ -39,7 +61,7 @@ export class Character<T> extends Actor<T> {
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void {
+  update(world: TWorld, deltaSec: number): void {
     super.update(world, deltaSec);
     this.plan.update(world, deltaSec, this);
     this.weapon.update(world, deltaSec);
@@ -52,7 +74,7 @@ export class Character<T> extends Actor<T> {
    * @returns this.
    */
   inTeam(team: Team): this {
-    this.team = team;
+    this.teamInner = team;
     return this;
   }
 
@@ -61,8 +83,8 @@ export class Character<T> extends Actor<T> {
    *
    * @returns team.
    */
-  getTeam(): Team {
-    return this.team;
+  team(): Team {
+    return this.teamInner;
   }
 
   /**
@@ -71,7 +93,7 @@ export class Character<T> extends Actor<T> {
    * @param plan New plan.
    * @returns this.
    */
-  plannedBy(plan: Plan<T>): this {
+  plannedBy(plan: Plan<TWorld>): this {
     this.plan = plan;
     return this;
   }
@@ -97,22 +119,21 @@ export class Character<T> extends Actor<T> {
   }
 
   /**
-   * Get owned weapon.
+   * Init weapon.
    *
-   * @returns Weapon.
+   * @param args Arguments for firing.
+   * @param args.guntree Using Guntree gun.
+   * @param args.muzzles Muzzle transformations.
+   * @param args.bulletGenerator Generator used when fired.
+   * @param args.targetProvider Target provider.
    */
-  getWeapon(): Weapon<T> {
-    return this.weapon;
-  }
-
-  /**
-   * Set weapon.
-   *
-   * @param weapon New weapon.
-   * @returns this.
-   */
-  armedWith(weapon: Weapon<T>): this {
-    this.weapon = weapon;
+  initWeapon(args: {
+    guntree: gt.Gun;
+    muzzles: Map<string, Transformation>;
+    bulletGenerator: BulletGenerator<TWorld, Actor<TWorld>>;
+    targetProvider: TargetProvider<TWorld>;
+  }): this {
+    this.weapon.init(args);
     return this;
   }
 }
