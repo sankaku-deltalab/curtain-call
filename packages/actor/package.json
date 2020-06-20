@@ -33,6 +33,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@curtain-call/collision": "^0.1.1",
     "@curtain-call/display-object": "^0.1.1",
     "@curtain-call/health": "^0.1.1",
     "@curtain-call/mover": "^0.1.1",
