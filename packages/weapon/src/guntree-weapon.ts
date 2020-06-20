@@ -23,7 +23,7 @@ class GuntreeOwner<T> implements gt.Owner {
 
   getEnemyTransform(name: string): Matrix {
     if (!this.world || !this.targetProvider) throw new Error();
-    const target = this.targetProvider.get(this.world);
+    const target = this.targetProvider.getTargetTrans(this.world);
     if (!target)
       return this.getMuzzleTransform(name).globalize(
         Matrix.translation({ x: 1, y: 0 })
