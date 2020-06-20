@@ -50,6 +50,20 @@ describe("@curtain-call/collision.Collision", () => {
     });
   });
 
+  it("can emit overlapped event", () => {
+    const world = "world";
+    const collision = new Collision();
+    const overlapEv = jest.fn();
+    collision.event.on("overlapped", (world, others) => {
+      overlapEv(world, others);
+    });
+    const others = new Set([new Collision(), new Collision()]);
+
+    collision.notifyOverlappedWith(world, others);
+
+    expect(overlapEv).toBeCalledWith(world, others);
+  });
+
   it("can deal boxes from shapes", () => {
     const box1: Box2d = [0, 1, 2, 3];
     const shape1 = shapeMock([box1]);

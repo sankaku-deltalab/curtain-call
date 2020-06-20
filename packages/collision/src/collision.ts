@@ -168,4 +168,17 @@ export class Collision<TWorld, TActor> {
   isEnabled(): boolean {
     return this.enabled;
   }
+
+  /**
+   * Notify overlapped with other collisions.
+   *
+   * @param world Our world.
+   * @param others Other collisions.
+   */
+  notifyOverlappedWith(
+    world: TWorld,
+    others: Set<Collision<TWorld, TActor>>
+  ): void {
+    this.event.emit("overlapped", world, others);
+  }
 }
