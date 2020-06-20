@@ -1,3 +1,4 @@
+export * from "./collision-group";
 export * from "./collision-shape";
 export * from "./collision";
 export * from "./common";

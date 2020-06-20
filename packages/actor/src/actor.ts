@@ -4,10 +4,13 @@ import { Transformation, Updatable } from "@curtain-call/util";
 import { Health, DamageDealer } from "@curtain-call/health";
 import { Mover } from "@curtain-call/mover";
 import { DisplayObject } from "@curtain-call/display-object";
-import { Collision, CollisionShape } from "@curtain-call/collision";
+import {
+  Collision,
+  CollisionShape,
+  CollisionGroup,
+} from "@curtain-call/collision";
 import { DisplayObjects } from "./display-objects";
 import { Movers } from "./movers";
-import { CollisionGroup } from "@curtain-call/collision/dist/collision-group";
 
 /**
  * Actor is main object used in World.
