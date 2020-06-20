@@ -71,7 +71,7 @@ describe("@curtain-call/contents.Character", () => {
       guntree: gt.nop(),
       muzzles: new Map(),
       bulletGenerator: { generate: jest.fn() },
-      targetProvider: { get: jest.fn() },
+      targetProvider: { getTargetTrans: jest.fn() },
     };
     const character = new Character({ weapon }).initWeapon(initArgs);
 
