@@ -3,7 +3,11 @@ import { Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Sprite, DisplayObjectManager } from "@curtain-call/display-object";
 import { Camera } from "@curtain-call/camera";
-import { Updatable, Transformation } from "@curtain-call/util";
+import {
+  Updatable,
+  Transformation,
+  PositionStatusWithArea,
+} from "@curtain-call/util";
 import { PointerInputReceiver } from "@curtain-call/input";
 import { World } from "../src";
 import { RectCollisionShape } from "@curtain-call/collision";
@@ -72,20 +76,32 @@ describe("@curtain-call/world.World", () => {
     expect(() => new World()).not.toThrowError();
   });
 
-  it("can update drawing base", () => {
-    const { world } = worldWithMock();
+  it("can set draw area and setting effects visible area", () => {
+    const gameHeight = 400;
+    const gameWidth = 300;
+    const canvasHeight = 1000;
+    const canvasWidth = 600;
+    const gameUnitPerPixel = 2;
+    const world = new World().setDrawArea(
+      { x: canvasWidth / 2, y: canvasHeight / 2 },
+      { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
+      gameUnitPerPixel
+    );
+
     const obj = new PIXI.Container();
-    obj.position = new PIXI.Point(1, 2);
+    obj.position = new PIXI.Point(2, 3);
     world.tail.addChild(obj);
 
-    world.updateDrawBase({
-      center: { x: 3, y: 4 },
-      scale: 5,
-    });
+    const canvasPos = obj.getGlobalPosition();
+    expect(canvasPos.x).toBeCloseTo(300 + 2 * gameUnitPerPixel);
+    expect(canvasPos.y).toBeCloseTo(500 + 3 * gameUnitPerPixel);
 
-    const viewPos = obj.getGlobalPosition();
-    expect(viewPos.x).toBeCloseTo(8);
-    expect(viewPos.y).toBeCloseTo(14);
+    expect(
+      world.visibleArea.calcPositionStatus({ x: 150 - 1, y: 200 - 1 }, 0)
+    ).toBe(PositionStatusWithArea.inArea);
+    expect(world.visibleArea.calcPositionStatus({ x: 150, y: 200 }, 0)).toBe(
+      PositionStatusWithArea.onAreaEdge
+    );
   });
 
   describe("can add actor", () => {
@@ -235,22 +251,22 @@ describe("@curtain-call/world.World", () => {
   describe("can convert position between canvas and game", () => {
     it("so can convert canvas position to game position", () => {
       const { world } = worldWithMock();
-      world.updateDrawBase({ center: { x: 1, y: 2 } });
+      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 2);
 
-      const canvasPos = { x: 3, y: 4 };
+      const canvasPos = { x: 152, y: 206 };
       const gamePos = world.canvasPosToGamePos(canvasPos);
 
-      expect(gamePos).toEqual(new Vector(2, 2));
+      expect(gamePos).toEqual(new Vector(1, 3));
     });
 
     it("so can convert game position to canvas position", () => {
       const { world } = worldWithMock();
-      world.updateDrawBase({ center: { x: 1, y: 2 } });
+      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 2);
 
-      const gamePos = { x: 3, y: 4 };
+      const gamePos = { x: 1, y: 3 };
       const canvasPos = world.gamePosToCanvasPos(gamePos);
 
-      expect(canvasPos).toEqual(new Vector(4, 6));
+      expect(canvasPos).toEqual(new Vector(152, 206));
     });
   });
 
