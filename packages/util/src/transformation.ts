@@ -41,6 +41,16 @@ export class Transformation {
   }
 
   /**
+   * Get relative matrix.
+   *
+   * @param base Base transformation.
+   * @returns Relative matrix.
+   */
+  calcRelative(base: Transformation): Matrix {
+    return base.getGlobal().localize(this.global);
+  }
+
+  /**
    * Attach self to other Transformation and update global matrix.
    *
    * @param parent Other Transformation.

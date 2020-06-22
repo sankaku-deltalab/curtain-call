@@ -12,6 +12,21 @@ describe("@curtain-call/util.Transformation", () => {
     expect(trans.getGlobal()).toBeInstanceOf(Matrix);
   });
 
+  it("can calc relative matrix from other Transformation", () => {
+    const base = new Transformation().setLocal(
+      Matrix.from({ translation: { x: 1, y: 2 }, rotation: Math.PI / 2 })
+    );
+    const trans = new Transformation().setLocal(
+      Matrix.from({ translation: { x: 3, y: 5 }, rotation: Math.PI * (3 / 4) })
+    );
+
+    const rel = trans.calcRelative(base).decompose();
+
+    expect(rel.translation.x).toBeCloseTo(3);
+    expect(rel.translation.y).toBeCloseTo(-2);
+    expect(rel.rotation).toBeCloseTo(Math.PI / 4);
+  });
+
   describe("can attach to parent Transformation", () => {
     it("from function", () => {
       const parent = new Transformation();
