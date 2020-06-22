@@ -45,7 +45,11 @@ const worldWithMock = <T>(): {
 
   const pixiCameraHead = containerMock();
   const pixiCameraTail = containerMock();
-  const camera = new Camera(pixiCameraHead, pixiCameraTail);
+  const camera = new Camera(
+    new Transformation(),
+    pixiCameraHead,
+    pixiCameraTail
+  );
 
   const world = new World(worldHead, worldTail, camera, DisplayObjectContainer);
 
@@ -214,6 +218,7 @@ describe("@curtain-call/world.World", () => {
     world.tail.addChild(obj);
 
     camera.moveTo({ x: 3, y: 1 });
+    world.update(1);
     const viewPos = obj.getGlobalPosition();
 
     expect(viewPos.x).toBeCloseTo(-2);

@@ -80,6 +80,7 @@ export class World {
     this.checkCollision();
     this.displayObject.update(this, deltaSec);
     this.updatePixiDisplayObject();
+    this.camera.update();
   }
 
   /**

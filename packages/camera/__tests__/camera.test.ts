@@ -9,6 +9,7 @@ describe("@curtain-call/camera.Camera", () => {
     camera.tail.addChild(obj);
 
     camera.moveTo({ x: 3, y: 1 });
+    camera.update();
     const viewPos = obj.getGlobalPosition();
 
     expect(viewPos.x).toBeCloseTo(-2);
@@ -23,6 +24,7 @@ describe("@curtain-call/camera.Camera", () => {
 
     camera.moveTo({ x: 3, y: 1 });
     camera.rotateTo(Math.PI / 2);
+    camera.update();
     const viewPos = obj.getGlobalPosition();
 
     expect(viewPos.x).toBeCloseTo(1);
@@ -37,6 +39,7 @@ describe("@curtain-call/camera.Camera", () => {
 
     camera.moveTo({ x: 3, y: 1 });
     camera.zoomTo(2);
+    camera.update();
     const viewPos = obj.getGlobalPosition();
 
     expect(viewPos.x).toBeCloseTo(-4);

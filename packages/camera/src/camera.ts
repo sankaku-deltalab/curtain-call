@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
-import { Vector, VectorLike } from "trans-vector2d";
+import { VectorLike, Matrix, Vector } from "trans-vector2d";
+import { Transformation } from "@curtain-call/util";
 
 /**
  * Camera transform graphics.
@@ -9,10 +10,18 @@ export class Camera {
    * @param tail Pixi container.
    */
   constructor(
+    public readonly trans = new Transformation(),
     public readonly head = new PIXI.Container(),
     public readonly tail = new PIXI.Container()
   ) {
     this.head.addChild(tail);
+  }
+
+  update(): void {
+    const { translation, rotation, scale } = this.trans.getGlobal().decompose();
+    this.tail.position = new PIXI.Point(-translation.x, -translation.y);
+    this.head.scale = new PIXI.Point(scale.x, scale.y);
+    this.head.rotation = -rotation;
   }
 
   /**
@@ -22,8 +31,8 @@ export class Camera {
    * @returns this.
    */
   moveTo(pos: VectorLike): this {
-    const iPos = Vector.from(pos).mlt(-1);
-    this.tail.position = new PIXI.Point(iPos.x, iPos.y);
+    const { rotation, scale } = this.trans.getLocal().decompose();
+    this.trans.setLocal(Matrix.from({ translation: pos, rotation, scale }));
     return this;
   }
 
@@ -34,7 +43,10 @@ export class Camera {
    * @return this.
    */
   zoomTo(scale: number): this {
-    this.head.scale = new PIXI.Point(scale, scale);
+    const { translation, rotation } = this.trans.getLocal().decompose();
+    this.trans.setLocal(
+      Matrix.from({ translation, rotation, scale: Vector.one.mlt(scale) })
+    );
     return this;
   }
 
@@ -45,7 +57,8 @@ export class Camera {
    * @returns this.
    */
   rotateTo(rotation: number): this {
-    this.head.rotation = -rotation;
+    const { translation, scale } = this.trans.getLocal().decompose();
+    this.trans.setLocal(Matrix.from({ translation, rotation, scale }));
     return this;
   }
 }
