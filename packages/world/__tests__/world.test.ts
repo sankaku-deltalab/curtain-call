@@ -24,13 +24,13 @@ const updatableMock = <T>(): Updatable<T> => {
 };
 
 const worldWithMock = <T>(): {
-  worldHead: PIXI.Container;
-  worldTail: PIXI.Container;
-  pixiDisplayObjectContainer: PIXI.Container;
-  displayObjectManager: DisplayObjectManager<World>;
-  pixiCameraHead: PIXI.Container;
-  pixiCameraTail: PIXI.Container;
-  camera: Camera;
+  diArgs: {
+    readonly head: PIXI.Container;
+    readonly tail: PIXI.Container;
+    readonly camera: Camera;
+    readonly displayObject: DisplayObjectManager<World>;
+    readonly pointerInput: PointerInputReceiver;
+  };
   world: World;
 } => {
   const worldHead = containerMock();
@@ -51,21 +51,20 @@ const worldWithMock = <T>(): {
     pixiCameraTail
   );
 
-  const world = new World(worldHead, worldTail, camera, DisplayObjectContainer);
+  const diArgs = {
+    head: worldHead,
+    tail: worldTail,
+    camera,
+    displayObject: DisplayObjectContainer,
+    pointerInput: new PointerInputReceiver(),
+  };
+
+  const world = new World(diArgs);
 
   const engineLikeContainer = new PIXI.Container();
   engineLikeContainer.addChild(world.head);
 
-  return {
-    worldHead,
-    worldTail,
-    world,
-    pixiDisplayObjectContainer,
-    displayObjectManager: DisplayObjectContainer,
-    pixiCameraHead,
-    pixiCameraTail,
-    camera,
-  };
+  return { diArgs, world };
 };
 
 describe("@curtain-call/world.World", () => {
@@ -178,46 +177,42 @@ describe("@curtain-call/world.World", () => {
     };
 
     it("and DisplayObjectContainer's pixi container was added to world at constructor", () => {
-      const { worldTail, pixiDisplayObjectContainer } = worldWithMock();
+      const { diArgs } = worldWithMock();
 
-      expect(worldTail.addChild).toBeCalledWith(pixiDisplayObjectContainer);
+      expect(diArgs.tail.addChild).toBeCalledWith(
+        diArgs.displayObject.container
+      );
     });
 
     it("and add DisplayObject in actor when updated", () => {
-      const {
-        world,
-        displayObjectManager: DisplayObjectContainer,
-      } = worldWithMock();
+      const { world, diArgs } = worldWithMock();
       const { actor, sprite } = actorMock<typeof world>();
 
       world.addActor(actor);
       world.update(0.125);
 
-      expect(DisplayObjectContainer.add).toBeCalledWith(sprite);
+      expect(diArgs.displayObject.add).toBeCalledWith(sprite);
     });
 
     it("and remove DisplayObject in actor when actor removed", () => {
-      const {
-        world,
-        displayObjectManager: DisplayObjectContainer,
-      } = worldWithMock();
+      const { world, diArgs } = worldWithMock();
       const { actor, sprite } = actorMock<typeof world>();
 
       world.addActor(actor);
       world.update(0.125);
       world.removeActor(actor);
 
-      expect(DisplayObjectContainer.remove).toBeCalledWith(sprite);
+      expect(diArgs.displayObject.remove).toBeCalledWith(sprite);
     });
   });
 
   it("use camera", () => {
-    const { world, camera } = worldWithMock();
+    const { world } = worldWithMock();
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
     world.tail.addChild(obj);
 
-    camera.moveTo({ x: 3, y: 1 });
+    world.camera.moveTo({ x: 3, y: 1 });
     world.update(1);
     const viewPos = obj.getGlobalPosition();
 

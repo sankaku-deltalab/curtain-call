@@ -16,28 +16,41 @@ import {
  */
 export class World {
   public readonly backgroundTrans = new Transformation();
+  public readonly head: PIXI.Container;
+  public readonly tail: PIXI.Container;
+  public readonly camera: Camera;
+  public readonly pointerInput: PointerInputReceiver;
+
+  private readonly displayObject: DisplayObjectManager<World>;
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
   private readonly overlapChecker = new OverlapChecker<this, Actor<this>>();
 
   /**
-   * @param head Root of PIXI objects.
-   * @param tail Tail of PIXI objects.
-   * @param camera Camera.
-   * @param displayObject DisplayObjectContainer.
-   * @param pointerInput PointerInputReceiver.
+   * @param diArgs.head Root of PIXI objects.
+   * @param diArgs.tail Tail of PIXI objects.
+   * @param diArgs.camera Camera.
+   * @param diArgs.displayObject DisplayObjectContainer.
+   * @param diArgs.pointerInput PointerInputReceiver.
    */
-  constructor(
-    public readonly head = new PIXI.Container(),
-    public readonly tail = new PIXI.Container(),
-    public readonly camera = new Camera(),
-    private readonly displayObject = new DisplayObjectManager<World>(),
-    public readonly pointerInput = new PointerInputReceiver()
-  ) {
-    head.addChild(camera.head);
-    camera.tail.addChild(tail);
-    tail.addChild(this.displayObject.container);
-    this.displayObject = displayObject;
+  constructor(diArgs?: {
+    readonly head?: PIXI.Container;
+    readonly tail?: PIXI.Container;
+    readonly camera?: Camera;
+    readonly displayObject?: DisplayObjectManager<World>;
+    readonly pointerInput?: PointerInputReceiver;
+  }) {
+    this.head = diArgs?.head || new PIXI.Container();
+    this.tail = diArgs?.tail || new PIXI.Container();
+    this.camera = diArgs?.camera || new Camera();
+    this.displayObject =
+      diArgs?.displayObject || new DisplayObjectManager<World>();
+    this.pointerInput = diArgs?.pointerInput || new PointerInputReceiver();
+
+    this.head.addChild(this.camera.head);
+    this.camera.tail.addChild(this.tail);
+    this.tail.addChild(this.displayObject.container);
+    this.displayObject = this.displayObject;
   }
 
   /**
