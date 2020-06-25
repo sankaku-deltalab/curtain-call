@@ -10,6 +10,7 @@ import {
   Updatable,
   Transformation,
   RectArea,
+  PositionStatusWithArea,
 } from "@curtain-call/util";
 
 /**
@@ -28,6 +29,7 @@ export class World {
   private readonly updatable = new Set<Updatable<this>>();
   private readonly overlapChecker = new OverlapChecker<this, Actor<this>>();
   private readonly mask = new PIXI.Graphics();
+  private readonly coreArea: RectArea;
 
   /**
    * @param diArgs.head Root of PIXI objects.
@@ -36,6 +38,7 @@ export class World {
    * @param diArgs.displayObject DisplayObjectContainer.
    * @param diArgs.pointerInput PointerInputReceiver.
    * @param diArgs.visibleArea Rectangle area represent visible area.
+   * @param diArgs.coreArea Rectangle area for game.
    */
   constructor(diArgs?: {
     readonly head?: PIXI.Container;
@@ -44,6 +47,7 @@ export class World {
     readonly displayObject?: DisplayObjectManager<World>;
     readonly pointerInput?: PointerInputReceiver;
     readonly visibleArea?: RectArea;
+    readonly coreArea?: RectArea;
   }) {
     this.head = diArgs?.head || new PIXI.Container();
     this.head.mask = this.mask;
@@ -56,6 +60,7 @@ export class World {
     this.visibleArea = (diArgs?.visibleArea || new RectArea()).attachTo(
       this.camera.trans
     );
+    this.coreArea = diArgs?.coreArea || new RectArea();
 
     this.head.addChild(this.camera.head);
     this.camera.tail.addChild(this.tail);
@@ -253,6 +258,32 @@ export class World {
     this.head.updateTransform();
     const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
     return worldTrans.globalizePoint(gamePos);
+  }
+
+  /**
+   * Set core area.
+   *
+   * @param nw NW point on this.trans.
+   * @param se SE point on this.trans.
+   * @returns this.
+   */
+  setCoreArea(nw: VectorLike, se: VectorLike): this {
+    this.coreArea.init(nw, se);
+    return this;
+  }
+
+  /**
+   * Calc position status for core area.
+   *
+   * @param globalPos Target position in global coordinates.
+   * @param radius Target radius.
+   * @returns Status.
+   */
+  calcPositionStatusWithCoreArea(
+    globalPos: VectorLike,
+    radius: number
+  ): PositionStatusWithArea {
+    return this.coreArea.calcPositionStatus(globalPos, radius);
   }
 
   private removeDeadUpdatable(): void {

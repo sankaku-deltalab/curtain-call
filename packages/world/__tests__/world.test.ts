@@ -367,4 +367,16 @@ describe("@curtain-call/world.World", () => {
     );
     expect(actor3.collision.event.emit).not.toBeCalled();
   });
+
+  it.each`
+    status                               | pos                 | radius
+    ${PositionStatusWithArea.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
+    ${PositionStatusWithArea.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${1.1}
+    ${PositionStatusWithArea.onAreaEdge} | ${{ x: -1, y: -2 }} | ${0}
+    ${PositionStatusWithArea.outOfArea}  | ${{ x: 4, y: 5 }}   | ${0.9}
+  `("has core area", ({ status, pos, radius }) => {
+    const world = new World().setCoreArea({ x: -1, y: -2 }, { x: 3, y: 4 });
+
+    expect(world.calcPositionStatusWithCoreArea(pos, radius)).toBe(status);
+  });
 });
