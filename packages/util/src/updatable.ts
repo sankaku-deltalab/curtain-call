@@ -2,9 +2,10 @@ export interface Updatable<T> {
   /**
    * If remove self from world, this function must be true.
    *
+   * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean;
+  shouldRemoveSelfFromWorld(world: T): boolean;
 
   /**
    * Update self.

@@ -28,7 +28,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     this.collision.add(this.collisionShape);
     this.collision.event.on("overlapped", (world, others) => {
       others.forEach((other) => {
-        if (this.shouldRemoveSelfFromWorld()) return;
+        if (this.shouldRemoveSelfFromWorld(world)) return;
         const otherActor = other.owner();
         this.processHit(world, otherActor);
       });
@@ -49,10 +49,11 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
   /**
    * If remove self from world, this function must be true.
    *
+   * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean {
-    return this.lifeTimeSec <= 0 || super.shouldRemoveSelfFromWorld();
+  shouldRemoveSelfFromWorld(world: TWorld): boolean {
+    return this.lifeTimeSec <= 0 || super.shouldRemoveSelfFromWorld(world);
   }
 
   /**
@@ -81,7 +82,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
   }
 
   private processHit(world: TWorld, other: Actor<TWorld>): boolean {
-    if (this.shouldRemoveSelfFromWorld()) return false;
+    if (this.shouldRemoveSelfFromWorld(world)) return false;
     other.health.takeDamage(world, this.damage, this.damageDealer, {
       name: this.damageName,
     });

@@ -288,7 +288,7 @@ export class World {
 
   private removeDeadUpdatable(): void {
     this.updatable.forEach((up) => {
-      if (!up.shouldRemoveSelfFromWorld()) return;
+      if (!up.shouldRemoveSelfFromWorld(this)) return;
       if (up instanceof Actor) {
         this.removeActor(up);
       } else {

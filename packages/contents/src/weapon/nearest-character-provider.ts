@@ -54,7 +54,7 @@ export class NearestCharacterProvider<TWorld extends World = World>
   private targetIsAlive(world: TWorld, target: Character<TWorld>): boolean {
     return (
       world.hasActor(target) &&
-      !target.shouldRemoveSelfFromWorld() &&
+      !target.shouldRemoveSelfFromWorld(world) &&
       !target.health.isDead()
     );
   }
