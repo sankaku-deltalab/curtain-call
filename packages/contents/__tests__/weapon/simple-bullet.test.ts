@@ -66,15 +66,34 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
   it("remove self when life time finished", () => {
     const world = new World();
-    const victim = victimMock().inTeam(Team.enemySide);
     const { initArgs, bullet } = createInitializedBullet();
-    world.addActor(victim).addActor(bullet);
+    world.addActor(bullet);
 
     bullet.update(world, initArgs.lifeTimeSec / 2);
     bullet.update(world, initArgs.lifeTimeSec / 2);
 
     expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
   });
+
+  it.each`
+    radius | shouldRemove
+    ${0.9} | ${true}
+    ${1.1} | ${false}
+  `(
+    "remove self if bullet is not in visible area",
+    ({ radius, shouldRemove }) => {
+      const world = new World().setDrawArea(
+        { x: 0, y: 0 },
+        { x: 300, y: 400 },
+        1
+      );
+      const { bullet } = createInitializedBullet();
+      bullet.setVisualRadius(radius).moveTo({ x: 151, y: 201 });
+      world.addActor(bullet);
+
+      expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(shouldRemove);
+    }
+  );
 
   it("deal damage when hit to enemy", () => {
     const world = new World();

@@ -3,6 +3,7 @@ import { Actor } from "@curtain-call/actor";
 import { World } from "@curtain-call/world";
 import { RelativeMover } from "@curtain-call/mover";
 import { RectCollisionShape } from "@curtain-call/collision";
+import { PositionStatusWithArea } from "@curtain-call/util";
 
 /**
  * SimpleBullet move with constant velocity to front.
@@ -12,6 +13,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
   private damage = 0;
   private damageName = "";
   private lifeTimeSec = 0;
+  private visualRadius = 0;
   private readonly mover: RelativeMover<TWorld>;
   private readonly collisionShape: RectCollisionShape;
 
@@ -35,6 +37,11 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     });
   }
 
+  setVisualRadius(radius: number): this {
+    this.visualRadius = radius;
+    return this;
+  }
+
   /**
    * Update self.
    *
@@ -53,7 +60,15 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
    * @returns Self must remove from world.
    */
   shouldRemoveSelfFromWorld(world: TWorld): boolean {
-    return this.lifeTimeSec <= 0 || super.shouldRemoveSelfFromWorld(world);
+    const { translation } = this.trans.getLocal().decompose();
+    const isNotVisible =
+      world.camera.calcVisibilityStatus(translation, this.visualRadius) ===
+      PositionStatusWithArea.outOfArea;
+    return (
+      isNotVisible ||
+      this.lifeTimeSec <= 0 ||
+      super.shouldRemoveSelfFromWorld(world)
+    );
   }
 
   /**
