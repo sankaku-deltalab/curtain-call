@@ -103,6 +103,9 @@ export class World {
       .drawRect(maskNW.x, maskNW.y, maskSize.x, maskSize.y)
       .endFill();
 
+    const gameVisibleSize = Vector.from(drawSizeInCanvas).mlt(gameUnitPerPixel);
+    this.camera.setCameraResolution(gameVisibleSize);
+
     return this;
   }
 

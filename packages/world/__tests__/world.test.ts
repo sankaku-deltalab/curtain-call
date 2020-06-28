@@ -229,6 +229,15 @@ describe("@curtain-call/world.World", () => {
     expect(viewPos.y).toBeCloseTo(1);
   });
 
+  it("update camera", () => {
+    const { world } = worldWithMock();
+    jest.spyOn(world.camera, "update");
+
+    world.update(1);
+
+    expect(world.camera.update).toBeCalled();
+  });
+
   it("can update added actors", () => {
     const { world } = worldWithMock();
     const actor = new Actor<typeof world>();
