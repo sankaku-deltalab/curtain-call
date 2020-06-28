@@ -88,7 +88,8 @@ describe("@curtain-call/actor.Actor", () => {
 
     actor.notifyAddedToWorld({});
 
-    expect(actor.shouldRemoveSelfFromWorld()).toBe(false);
+    const world = jest.fn();
+    expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
   });
 
   it("has DamageDealer", () => {

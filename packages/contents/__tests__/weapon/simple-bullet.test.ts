@@ -73,7 +73,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     bullet.update(world, initArgs.lifeTimeSec / 2);
     bullet.update(world, initArgs.lifeTimeSec / 2);
 
-    expect(bullet.shouldRemoveSelfFromWorld()).toBe(true);
+    expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
   });
 
   it("deal damage when hit to enemy", () => {
@@ -100,6 +100,6 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
     bullet.collision.notifyOverlappedWith(world, new Set([victim.collision]));
 
-    expect(bullet.shouldRemoveSelfFromWorld()).toBe(true);
+    expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
   });
 });
