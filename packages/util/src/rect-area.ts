@@ -41,22 +41,23 @@ export class RectArea {
    * Calc position status for this area.
    *
    * @param globalPos Target position in global coordinates.
-   * @param radius Target radius.
+   * @param globalRadius Target radius.
    * @returns Status.
    */
   calcPositionStatus(
     globalPos: VectorLike,
-    radius: number
+    globalRadius: number
   ): PositionStatusWithArea {
     const relPos = this.trans.getGlobal().localizePoint(globalPos);
-    const mapping: [boolean, number, number][] = [
-      [true, this.nw.x, relPos.x],
-      [false, this.se.x, relPos.x],
-      [true, this.nw.y, relPos.y],
-      [false, this.se.y, relPos.y],
+    const { scale } = this.trans.getGlobal().decompose();
+    const mapping: [boolean, number, number, number][] = [
+      [true, this.nw.x, relPos.x, globalRadius / scale.x],
+      [false, this.se.x, relPos.x, globalRadius / scale.x],
+      [true, this.nw.y, relPos.y, globalRadius / scale.y],
+      [false, this.se.y, relPos.y, globalRadius / scale.y],
     ];
-    const statuses = mapping.map(([positive, threshold, value]) =>
-      this.calcThresholdStatus(threshold, value, radius, positive)
+    const statuses = mapping.map(([positive, threshold, value, localRadius]) =>
+      this.calcThresholdStatus(threshold, value, localRadius, positive)
     );
     if (statuses.some((st) => st === PositionStatusWithArea.outOfArea))
       return PositionStatusWithArea.outOfArea;

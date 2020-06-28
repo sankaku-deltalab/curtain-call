@@ -1,19 +1,23 @@
-import { Matrix } from "trans-vector2d";
+import { Matrix, Vector } from "trans-vector2d";
 import { RectArea, PositionStatusWithArea, Transformation } from "../src";
 
 describe("@curtain-call/util.RectArea", () => {
   it.each`
     status                               | pos                 | radius
-    ${PositionStatusWithArea.inArea}     | ${{ x: 1, y: 1 }}   | ${0.9}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: -1, y: -1 }} | ${1.1}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${0}
-    ${PositionStatusWithArea.outOfArea}  | ${{ x: 6, y: 8 }}   | ${1}
+    ${PositionStatusWithArea.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
+    ${PositionStatusWithArea.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${1.1}
+    ${PositionStatusWithArea.onAreaEdge} | ${{ x: -1, y: -1 }} | ${0}
+    ${PositionStatusWithArea.outOfArea}  | ${{ x: -2, y: -2 }} | ${0.9}
   `("calc given position is $status", ({ status, pos, radius }) => {
     const areaParentTrans = new Transformation().setLocal(
-      Matrix.from({ translation: { x: 1, y: 2 } })
+      Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: Math.PI / 2,
+        scale: Vector.one.mlt(0.5),
+      })
     );
     const area = new RectArea()
-      .init({ x: -1, y: -2 }, { x: 3, y: 4 })
+      .init({ x: -6, y: -4 }, { x: 6, y: 4 })
       .attachTo(areaParentTrans);
 
     expect(area.calcPositionStatus(pos, radius)).toBe(status);
