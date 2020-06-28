@@ -76,7 +76,7 @@ describe("@curtain-call/world.World", () => {
     expect(() => new World()).not.toThrowError();
   });
 
-  it("can set draw area and setting effects visible area", () => {
+  it("can set draw area in canvas", () => {
     const gameHeight = 400;
     const gameWidth = 300;
     const canvasHeight = 1000;
@@ -95,13 +95,6 @@ describe("@curtain-call/world.World", () => {
     const canvasPos = obj.getGlobalPosition();
     expect(canvasPos.x).toBeCloseTo(300 + 2 * gameUnitPerPixel);
     expect(canvasPos.y).toBeCloseTo(500 + 3 * gameUnitPerPixel);
-
-    expect(
-      world.visibleArea.calcPositionStatus({ x: 150 - 1, y: 200 - 1 }, 0)
-    ).toBe(PositionStatusWithArea.inArea);
-    expect(world.visibleArea.calcPositionStatus({ x: 150, y: 200 }, 0)).toBe(
-      PositionStatusWithArea.onAreaEdge
-    );
   });
 
   describe("can add actor", () => {

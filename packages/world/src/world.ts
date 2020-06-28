@@ -22,7 +22,6 @@ export class World {
   public readonly tail: PIXI.Container;
   public readonly camera: Camera;
   public readonly pointerInput: PointerInputReceiver;
-  public readonly visibleArea: RectArea;
 
   private readonly displayObject: DisplayObjectManager<World>;
   private readonly actors = new Set<Actor<this>>();
@@ -37,7 +36,6 @@ export class World {
    * @param diArgs.camera Camera.
    * @param diArgs.displayObject DisplayObjectContainer.
    * @param diArgs.pointerInput PointerInputReceiver.
-   * @param diArgs.visibleArea Rectangle area represent visible area.
    * @param diArgs.coreArea Rectangle area for game.
    */
   constructor(diArgs?: {
@@ -46,7 +44,6 @@ export class World {
     readonly camera?: Camera;
     readonly displayObject?: DisplayObjectManager<World>;
     readonly pointerInput?: PointerInputReceiver;
-    readonly visibleArea?: RectArea;
     readonly coreArea?: RectArea;
   }) {
     this.head = diArgs?.head || new PIXI.Container();
@@ -57,9 +54,6 @@ export class World {
     this.displayObject =
       diArgs?.displayObject || new DisplayObjectManager<World>();
     this.pointerInput = diArgs?.pointerInput || new PointerInputReceiver();
-    this.visibleArea = (diArgs?.visibleArea || new RectArea()).attachTo(
-      this.camera.trans
-    );
     this.coreArea = diArgs?.coreArea || new RectArea();
 
     this.head.addChild(this.camera.head);
@@ -97,10 +91,6 @@ export class World {
       drawCenterInCanvas.y
     );
     this.head.scale = new PIXI.Point(gameUnitPerPixel, gameUnitPerPixel);
-    const gameVisibleSizeHalf = Vector.from(drawSizeInCanvas).mlt(
-      gameUnitPerPixel / 2
-    );
-    this.visibleArea.init(gameVisibleSizeHalf.mlt(-1), gameVisibleSizeHalf);
 
     const maskSize = Vector.from(drawSizeInCanvas).div(gameUnitPerPixel);
     const maskSizeHalf = maskSize.div(2);
