@@ -2,12 +2,13 @@ import { Matrix } from "trans-vector2d";
 import { BulletGenerator, GuntreeWeapon } from "@curtain-call/weapon";
 import { World } from "@curtain-call/world";
 import { SimpleBullet } from "./simple-bullet";
+import { Actor } from "@curtain-call/actor";
 
 /**
  * Deal given `SimpleBullet`s and reuse them.
  */
 export class SimpleBulletGenerator<TWorld extends World = World>
-  implements BulletGenerator<TWorld, SimpleBullet<TWorld>> {
+  implements BulletGenerator<TWorld, Actor<TWorld>> {
   private readonly usedBullets: SimpleBullet<TWorld>[] = [];
 
   /**
@@ -28,7 +29,7 @@ export class SimpleBulletGenerator<TWorld extends World = World>
    */
   generate(
     world: TWorld,
-    weapon: GuntreeWeapon<TWorld, SimpleBullet<TWorld>>,
+    weapon: GuntreeWeapon<TWorld, Actor<TWorld>>,
     trans: Matrix,
     elapsedSec: number,
     params: Map<string, number>,
