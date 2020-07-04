@@ -7,6 +7,7 @@ import { Character, Team, NullPlan, Plan } from "../../src";
 const planMock = <T extends World = World>(): Plan<T> => {
   const plan = new NullPlan();
   jest.spyOn(plan, "update");
+  jest.spyOn(plan, "start");
   return plan;
 };
 
@@ -26,11 +27,13 @@ describe("@curtain-call/contents.Character", () => {
   it("can set plan", () => {
     const plan = planMock();
     const character = new Character().plannedBy(plan);
-
     const world = new World();
+
+    world.addActor(character);
+    expect(plan.start).toBeCalledWith(world, character);
+
     const deltaSec = 0.125;
     character.update(world, deltaSec);
-
     expect(plan.update).toBeCalledWith(world, deltaSec, character);
   });
 

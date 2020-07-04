@@ -7,6 +7,14 @@ import { World } from "@curtain-call/world";
  */
 export interface Plan<TWorld extends World> {
   /**
+   * Start this plan.
+   *
+   * @param world World.
+   * @param character Target character.
+   */
+  start(world: TWorld, character: Character<TWorld>): void;
+
+  /**
    * Update self.
    *
    * @param world World.

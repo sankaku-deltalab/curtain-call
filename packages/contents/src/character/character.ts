@@ -68,6 +68,17 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
   }
 
   /**
+   * Notify added to world.
+   * Called from only World.
+   *
+   * @param world Added World.
+   */
+  notifyAddedToWorld(world: TWorld): void {
+    this.plan.start(world, this);
+    super.notifyAddedToWorld(world);
+  }
+
+  /**
    * Set team.
    *
    * @param team New team.
