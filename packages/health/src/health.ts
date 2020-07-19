@@ -1,81 +1,46 @@
-import { EventEmitter } from "eventemitter3";
-import { DamageDealer } from "./damage-dealer";
-import { DamageInterceptor } from "./damage-interceptor";
-import { DamageType } from "./damage-type";
-
 /**
  * Health.
  */
-export class Health<T> {
-  public readonly event = new EventEmitter<{
-    healed: [T, number];
-    takenDamage: [T, number, DamageDealer<T>, DamageType];
-    died: [T, DamageDealer<T>, DamageType];
-  }>();
-
+export class Health {
   private health = 0;
   private healthMax = 0;
-  private interceptors = new Set<DamageInterceptor<T>>();
 
   /**
    * Init health and healthMax.
    *
-   * @param health Health and healthMax.
+   * @param health Initial health.
+   * @param health HealthMax.
    * @returns this.
    */
-  init(health: number): this {
-    this.health = this.healthMax = health;
+  init(health: number, healthMax: number): this {
+    if (health < 0) throw new Error("Initial health must be > 0");
+    if (healthMax < 0) throw new Error("Initial health max must be > 0");
+    if (health > healthMax) throw new Error("Initial health must be <= max");
+
+    this.health = health;
+    this.healthMax = healthMax;
     return this;
   }
 
   /**
    * Take damage to self.
    *
-   * @param world World.
    * @param damage Damage amount.
-   * @param dealer Damage dealer dealing directory.
-   * @param type Damage type.
    */
-  takeDamage(
-    world: T,
-    damage: number,
-    dealer: DamageDealer<T>,
-    type: DamageType
-  ): void {
-    if (this.isDead()) return;
+  takeDamage(damage: number): { actualDamage: number; died: boolean } {
+    if (this.isDead()) return { actualDamage: 0, died: false };
 
-    let modifiedDamage = damage;
-    this.interceptors.forEach((interceptor) => {
-      modifiedDamage = interceptor.interceptDamage(
-        world,
-        modifiedDamage,
-        dealer,
-        type,
-        this
-      );
-    });
-
-    const actualDamage = Math.min(modifiedDamage, this.health);
-    this.event.emit("takenDamage", world, actualDamage, dealer, type);
-    dealer.notifyDealtDamage(world, actualDamage, this, type);
-
+    const actualDamage = Math.min(damage, this.health);
     this.health -= actualDamage;
-    if (this.health === 0) {
-      this.event.emit("died", world, dealer, type);
-      dealer.notifyKilled(world, this, type);
-    }
+
+    return { actualDamage, died: this.health === 0 };
   }
 
   /**
    * Kill self.
-   *
-   * @param world World.
-   * @param dealer Damage dealer killing self directory.
-   * @param type Damage type.
    */
-  die(world: T, dealer: DamageDealer<T>, type: DamageType): void {
+  kill(): void {
     this.health = 0;
-    this.event.emit("died", world, dealer, type);
   }
 
   /**
@@ -99,12 +64,12 @@ export class Health<T> {
   /**
    * Heal health.
    *
-   * @param world World.
    * @param amount Healing amount.
    */
-  heal(world: T, amount: number): void {
-    this.health = Math.min(this.healthMax, this.health + amount);
-    this.event.emit("healed", world, amount);
+  heal(amount: number): { actualHealed: number } {
+    const actualHealed = Math.min(this.healthMax - this.health, amount);
+    this.health += actualHealed;
+    return { actualHealed };
   }
 
   /**
@@ -113,28 +78,6 @@ export class Health<T> {
    * @returns Self is dead.
    */
   isDead(): boolean {
-    return this.healthMax > 0 && this.health <= 0;
-  }
-
-  /**
-   * Add interceptor.
-   *
-   * @param interceptor
-   * @returns this.
-   */
-  addInterceptor(interceptor: DamageInterceptor<T>): this {
-    this.interceptors.add(interceptor);
-    return this;
-  }
-
-  /**
-   * Remove interceptor.
-   *
-   * @param interceptor
-   * @returns this.
-   */
-  removeInterceptor(interceptor: DamageInterceptor<T>): this {
-    this.interceptors.delete(interceptor);
-    return this;
+    return this.health <= 0;
   }
 }
