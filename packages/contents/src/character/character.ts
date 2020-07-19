@@ -7,7 +7,7 @@ import {
   TargetProvider,
 } from "@curtain-call/weapon";
 import { World } from "@curtain-call/world";
-import { Transformation } from "@curtain-call/util";
+import { Transformation, PositionStatusWithArea } from "@curtain-call/util";
 import { NullPlan } from "./null-plan";
 import { Plan } from "./plan";
 import { Collision } from "@curtain-call/collision";
@@ -71,7 +71,14 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
     dealer: DamageDealer<TWorld, Actor<TWorld>>,
     type: DamageType
   ): { actualDamage: number; died: boolean } {
-    const modifiedDamage = this.isImmortal() ? 0 : damage;
+    const { translation: worldPos } = this.getWorldTransform().decompose();
+    const outOfArea =
+      world.calcPositionStatusWithCoreArea(worldPos, 0) !==
+        PositionStatusWithArea.inArea ||
+      world.camera.calcVisibilityStatus(worldPos, 0) !==
+        PositionStatusWithArea.inArea;
+    const immortal = this.isImmortal() || outOfArea;
+    const modifiedDamage = immortal ? 0 : damage;
     return super.takeDamage(world, modifiedDamage, dealer, type);
   }
 

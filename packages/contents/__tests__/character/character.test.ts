@@ -4,6 +4,7 @@ import { BasicDamageDealer } from "@curtain-call/health";
 import { GuntreeWeapon, guntree as gt } from "@curtain-call/weapon";
 import { Character, NullPlan, Plan } from "../../src";
 import { Team } from "@curtain-call/util";
+import { Vector } from "trans-vector2d";
 
 const planMock = <T extends World = World>(): Plan<T> => {
   const plan = new NullPlan();
@@ -45,20 +46,40 @@ describe("@curtain-call/contents.Character", () => {
   `("can be immortal", ({ immortality, takenDamage }) => {
     const character = new Character().initHealth(1, 1).asImmortal(immortality);
 
-    const damageTakeCallback = jest.fn();
-    character.event.on("takenDamage", damageTakeCallback);
-
-    const world = new World();
+    const world = new World()
+      .setCoreArea(Vector.one.mlt(-1), Vector.one)
+      .setDrawArea(Vector.zero, Vector.one.mlt(10), 1);
     const dealer = new BasicDamageDealer();
     const damageType = jest.fn();
-    character.takeDamage(world, 1, dealer, damageType);
+    const r = character.takeDamage(world, 1, dealer, damageType);
 
-    expect(damageTakeCallback).toBeCalledWith(
-      world,
-      takenDamage,
-      dealer,
-      damageType
-    );
+    expect(r.actualDamage).toBe(takenDamage);
+  });
+
+  it("do not take damage if not in core area", () => {
+    const character = new Character().initHealth(1, 1).moveTo({ x: 2, y: 2 });
+    const world = new World()
+      .setCoreArea(Vector.one.mlt(-1), Vector.one)
+      .setDrawArea(Vector.zero, Vector.one.mlt(10), 1);
+    const dealer = new BasicDamageDealer();
+    const damageType = jest.fn();
+    const r = character.takeDamage(world, 1, dealer, damageType);
+
+    expect(r.actualDamage).toBe(0);
+  });
+
+  it("do not take damage if not in visible area", () => {
+    const character = new Character().initHealth(1, 1);
+    const world = new World()
+      .setCoreArea(Vector.one.mlt(-1), Vector.one)
+      .setDrawArea(Vector.zero, Vector.one.mlt(10), 1);
+
+    world.camera.moveTo({ x: 100, y: 100 });
+    const dealer = new BasicDamageDealer();
+    const damageType = jest.fn();
+    const r = character.takeDamage(world, 1, dealer, damageType);
+
+    expect(r.actualDamage).toBe(0);
   });
 
   it("has Weapon", () => {
