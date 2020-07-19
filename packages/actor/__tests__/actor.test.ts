@@ -1,231 +1,364 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { Transformation } from "@curtain-call/util";
-import { DamageDealer } from "@curtain-call/health";
-import { Collision, RectCollisionShape } from "@curtain-call/collision";
-import { Actor, DisplayObjects, Movers } from "../src";
+import { BasicDamageDealer } from "@curtain-call/health";
+import {
+  Collision,
+  RectCollisionShape,
+  CollisionGroupPresets,
+} from "@curtain-call/collision";
+import { Actor } from "../src";
 import { moverMock, spriteMock } from "./mock";
-import { CollisionGroupPresets } from "@curtain-call/collision/src/collision-group";
+import { DisplayObject } from "@curtain-call/display-object";
 
 describe("@curtain-call/actor.Actor", () => {
-  describe("has DisplayObjects", () => {
-    it("as property", () => {
+  describe("has transformation", () => {
+    it("has global transform", () => {
       const actor = new Actor();
 
-      expect(actor.displayObjects).toBeInstanceOf(DisplayObjects);
+      expect(actor.getWorldTransform()).toEqual(Matrix.identity);
     });
 
-    it("and trans was attached to actor", () => {
-      const actor = new Actor<{}>();
-      actor.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
+    it("can move with local transform", () => {
+      const newPos = { x: 1, y: 2 };
+      const actor = new Actor().moveTo(newPos);
 
-      expect(actor.displayObjects.trans).toBeInstanceOf(Transformation);
+      expect(actor.getWorldTransform()).toEqual(Matrix.translation(newPos));
     });
 
-    it("and update them", () => {
-      const actor = new Actor<{}>();
-      jest.spyOn(actor.displayObjects, "update");
+    it("can rotate", () => {
+      const newRot = 1;
+      const actor = new Actor().rotateTo(newRot);
 
-      const world = jest.fn();
-      const deltaSec = 0.125;
-      actor.update(world, deltaSec);
-
-      expect(actor.displayObjects.update).toBeCalledWith(world, deltaSec);
-    });
-  });
-  describe("has Movers", () => {
-    it("as property", () => {
-      const actor = new Actor();
-
-      expect(actor.movers).toBeInstanceOf(Movers);
+      expect(actor.getWorldTransform()).toEqual(Matrix.rotation(newRot));
     });
 
-    it("and update them", () => {
-      const currentTrans = Matrix.translation({ x: 1, y: 2 });
-      const newTrans = Matrix.translation({ x: 3, y: 4 });
-      const actor = new Actor<{}>();
-      actor.trans.setLocal(currentTrans);
-      jest.spyOn(actor.movers, "update").mockReturnValue({
-        done: false,
-        newTrans,
+    it("can set local transform", () => {
+      const newTrans = Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
       });
+      const actor = new Actor().setLocalTransform(newTrans);
 
-      const world = jest.fn();
-      const deltaSec = 0.125;
-      actor.update(world, deltaSec);
+      expect(actor.getWorldTransform()).toEqual(newTrans);
+    });
 
-      expect(actor.movers.update).toBeCalledWith(world, deltaSec, currentTrans);
-      expect(actor.trans.getLocal()).toEqual(newTrans);
+    it("can attach to other actor", () => {
+      const parentTrans = Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
+      });
+      const parentActor = new Actor().setLocalTransform(parentTrans);
+      const actor = new Actor().attachTo(parentActor);
+
+      expect(actor.getWorldTransform()).toEqual(parentTrans);
+    });
+
+    it("can detach from other actor", () => {
+      const parentTrans = Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
+      });
+      const parentActor = new Actor().setLocalTransform(parentTrans);
+      const actor = new Actor().attachTo(parentActor).detachFromParent();
+
+      expect(actor.getWorldTransform()).toEqual(Matrix.identity);
     });
   });
 
-  describe("can emit world event", () => {
-    it("when added", () => {
-      const func = jest.fn();
+  describe("can use by world", () => {
+    it("can be notified added to world and emit event", () => {
       const actor = new Actor();
-      actor.event.on("addedToWorld", func);
+      const ev = jest.fn();
+      actor.event.on("addedToWorld", ev);
 
-      const world = jest.fn();
+      const world = "world";
       actor.notifyAddedToWorld(world);
 
-      expect(func).toBeCalledWith(world);
+      expect(ev).toBeCalledWith(world);
     });
 
-    it("when removed", () => {
-      const func = jest.fn();
+    it("can be notified removed from world and emit event", () => {
       const actor = new Actor();
-      actor.event.on("removedFromWorld", func);
+      const ev = jest.fn();
+      actor.event.on("removedFromWorld", ev);
 
-      const world = jest.fn();
+      const world = "world";
+      actor.notifyAddedToWorld(world);
       actor.notifyRemovedFromWorld(world);
 
-      expect(func).toBeCalledWith(world);
+      expect(ev).toBeCalledWith(world);
+    });
+
+    it("can express removing self from world", () => {
+      const actor = new Actor().removeSelfFromWorld(true);
+
+      const world = "world";
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(true);
+    });
+
+    it("can revoke removing self expressing", () => {
+      const actor = new Actor()
+        .removeSelfFromWorld(true)
+        .removeSelfFromWorld(false);
+
+      const world = "world";
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
     });
   });
 
-  it("should not remove from world when added to world", () => {
-    const actor = new Actor();
-    actor.removeSelfFromWorld();
+  describe("has single Collision", () => {
+    it("can deal Collision", () => {
+      const actor = new Actor()
+        .removeSelfFromWorld(true)
+        .removeSelfFromWorld(false);
 
-    actor.notifyAddedToWorld({});
+      expect(actor.getCollision()).toBeInstanceOf(Collision);
+    });
 
-    const world = jest.fn();
-    expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
+    it("can notify overlapping with other actor and emit event", () => {
+      const actor = new Actor();
+      const ev = jest.fn();
+      actor.event.on("overlapped", ev);
+
+      const world = "world";
+      const otherActor = new Actor();
+      actor.notifyOverlappedWith(world, new Set([otherActor]));
+
+      expect(ev).toBeCalledWith(world, new Set([otherActor]));
+    });
+
+    it("can add shape", () => {
+      const collisionShape = new RectCollisionShape().setSize(Vector.one);
+      const actor = new Actor()
+        .addCollisionShape(collisionShape)
+        .moveTo(Vector.one);
+
+      expect(actor.getCollision().getBox2Ds()).toStrictEqual([
+        [0.5, 0.5, 1.5, 1.5],
+      ]);
+    });
+
+    it("can remove shape", () => {
+      const collisionShape = new RectCollisionShape().setSize(Vector.one);
+      const actor = new Actor()
+        .addCollisionShape(collisionShape)
+        .removeCollisionShape(collisionShape);
+
+      expect(actor.getCollision().getBox2Ds()).toStrictEqual([]);
+    });
+
+    it.each`
+      isHuge
+      ${true}
+      ${false}
+    `("can set collision as huge number", ({ isHuge }) => {
+      const actor = new Actor().setCollisionAsHugeNumber(isHuge);
+
+      expect(actor.getCollision().isHugeNumber()).toBe(isHuge);
+    });
+
+    it("can set collision group", () => {
+      const actor = new Actor().setCollisionGroup(CollisionGroupPresets.player);
+
+      expect(actor.getCollision().group()).toBe(CollisionGroupPresets.player);
+    });
+
+    it.each`
+      enable
+      ${true}
+      ${false}
+    `("can set collision enable", ({ enable }) => {
+      const actor = new Actor().setCollisionEnable(enable);
+
+      expect(actor.getCollision().isEnabled()).toBe(enable);
+    });
   });
 
-  it("has DamageDealer", () => {
-    const actor = new Actor();
+  describe("can use Mover", () => {
+    it("can add Mover and use it when updated", () => {
+      const movementDelta = new Vector(1, 2);
+      const mover = moverMock(false, movementDelta);
+      const actor = new Actor().addMover(mover);
 
-    expect(actor.damageDealer).toBeInstanceOf(DamageDealer);
+      const world = "world";
+      const deltaSec = 0.5;
+      actor.update(world, deltaSec);
+
+      expect(mover.update).toBeCalled();
+      expect(actor.getWorldTransform()).toEqual(
+        Matrix.translation(movementDelta.mlt(deltaSec))
+      );
+    });
+
+    it("can remove Mover", () => {
+      const movementDelta = new Vector(1, 2);
+      const mover = moverMock(false, movementDelta);
+      const actor = new Actor().addMover(mover).removeMover(mover);
+
+      const world = "world";
+      const deltaSec = 0.125;
+      actor.update(world, deltaSec);
+
+      expect(mover.update).not.toBeCalled();
+    });
   });
 
-  it("has collision owned by self", () => {
-    const collision = new Collision<unknown, Actor<unknown>>();
-    jest.spyOn(collision, "attachTo");
-    const actor = new Actor({ collision });
+  describe("can contain DisplayObjects", () => {
+    it("can add DisplayObject", () => {
+      const sprite = spriteMock();
+      const actor = new Actor().addDisplayObject(sprite);
 
-    expect(actor.collision).toBeInstanceOf(Collision);
-    expect(actor.collision.owner()).toBe(actor);
-    expect(actor.collision.attachTo).toBeCalledWith(actor.trans);
+      const objects: DisplayObject[] = [];
+      actor.iterateDisplayObject((obj) => objects.push(obj));
+      expect(objects).toStrictEqual([sprite]);
+    });
+
+    it("can remove DisplayObject", () => {
+      const sprite = spriteMock();
+      const actor = new Actor()
+        .addDisplayObject(sprite)
+        .removeDisplayObject(sprite);
+
+      const objects: DisplayObject[] = [];
+      actor.iterateDisplayObject((obj) => objects.push(obj));
+      expect(objects).toStrictEqual([]);
+    });
+
+    it("add DisplayObject was attached to actor trans", () => {
+      const sprite = spriteMock();
+      const actor = new Actor().addDisplayObject(sprite).moveTo({ x: 1, y: 2 });
+
+      expect(sprite.trans.getGlobal()).toStrictEqual(actor.getWorldTransform());
+    });
+
+    it("update display objects in actor update", () => {
+      const sprite = spriteMock();
+      const actor = new Actor().addDisplayObject(sprite);
+
+      const world = "world";
+      const deltaSec = 125;
+      actor.update(world, deltaSec);
+
+      expect(sprite.updatePixiObject).toBeCalledWith(deltaSec);
+    });
   });
 
-  it("can move", () => {
-    const actor = new Actor();
-    actor.trans.setLocal(
-      Matrix.from({
-        translation: new Vector(1, 2),
-        rotation: 3,
-        scale: new Vector(4, 5),
-      })
-    );
+  describe("has health", () => {
+    it("is dead if not initialized", () => {
+      const actor = new Actor();
 
-    actor.moveTo({ x: 6, y: 7 });
+      expect(actor.health()).toBe(0);
+      expect(actor.healthMax()).toBe(0);
+      expect(actor.isDead()).toBe(true);
+    });
 
-    expect(
-      actor.trans.getLocal().isClosedTo(
-        Matrix.from({
-          translation: new Vector(6, 7),
-          rotation: 3,
-          scale: new Vector(4, 5),
-        })
-      )
-    ).toBe(true);
+    it("can init health", () => {
+      const actor = new Actor().initHealth(1, 2);
+
+      expect(actor.health()).toBe(1);
+      expect(actor.healthMax()).toBe(2);
+      expect(actor.isDead()).toBe(false);
+    });
+
+    it("can take damage and emit event and notify it to DamageDealer", () => {
+      const actor = new Actor().initHealth(1000, 2000);
+      const ev = jest.fn();
+      actor.event.on("takenDamage", ev);
+
+      const world = "world";
+      const damage = 125;
+      const dealer = new BasicDamageDealer();
+      jest.spyOn(dealer, "notifyDealtDamage");
+      const damageType = { name: "test" };
+      const r = actor.takeDamage(world, damage, dealer, damageType);
+
+      expect(r.actualDamage).toBe(damage);
+      expect(r.died).toBe(false);
+      expect(actor.health()).toBe(1000 - damage);
+      expect(dealer.notifyDealtDamage).toBeCalledWith(
+        world,
+        r.actualDamage,
+        actor,
+        damageType
+      );
+      expect(ev).toBeCalledWith(world, r.actualDamage, dealer, damageType);
+    });
+
+    it("can kill and emit event and notify it to DamageDealer", () => {
+      const actor = new Actor().initHealth(1000, 2000);
+      const ev = jest.fn();
+      actor.event.on("dead", ev);
+
+      const world = "world";
+      const dealer = new BasicDamageDealer();
+      jest.spyOn(dealer, "notifyKilled");
+      const damageType = { name: "test" };
+      actor.kill(world, dealer, damageType);
+
+      expect(actor.health()).toBe(0);
+      expect(actor.isDead()).toBe(true);
+      expect(dealer.notifyKilled).toBeCalledWith(world, actor, damageType);
+      expect(ev).toBeCalledWith(world, dealer, damageType);
+    });
+
+    it("can heal", () => {
+      const actor = new Actor().initHealth(1000, 2000);
+      const ev = jest.fn();
+      actor.event.on("beHealed", ev);
+
+      const world = "world";
+      const healAmount = 125;
+      actor.heal(world, healAmount);
+
+      expect(actor.health()).toBe(1000 + healAmount);
+      expect(ev).toBeCalledWith(world, healAmount);
+    });
   });
 
-  it("can rotate", () => {
-    const actor = new Actor();
-    actor.trans.setLocal(
-      Matrix.from({
-        translation: new Vector(1, 2),
-        rotation: 3,
-        scale: new Vector(4, 5),
-      })
-    );
+  describe("act as DamageDealer", () => {
+    it("can be notified dealing damage", () => {
+      const actor = new Actor();
+      const ev = jest.fn();
+      actor.event.on("dealDamage", ev);
 
-    actor.rotateTo(6);
+      const parentDamageDealer = new BasicDamageDealer();
+      jest.spyOn(parentDamageDealer, "notifyDealtDamage");
+      actor.setDamageDealerParent(parentDamageDealer);
 
-    expect(
-      actor.trans.getLocal().isClosedTo(
-        Matrix.from({
-          translation: new Vector(1, 2),
-          rotation: 6,
-          scale: new Vector(4, 5),
-        })
-      )
-    ).toBe(true);
-  });
+      const world = "world";
+      const damage = 125;
+      const taker = new Actor();
+      const damageType = { name: "test" };
+      actor.notifyDealtDamage(world, damage, taker, damageType);
 
-  it("can attach to other trans", () => {
-    const actor = new Actor();
-    jest.spyOn(actor.trans, "attachTo");
+      expect(ev).toBeCalledWith(world, damage, taker, damageType);
+      expect(parentDamageDealer.notifyDealtDamage).toBeCalledWith(
+        world,
+        damage,
+        taker,
+        damageType
+      );
+    });
 
-    const parent = new Transformation();
-    actor.attachTo(parent);
+    it("can be notified killing", () => {
+      const actor = new Actor();
+      const ev = jest.fn();
+      actor.event.on("killed", ev);
 
-    expect(actor.trans.attachTo).toBeCalledWith(parent);
-  });
+      const parentDamageDealer = new BasicDamageDealer();
+      jest.spyOn(parentDamageDealer, "notifyKilled");
+      actor.setDamageDealerParent(parentDamageDealer);
 
-  it("can init health", () => {
-    const actor = new Actor().healthInitialized(15);
+      const world = "world";
+      const taker = new Actor();
+      const damageType = { name: "test" };
+      actor.notifyKilled(world, taker, damageType);
 
-    expect(actor.health.current()).toBe(15);
-    expect(actor.health.max()).toBe(15);
-  });
-
-  it("can init health", () => {
-    const actor = new Actor().healthInitialized(15);
-
-    expect(actor.health.current()).toBe(15);
-    expect(actor.health.max()).toBe(15);
-  });
-
-  it("can add mover", () => {
-    const actor = new Actor();
-    jest.spyOn(actor.movers, "add");
-
-    const mover = moverMock(false, Vector.zero);
-    actor.movedBy(mover);
-
-    expect(actor.movers.add).toBeCalledWith(mover);
-  });
-
-  it("can add DisplayObject", () => {
-    const actor = new Actor();
-    jest.spyOn(actor.displayObjects, "add");
-
-    const sprite = spriteMock();
-    actor.visualizedBy(sprite);
-
-    expect(actor.displayObjects.add).toBeCalledWith(sprite);
-  });
-
-  it("can add CollisionShape", () => {
-    const actor = new Actor();
-    jest.spyOn(actor.collision, "add");
-
-    const collisionShape = new RectCollisionShape();
-    actor.collideWith(collisionShape);
-
-    expect(actor.collision.add).toBeCalledWith(collisionShape);
-  });
-
-  it("can set CollisionGroup", () => {
-    const actor = new Actor();
-
-    const group = CollisionGroupPresets.item;
-    actor.setCollisionGroup(group);
-
-    expect(actor.collision.group()).toBe(group);
-  });
-
-  it.each`
-    enabled
-    ${true}
-    ${false}
-  `("can set collision enable or disable", ({ enabled }) => {
-    const actor = new Actor();
-
-    actor.setCollisionEnabled(enabled);
-
-    expect(actor.collision.isEnabled()).toBe(enabled);
+      expect(ev).toBeCalledWith(world, taker, damageType);
+      expect(parentDamageDealer.notifyKilled).toBeCalledWith(
+        world,
+        taker,
+        damageType
+      );
+    });
   });
 });

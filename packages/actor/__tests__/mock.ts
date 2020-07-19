@@ -9,7 +9,7 @@ export const moverMock = <T>(done: boolean, delta: Vector): Mover<T> => {
       .mockImplementation(
         (world: T, deltaSec: number, currentTrans: Matrix) => ({
           done,
-          newTrans: currentTrans.translated(delta),
+          newTrans: currentTrans.translated(delta.mlt(deltaSec)),
         })
       ),
   }));
@@ -18,6 +18,6 @@ export const moverMock = <T>(done: boolean, delta: Vector): Mover<T> => {
 
 export const spriteMock = <T>(): Sprite<T> => {
   const obj = new Sprite();
-  jest.spyOn(obj, "update");
+  jest.spyOn(obj, "updatePixiObject");
   return obj;
 };
