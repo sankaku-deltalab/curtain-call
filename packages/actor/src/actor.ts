@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { Updatable, Transformation } from "@curtain-call/util";
+import { Updatable, Transformation, Team } from "@curtain-call/util";
 import { DamageDealer, Health, DamageType } from "@curtain-call/health";
 import { Mover } from "@curtain-call/mover";
 import { DisplayObject } from "@curtain-call/display-object";
@@ -44,6 +44,7 @@ export class Actor<TWorld>
   private readonly objects = new Set<DisplayObject>();
   private readonly movers = new Set<Mover<TWorld>>();
   private parent?: DamageDealer<TWorld, Actor<TWorld>>;
+  private team = Team.noSide;
 
   constructor(diArgs?: {
     trans?: Transformation;
@@ -500,5 +501,27 @@ export class Actor<TWorld>
   ): this {
     this.parent = parentDealer;
     return this;
+  }
+
+  // about team
+
+  /**
+   * Set team joined this.
+   *
+   * @param team New team.
+   * @returns this.
+   */
+  setTeam(team: Team): this {
+    this.team = team;
+    return this;
+  }
+
+  /**
+   * Get team joined this.
+   *
+   * @returns Team.
+   */
+  getTeam(): Team {
+    return this.team;
   }
 }

@@ -8,7 +8,7 @@ import {
 import { Actor } from "../src";
 import { moverMock, spriteMock } from "./mock";
 import { DisplayObject } from "@curtain-call/display-object";
-import { Transformation } from "@curtain-call/util";
+import { Transformation, Team } from "@curtain-call/util";
 
 describe("@curtain-call/actor.Actor", () => {
   describe("has transformation", () => {
@@ -372,6 +372,20 @@ describe("@curtain-call/actor.Actor", () => {
         taker,
         damageType
       );
+    });
+  });
+
+  describe("join team", () => {
+    it("initial team is noSide", () => {
+      const actor = new Actor();
+
+      expect(actor.getTeam()).toBe(Team.noSide);
+    });
+
+    it("can change team", () => {
+      const actor = new Actor().setTeam(Team.playerSide);
+
+      expect(actor.getTeam()).toBe(Team.playerSide);
     });
   });
 });

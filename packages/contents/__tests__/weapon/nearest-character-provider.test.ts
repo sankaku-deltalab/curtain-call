@@ -1,19 +1,19 @@
 import { Matrix } from "trans-vector2d";
 import { World } from "@curtain-call/world";
-import { Transformation } from "@curtain-call/util";
-import { NearestCharacterProvider, Character, Team } from "../../src";
+import { Transformation, Team } from "@curtain-call/util";
+import { NearestCharacterProvider, Character } from "../../src";
 
 const nonTargetableTeamCharacter = (): Character => {
   return new Character()
     .moveTo({ x: 0, y: 0 })
-    .inTeam(Team.noSide)
+    .setTeam(Team.noSide)
     .initHealth(1, 1);
 };
 
 const daedCharacter = (): Character => {
   const character = new Character()
     .moveTo({ x: 0, y: 0 })
-    .inTeam(Team.enemySide)
+    .setTeam(Team.enemySide)
     .initHealth(1, 1);
   jest.spyOn(character, "isDead").mockReturnValue(true);
   return character;
@@ -22,7 +22,7 @@ const daedCharacter = (): Character => {
 const removingCharacter = (): Character => {
   const character = new Character()
     .moveTo({ x: 0, y: 0 })
-    .inTeam(Team.enemySide);
+    .setTeam(Team.enemySide);
   jest.spyOn(character, "shouldRemoveSelfFromWorld").mockReturnValue(true);
   return character;
 };
@@ -33,11 +33,11 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     const userTrans = new Transformation().setLocal(Matrix.identity);
     const nearTargetable = new Character()
       .moveTo({ x: 2, y: 0 })
-      .inTeam(Team.enemySide)
+      .setTeam(Team.enemySide)
       .initHealth(1, 1);
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
-      .inTeam(Team.enemySide)
+      .setTeam(Team.enemySide)
       .initHealth(1, 1);
     world.addActor(nearTargetable).addActor(farTargetable);
 
@@ -61,11 +61,11 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     const userTrans = new Transformation().setLocal(Matrix.identity);
     const nearTargetable = new Character()
       .moveTo({ x: 2, y: 0 })
-      .inTeam(Team.enemySide)
+      .setTeam(Team.enemySide)
       .initHealth(1, 1);
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
-      .inTeam(Team.enemySide)
+      .setTeam(Team.enemySide)
       .initHealth(1, 1);
     world.addActor(nearTargetable).addActor(farTargetable);
 
@@ -102,7 +102,7 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     });
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
-      .inTeam(Team.enemySide)
+      .setTeam(Team.enemySide)
       .initHealth(1, 1);
     world.addActor(nearNonTargetable).addActor(farTargetable);
 

@@ -2,7 +2,8 @@ import { World } from "@curtain-call/world";
 import { Actor } from "@curtain-call/actor";
 import { BasicDamageDealer } from "@curtain-call/health";
 import { GuntreeWeapon, guntree as gt } from "@curtain-call/weapon";
-import { Character, Team, NullPlan, Plan } from "../../src";
+import { Character, NullPlan, Plan } from "../../src";
+import { Team } from "@curtain-call/util";
 
 const planMock = <T extends World = World>(): Plan<T> => {
   const plan = new NullPlan();
@@ -15,13 +16,13 @@ describe("@curtain-call/contents.Character", () => {
   it("is in noSide team at first", () => {
     const character = new Character();
 
-    expect(character.team()).toBe(Team.noSide);
+    expect(character.getTeam()).toBe(Team.noSide);
   });
 
   it("can join to team", () => {
-    const character = new Character().inTeam(Team.playerSide);
+    const character = new Character().setTeam(Team.playerSide);
 
-    expect(character.team()).toBe(Team.playerSide);
+    expect(character.getTeam()).toBe(Team.playerSide);
   });
 
   it("can set plan", () => {

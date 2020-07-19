@@ -1,8 +1,9 @@
 import { Matrix } from "trans-vector2d";
 import { World } from "@curtain-call/world";
 import { RectCollisionShape } from "@curtain-call/collision";
-import { SimpleBullet, Character, Team } from "../../src";
+import { SimpleBullet, Character } from "../../src";
 import { RelativeMover } from "@curtain-call/mover";
+import { Team } from "@curtain-call/util";
 
 const victimMock = (): Character => {
   const victim = new Character();
@@ -52,7 +53,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
   it("move with constant speed", () => {
     const world = new World();
-    const victim = victimMock().inTeam(Team.enemySide);
+    const victim = victimMock().setTeam(Team.enemySide);
     const { initArgs, bullet } = createInitializedBullet();
     world.addActor(victim).addActor(bullet);
 
@@ -97,7 +98,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
   it("deal damage when hit to enemy", () => {
     const world = new World();
-    const victim = victimMock().inTeam(Team.enemySide);
+    const victim = victimMock().setTeam(Team.enemySide);
     const { initArgs, bullet } = createInitializedBullet();
     world.addActor(victim).addActor(bullet);
 
@@ -110,7 +111,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
   it("would be removed after hit", () => {
     const world = new World();
-    const victim = victimMock().inTeam(Team.enemySide);
+    const victim = victimMock().setTeam(Team.enemySide);
     const { bullet } = createInitializedBullet();
     world.addActor(victim).addActor(bullet);
 

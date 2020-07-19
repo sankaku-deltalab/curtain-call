@@ -1,7 +1,6 @@
 import { TargetProvider } from "@curtain-call/weapon";
 import { World } from "@curtain-call/world";
-import { Transformation } from "@curtain-call/util";
-import { Team } from "../team";
+import { Transformation, Team } from "@curtain-call/util";
 import { Character } from "../character/character";
 import { Vector } from "trans-vector2d";
 
@@ -70,7 +69,7 @@ export class NearestCharacterProvider<TWorld extends World = World>
     for (const ac of actors) {
       if (!(ac instanceof Character)) continue;
       if (!this.targetIsAlive(world, ac)) continue;
-      if (ac.team() !== this.targeTeam) continue;
+      if (ac.getTeam() !== this.targeTeam) continue;
 
       const { translation: targetPos } = ac.getWorldTransform().decompose();
       const distance = targetPos.distance(myPos);

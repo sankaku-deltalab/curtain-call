@@ -10,7 +10,6 @@ import { World } from "@curtain-call/world";
 import { Transformation } from "@curtain-call/util";
 import { NullPlan } from "./null-plan";
 import { Plan } from "./plan";
-import { Team } from "../team";
 import { Collision } from "@curtain-call/collision";
 
 /**
@@ -20,7 +19,6 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
   /** Weapon. */
   public readonly weapon: GuntreeWeapon<TWorld, Actor<TWorld>>;
 
-  private teamInner = Team.noSide;
   private plan: Plan<TWorld> = new NullPlan();
   private isImmortalInner = false;
 
@@ -75,26 +73,6 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
   ): { actualDamage: number; died: boolean } {
     const modifiedDamage = this.isImmortal() ? 0 : damage;
     return super.takeDamage(world, modifiedDamage, dealer, type);
-  }
-
-  /**
-   * Set team.
-   *
-   * @param team New team.
-   * @returns this.
-   */
-  inTeam(team: Team): this {
-    this.teamInner = team;
-    return this;
-  }
-
-  /**
-   * Get Team.
-   *
-   * @returns team.
-   */
-  team(): Team {
-    return this.teamInner;
   }
 
   /**
