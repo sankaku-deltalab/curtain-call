@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 import * as gt from "guntree";
 import { Transformation } from "@curtain-call/util";
-import { DamageDealer } from "@curtain-call/health";
+import { BasicDamageDealer } from "@curtain-call/health";
 import { Matrix } from "trans-vector2d";
 import { BulletGenerator } from "./bullet-generator";
 import { TargetProvider, NonTargetProvider } from "./target-provider";
@@ -23,20 +23,20 @@ class GuntreeOwner<T> implements gt.Owner {
 
   getEnemyTransform(name: string): Matrix {
     if (!this.world || !this.targetProvider) throw new Error();
-    const target = this.targetProvider.getTargetTrans(this.world);
-    if (!target)
+    const targetPos = this.targetProvider.getTargetPosition(this.world);
+    if (!targetPos)
       return this.getMuzzleTransform(name).globalize(
         Matrix.translation({ x: 1, y: 0 })
       );
 
-    return target.getGlobal();
+    return Matrix.from({ translation: targetPos });
   }
 }
 
 /**
  * Fire bullets with Guntree.
  */
-export class GuntreeWeapon<T, A> implements Weapon<T> {
+export class GuntreeWeapon<T, A> implements Weapon<T, A> {
   /** Events. */
   public readonly event = new EventEmitter<{
     fired: [T, A];
@@ -53,7 +53,7 @@ export class GuntreeWeapon<T, A> implements Weapon<T> {
   /**
    * @param damageDealer Damage dealer would be emitted when bullet dealt damage.
    */
-  constructor(public readonly damageDealer = new DamageDealer<T>()) {
+  constructor(public readonly damageDealer = new BasicDamageDealer<T, A>()) {
     this.player.events.on("fired", (data, bullet) => {
       if (!this.world || !this.bulletGenerator) throw new Error();
       const bulletActor = this.generateBullet(data, bullet);

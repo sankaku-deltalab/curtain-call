@@ -1,11 +1,11 @@
-import { DamageDealer } from "@curtain-call/health";
+import { BasicDamageDealer } from "@curtain-call/health";
 import { Weapon } from "./weapon";
 
 /**
  * Weapon do nothing.
  */
-export class NullWeapon<T> implements Weapon<T> {
-  constructor(public readonly damageDealer = new DamageDealer<T>()) {}
+export class NullWeapon<T, A> implements Weapon<T, A> {
+  constructor(public readonly damageDealer = new BasicDamageDealer<T, A>()) {}
 
   /**
    * Start firing.

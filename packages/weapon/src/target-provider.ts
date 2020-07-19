@@ -1,17 +1,17 @@
-import { Transformation } from "@curtain-call/util";
+import { Vector } from "trans-vector2d";
 
 export interface TargetProvider<T> {
   /**
-   * Get target transformation.
+   * Get target position.
    *
    * @param world Our world.
-   * @returns Target transformation.
+   * @returns Target world position.
    */
-  getTargetTrans(world: T): Transformation | undefined;
+  getTargetPosition(world: T): Vector | undefined;
 }
 
 export class NonTargetProvider<T> implements TargetProvider<T> {
-  getTargetTrans(_world: T): undefined {
+  getTargetPosition(_world: T): undefined {
     return undefined;
   }
 }

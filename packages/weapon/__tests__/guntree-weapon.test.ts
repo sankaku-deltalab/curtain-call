@@ -12,7 +12,7 @@ const bulletGeneratorMock = <T, A>(): BulletGenerator<T, A> => {
 };
 
 const targetProviderMock = <T>(): TargetProvider<T> => {
-  const cls = jest.fn(() => ({ getTargetTrans: jest.fn() }));
+  const cls = jest.fn(() => ({ getTargetPosition: jest.fn() }));
   return new cls();
 };
 

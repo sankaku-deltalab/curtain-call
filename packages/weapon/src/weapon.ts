@@ -1,8 +1,15 @@
 import { DamageDealer } from "@curtain-call/health";
 
-export interface Weapon<T> {
+export interface WeaponActor<TWorld> {
+  startFiring(world: TWorld): this;
+  stopFiring(): this;
+  forceStopFiring(): this;
+  isFiring(): boolean;
+}
+
+export interface Weapon<T, A> {
   /** Damage dealer. */
-  readonly damageDealer: DamageDealer<T>;
+  readonly damageDealer: DamageDealer<T, A>;
 
   /**
    * Start firing.
