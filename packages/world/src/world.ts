@@ -2,9 +2,12 @@ import * as PIXI from "pixi.js";
 import { VectorLike, Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
 import { Camera } from "@curtain-call/camera";
-import { DisplayObjectManager } from "@curtain-call/display-object";
+import {
+  DisplayObjectManager,
+  DisplayObject,
+} from "@curtain-call/display-object";
 import { PointerInputReceiver } from "@curtain-call/input";
-import { OverlapChecker } from "@curtain-call/collision";
+import { OverlapChecker, Collision } from "@curtain-call/collision";
 import {
   pixiMatrixToMatrix2d,
   Updatable,
@@ -23,10 +26,10 @@ export class World {
   public readonly camera: Camera;
   public readonly pointerInput: PointerInputReceiver;
 
-  private readonly displayObject: DisplayObjectManager<World>;
+  private readonly displayObject: DisplayObjectManager;
   private readonly actors = new Set<Actor<this>>();
   private readonly updatable = new Set<Updatable<this>>();
-  private readonly overlapChecker = new OverlapChecker<this, Actor<this>>();
+  private readonly overlapChecker = new OverlapChecker();
   private readonly mask = new PIXI.Graphics();
   private readonly coreArea: RectArea;
 
@@ -42,7 +45,7 @@ export class World {
     readonly head?: PIXI.Container;
     readonly tail?: PIXI.Container;
     readonly camera?: Camera;
-    readonly displayObject?: DisplayObjectManager<World>;
+    readonly displayObject?: DisplayObjectManager;
     readonly pointerInput?: PointerInputReceiver;
     readonly coreArea?: RectArea;
   }) {
@@ -51,8 +54,7 @@ export class World {
     this.head.addChild(this.mask);
     this.tail = diArgs?.tail || new PIXI.Container();
     this.camera = diArgs?.camera || new Camera();
-    this.displayObject =
-      diArgs?.displayObject || new DisplayObjectManager<World>();
+    this.displayObject = diArgs?.displayObject || new DisplayObjectManager();
     this.pointerInput = diArgs?.pointerInput || new PointerInputReceiver();
     this.coreArea = diArgs?.coreArea || new RectArea();
 
@@ -119,7 +121,6 @@ export class World {
 
     this.updatable.forEach((up) => up.update(this, deltaSec));
     this.checkCollision();
-    this.displayObject.update(this, deltaSec);
     this.updatePixiDisplayObject();
     this.camera.update();
   }
@@ -149,10 +150,6 @@ export class World {
     if (!removed) throw new Error("Actor was not added");
 
     this.removeUpdatableInternal(actor);
-    actor.displayObjects.forEach((obj) => {
-      if (!this.displayObject.has(obj)) return;
-      this.displayObject.remove(obj);
-    });
     actor.notifyRemovedFromWorld(this);
 
     return this;
@@ -301,16 +298,31 @@ export class World {
   }
 
   private updatePixiDisplayObject(): void {
+    const displayObjects: DisplayObject[] = [];
     this.actors.forEach((actor) => {
-      actor.displayObjects.forEach((obj) => {
-        if (this.displayObject.has(obj)) return;
-        this.displayObject.add(obj);
+      actor.iterateDisplayObject((obj) => {
+        displayObjects.push(obj);
       });
     });
+
+    this.displayObject.updatePixiObjects(displayObjects);
   }
 
   private checkCollision(): void {
-    const collisions = Array.from(this.actors).map((ac) => ac.collision);
-    this.overlapChecker.checkOverlap(this, collisions);
+    const collisionToActor = new Map(
+      Array.from(this.actors).map((ac) => [ac.getCollision(), ac])
+    );
+    const getActor = (col: Collision): Actor<this> => {
+      const ac = collisionToActor.get(col);
+      if (!ac) throw new Error();
+      return ac;
+    };
+    const collisions = Array.from(collisionToActor.keys());
+    const r = this.overlapChecker.checkOverlap(collisions);
+    r.forEach((others, col) => {
+      const ac = getActor(col);
+      const othersActor = new Set(Array.from(others).map((c) => getActor(c)));
+      ac.notifyOverlappedWith(this, othersActor);
+    });
   }
 }

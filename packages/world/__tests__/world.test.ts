@@ -27,12 +27,12 @@ const updatableMock = <T>(): Updatable<T> => {
   return new cls();
 };
 
-const worldWithMock = <T>(): {
+const worldWithMock = (): {
   diArgs: {
     readonly head: PIXI.Container;
     readonly tail: PIXI.Container;
     readonly camera: Camera;
-    readonly displayObject: DisplayObjectManager<World>;
+    readonly displayObject: DisplayObjectManager;
     readonly pointerInput: PointerInputReceiver;
   };
   world: World;
@@ -41,11 +41,9 @@ const worldWithMock = <T>(): {
   const worldTail = containerMock();
 
   const pixiDisplayObjectContainer = containerMock();
-  const DisplayObjectContainer = new DisplayObjectManager<World>(
+  const DisplayObjectContainer = new DisplayObjectManager(
     pixiDisplayObjectContainer
   );
-  jest.spyOn(DisplayObjectContainer, "add");
-  jest.spyOn(DisplayObjectContainer, "remove");
 
   const pixiCameraHead = containerMock();
   const pixiCameraTail = containerMock();
@@ -179,13 +177,12 @@ describe("@curtain-call/world.World", () => {
 
   describe("use DisplayObject", () => {
     const actorMock = <T>(): { actor: Actor<T>; sprite: Sprite<T> } => {
-      const actor = new Actor<T>();
       const sprite = new Sprite();
-      actor.displayObjects.add(sprite);
+      const actor = new Actor<T>().addDisplayObject(sprite);
       return { actor, sprite };
     };
 
-    it("and DisplayObjectContainer's pixi container was added to world at constructor", () => {
+    it("and DisplayObjectManager's pixi container was added to world at constructor", () => {
       const { diArgs } = worldWithMock();
 
       expect(diArgs.tail.addChild).toBeCalledWith(
@@ -193,14 +190,30 @@ describe("@curtain-call/world.World", () => {
       );
     });
 
-    it("and add DisplayObject in actor when updated", () => {
+    it("and add DisplayObject in actor to manager when updated", () => {
       const { world, diArgs } = worldWithMock();
       const { actor, sprite } = actorMock<typeof world>();
 
       world.addActor(actor);
       world.update(0.125);
 
-      expect(diArgs.displayObject.add).toBeCalledWith(sprite);
+      expect(diArgs.displayObject.container.addChild).toBeCalledWith(
+        sprite.pixiObj
+      );
+    });
+
+    it("and remove DisplayObject in actor when DisplayObject was removed from actor", () => {
+      const { world, diArgs } = worldWithMock();
+      const { actor, sprite } = actorMock<typeof world>();
+
+      world.addActor(actor);
+      world.update(0.125);
+      actor.removeDisplayObject(sprite);
+      world.update(0.125);
+
+      expect(diArgs.displayObject.container.removeChild).toBeCalledWith(
+        sprite.pixiObj
+      );
     });
 
     it("and remove DisplayObject in actor when actor removed", () => {
@@ -210,8 +223,11 @@ describe("@curtain-call/world.World", () => {
       world.addActor(actor);
       world.update(0.125);
       world.removeActor(actor);
+      world.update(0.125);
 
-      expect(diArgs.displayObject.remove).toBeCalledWith(sprite);
+      expect(diArgs.displayObject.container.removeChild).toBeCalledWith(
+        sprite.pixiObj
+      );
     });
   });
 
@@ -341,33 +357,30 @@ describe("@curtain-call/world.World", () => {
   it("check overlapping when updated", () => {
     const { world } = worldWithMock();
     const actor1 = new Actor<typeof world>()
-      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .addCollisionShape(new RectCollisionShape().setSize({ x: 10, y: 10 }))
       .moveTo({ x: 0, y: 0 });
     const actor2 = new Actor<typeof world>()
-      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .addCollisionShape(new RectCollisionShape().setSize({ x: 10, y: 10 }))
       .moveTo({ x: 5, y: 5 });
     const actor3 = new Actor<typeof world>()
-      .collideWith(new RectCollisionShape().setSize({ x: 10, y: 10 }))
+      .addCollisionShape(new RectCollisionShape().setSize({ x: 10, y: 10 }))
       .moveTo({ x: -21, y: -21 });
-    const actors = [actor1, actor2, actor3];
-    actors.forEach((ac) => {
-      jest.spyOn(ac.collision.event, "emit");
+    [actor1, actor2, actor3].forEach((ac) => {
+      jest.spyOn(ac, "notifyOverlappedWith");
       world.addActor(ac);
     });
 
     world.update(1);
 
-    expect(actor1.collision.event.emit).toBeCalledWith(
-      "overlapped",
+    expect(actor1.notifyOverlappedWith).toBeCalledWith(
       world,
-      new Set([actor2.collision])
+      new Set([actor2])
     );
-    expect(actor2.collision.event.emit).toBeCalledWith(
-      "overlapped",
+    expect(actor2.notifyOverlappedWith).toBeCalledWith(
       world,
-      new Set([actor1.collision])
+      new Set([actor1])
     );
-    expect(actor3.collision.event.emit).not.toBeCalled();
+    expect(actor3.notifyOverlappedWith).not.toBeCalled();
   });
 
   it.each`
