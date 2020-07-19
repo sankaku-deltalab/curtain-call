@@ -2,13 +2,11 @@ import boxIntersect from "box-intersect";
 import { Box2d } from "./common";
 import { Collision } from "./collision";
 
-export class OverlapChecker<TWorld, TActor> {
-  checkOverlap(world: TWorld, collisions: Collision<TWorld, TActor>[]): void {
+export class OverlapChecker {
+  checkOverlap(collisions: Collision[]): Map<Collision, Set<Collision>> {
     const cols = collisions.filter((col) => col.isEnabled());
 
-    const collided = new Map(
-      cols.map((c) => [c, new Set<Collision<TWorld, TActor>>()])
-    );
+    const collided = new Map(cols.map((c) => [c, new Set<Collision>()]));
 
     const nonHugeBoxesToCollision = this.box2dToCollisionMapping(
       cols.filter((c) => !c.isHugeNumber())
@@ -20,10 +18,7 @@ export class OverlapChecker<TWorld, TActor> {
     );
     const hugeBoxes = Array.from(hugeBoxesToCollision.keys());
 
-    const updateCollided = (
-      a: Collision<TWorld, TActor>,
-      b: Collision<TWorld, TActor>
-    ): void => {
+    const updateCollided = (a: Collision, b: Collision): void => {
       if (a.canCollideWith(b)) collided.get(a)?.add(b);
       if (b.canCollideWith(a)) collided.get(b)?.add(a);
     };
@@ -44,23 +39,23 @@ export class OverlapChecker<TWorld, TActor> {
       updateCollided(nonHugeColA, nonHugeColB);
     });
 
-    collided.forEach((colBs, colA) => {
-      if (colBs.size === 0) return;
-      colA.event.emit("overlapped", world, colBs);
+    collided.forEach((value, key) => {
+      if (value.size > 0) return;
+      collided.delete(key);
     });
+    return new Map(collided);
   }
 
   private box2dToCollisionMapping(
-    collisions: Collision<TWorld, TActor>[]
-  ): Map<Box2d, Collision<TWorld, TActor>> {
-    const colBoxes = collisions.map<[Collision<TWorld, TActor>, Box2d[]]>(
-      (c) => [c, c.getBox2Ds()]
-    );
+    collisions: Collision[]
+  ): Map<Box2d, Collision> {
+    const colBoxes = collisions.map<[Collision, Box2d[]]>((c) => [
+      c,
+      c.getBox2Ds(),
+    ]);
     return new Map(
       colBoxes
-        .map<[Box2d, Collision<TWorld, TActor>][]>(([col, boxes]) =>
-          boxes.map((b) => [b, col])
-        )
+        .map<[Box2d, Collision][]>(([col, boxes]) => boxes.map((b) => [b, col]))
         .flat()
     );
   }

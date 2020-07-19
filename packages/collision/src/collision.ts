@@ -1,4 +1,3 @@
-import { EventEmitter } from "eventemitter3";
 import { Transformation } from "@curtain-call/util";
 import { CollisionShape } from "./collision-shape";
 import { CollisionGroup, CollisionGroupPresets } from "./collision-group";
@@ -7,15 +6,9 @@ import { Box2d } from "./common";
 /**
  * Collision.
  */
-export class Collision<TWorld, TActor> {
-  /** Events. */
-  public readonly event = new EventEmitter<{
-    overlapped: [TWorld, Set<Collision<TWorld, TActor>>];
-  }>();
-
+export class Collision {
   private isHugeNumberInternal = false;
   private readonly shapes = new Set<CollisionShape>();
-  private ownerInternal?: TActor;
   private collisionGroup = CollisionGroupPresets.all;
   private enabled = true;
 
@@ -23,27 +16,6 @@ export class Collision<TWorld, TActor> {
    * @param trans Transformation
    */
   constructor(public readonly trans = new Transformation()) {}
-
-  /**
-   * Self owned by actor.
-   *
-   * @param owner Owner actor.
-   * @returns this.
-   */
-  ownedBy(owner: TActor): this {
-    this.ownerInternal = owner;
-    return this;
-  }
-
-  /**
-   * Get owner.
-   *
-   * @returns Owner.
-   */
-  owner(): TActor {
-    if (!this.ownerInternal) throw new Error("Not owned yet");
-    return this.ownerInternal;
-  }
 
   /**
    * Attach self Transformation to other.
@@ -145,7 +117,7 @@ export class Collision<TWorld, TActor> {
    * @param other Other collision.
    * @return This can collide with other.
    */
-  canCollideWith(other: Collision<TWorld, TActor>): boolean {
+  canCollideWith(other: Collision): boolean {
     return (this.group().mask & other.group().category) !== 0;
   }
 
@@ -167,18 +139,5 @@ export class Collision<TWorld, TActor> {
    */
   isEnabled(): boolean {
     return this.enabled;
-  }
-
-  /**
-   * Notify overlapped with other collisions.
-   *
-   * @param world Our world.
-   * @param others Other collisions.
-   */
-  notifyOverlappedWith(
-    world: TWorld,
-    others: Set<Collision<TWorld, TActor>>
-  ): void {
-    this.event.emit("overlapped", world, others);
   }
 }
