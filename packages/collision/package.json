@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/box-intersect": "^1.0.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
