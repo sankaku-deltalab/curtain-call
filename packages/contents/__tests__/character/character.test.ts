@@ -1,6 +1,6 @@
 import { World } from "@curtain-call/world";
 import { Actor } from "@curtain-call/actor";
-import { DamageDealer } from "@curtain-call/health";
+import { BasicDamageDealer } from "@curtain-call/health";
 import { GuntreeWeapon, guntree as gt } from "@curtain-call/weapon";
 import { Character, Team, NullPlan, Plan } from "../../src";
 
@@ -42,17 +42,15 @@ describe("@curtain-call/contents.Character", () => {
     ${true}     | ${0}
     ${false}    | ${1}
   `("can be immortal", ({ immortality, takenDamage }) => {
-    const character = new Character()
-      .healthInitialized(1)
-      .asImmortal(immortality);
+    const character = new Character().initHealth(1, 1).asImmortal(immortality);
 
     const damageTakeCallback = jest.fn();
-    character.health.event.on("takenDamage", damageTakeCallback);
+    character.event.on("takenDamage", damageTakeCallback);
 
     const world = new World();
-    const dealer = new DamageDealer<World>();
+    const dealer = new BasicDamageDealer();
     const damageType = jest.fn();
-    character.health.takeDamage(world, 1, dealer, damageType);
+    character.takeDamage(world, 1, dealer, damageType);
 
     expect(damageTakeCallback).toBeCalledWith(
       world,
@@ -74,7 +72,7 @@ describe("@curtain-call/contents.Character", () => {
       guntree: gt.nop(),
       muzzles: new Map(),
       bulletGenerator: { generate: jest.fn() },
-      targetProvider: { getTargetTrans: jest.fn() },
+      targetProvider: { getTargetPosition: jest.fn() },
     };
     const character = new Character({ weapon }).initWeapon(initArgs);
 

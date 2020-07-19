@@ -25,14 +25,11 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     this.mover = diArgs?.mover || new RelativeMover<TWorld>();
     this.collisionShape = diArgs?.collisionShape || new RectCollisionShape();
 
-    this.movers.add(this.mover);
-
-    this.collision.add(this.collisionShape);
-    this.collision.event.on("overlapped", (world, others) => {
+    this.addMover(this.mover).addCollisionShape(this.collisionShape);
+    this.event.on("overlapped", (world, others) => {
       others.forEach((other) => {
         if (this.shouldRemoveSelfFromWorld(world)) return;
-        const otherActor = other.owner();
-        this.processHit(world, otherActor);
+        this.processHit(world, other);
       });
     });
   }
@@ -60,7 +57,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
    * @returns Self must remove from world.
    */
   shouldRemoveSelfFromWorld(world: TWorld): boolean {
-    const { translation } = this.trans.getLocal().decompose();
+    const { translation } = this.getWorldTransform().decompose();
     const isNotVisible =
       world.camera.calcVisibilityStatus(translation, this.visualRadius) ===
       PositionStatusWithArea.outOfArea;
@@ -86,7 +83,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     damageName: string;
     size: number;
   }): this {
-    this.trans.setLocal(args.trans);
+    this.setLocalTransform(args.trans);
     this.mover.setDelta(Matrix.from({ translation: { x: args.speed, y: 0 } }));
     this.damage = args.damage;
     this.damageName = args.damageName;
@@ -96,12 +93,17 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     return this;
   }
 
+  clearSelfForReuse(): void {
+    this.event.removeAllListeners();
+    this.removeSelfFromWorld(false);
+  }
+
   private processHit(world: TWorld, other: Actor<TWorld>): boolean {
     if (this.shouldRemoveSelfFromWorld(world)) return false;
-    other.health.takeDamage(world, this.damage, this.damageDealer, {
+    other.takeDamage(world, this.damage, this, {
       name: this.damageName,
     });
-    this.removeSelfFromWorld();
+    this.removeSelfFromWorld(true);
     return true;
   }
 }

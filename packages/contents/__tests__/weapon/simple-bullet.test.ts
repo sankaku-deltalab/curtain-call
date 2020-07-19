@@ -6,7 +6,7 @@ import { RelativeMover } from "@curtain-call/mover";
 
 const victimMock = (): Character => {
   const victim = new Character();
-  jest.spyOn(victim.health, "takeDamage");
+  jest.spyOn(victim, "takeDamage");
   return victim;
 };
 
@@ -46,7 +46,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
   it("could be initialized", () => {
     const { initArgs, collisionShape, bullet } = createInitializedBullet();
 
-    expect(bullet.trans.getLocal()).toEqual(initArgs.trans);
+    expect(bullet.getWorldTransform()).toEqual(initArgs.trans);
     expect(collisionShape.getBox2Ds()).toEqual([[-32, -32, 32, 32]]);
   });
 
@@ -58,7 +58,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
     bullet.update(world, 0.5);
 
-    expect(bullet.trans.getLocal().decompose().translation).toEqual({
+    expect(bullet.getWorldTransform().decompose().translation).toEqual({
       x: initArgs.speed / 2,
       y: 0,
     });
@@ -101,14 +101,11 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     const { initArgs, bullet } = createInitializedBullet();
     world.addActor(victim).addActor(bullet);
 
-    bullet.collision.notifyOverlappedWith(world, new Set([victim.collision]));
+    bullet.notifyOverlappedWith(world, new Set([victim]));
 
-    expect(victim.health.takeDamage).toBeCalledWith(
-      world,
-      initArgs.damage,
-      bullet.damageDealer,
-      { name: initArgs.damageName }
-    );
+    expect(victim.takeDamage).toBeCalledWith(world, initArgs.damage, bullet, {
+      name: initArgs.damageName,
+    });
   });
 
   it("would be removed after hit", () => {
@@ -117,7 +114,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     const { bullet } = createInitializedBullet();
     world.addActor(victim).addActor(bullet);
 
-    bullet.collision.notifyOverlappedWith(world, new Set([victim.collision]));
+    bullet.notifyOverlappedWith(world, new Set([victim]));
 
     expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
   });

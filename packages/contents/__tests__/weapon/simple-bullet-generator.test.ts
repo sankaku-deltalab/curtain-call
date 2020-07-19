@@ -2,6 +2,7 @@ import { Matrix } from "trans-vector2d";
 import { World } from "@curtain-call/world";
 import { SimpleBullet, SimpleBulletGenerator } from "../../src";
 import { GuntreeWeapon } from "@curtain-call/weapon";
+import { Actor } from "@curtain-call/actor";
 
 const generateParams = (): Map<string, number> =>
   new Map([
@@ -22,7 +23,7 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
 
     const world = new World();
     jest.spyOn(world, "addActor");
-    const weapon = new GuntreeWeapon<World, SimpleBullet>();
+    const weapon = new GuntreeWeapon<World, Actor<World>>();
     const gen = (): SimpleBullet | undefined =>
       generator.generate(
         world,
@@ -46,7 +47,7 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
 
     const world = new World();
     jest.spyOn(world, "addActor");
-    const weapon = new GuntreeWeapon<World, SimpleBullet>();
+    const weapon = new GuntreeWeapon<World, Actor<World>>();
     generator.generate(
       world,
       weapon,
@@ -74,7 +75,7 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
 
     const world = new World();
     jest.spyOn(world, "addActor");
-    const weapon = new GuntreeWeapon<World, SimpleBullet>();
+    const weapon = new GuntreeWeapon<World, Actor<World>>();
     const gen = (): SimpleBullet | undefined =>
       generator.generate(
         world,
@@ -97,7 +98,7 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
 
     const world = new World();
     jest.spyOn(world, "addActor");
-    const weapon = new GuntreeWeapon<World, SimpleBullet>();
+    const weapon = new GuntreeWeapon<World, Actor<World>>();
     const gen = (): SimpleBullet | undefined =>
       generator.generate(
         world,

@@ -5,8 +5,9 @@ import { Asset } from "@curtain-call/asset";
 
 const actorMock = <T>(): Actor<T> => {
   const actor = new Actor<T>();
-  jest.spyOn(actor.trans, "attachTo");
-  jest.spyOn(actor.trans, "detachFromParent");
+  jest.spyOn(actor, "attachTo");
+  jest.spyOn(actor, "attachToTransformation");
+  jest.spyOn(actor, "detachFromParent");
   return actor;
 };
 
@@ -50,7 +51,9 @@ describe("@curtain-call/contents.StaticLevel", () => {
     level.activate(world);
 
     actors.forEach((actor) => {
-      expect(actor.trans.attachTo).toBeCalledWith(world.backgroundTrans);
+      expect(actor.attachToTransformation).toBeCalledWith(
+        world.backgroundTrans
+      );
       expect(world.addActor).toBeCalledWith(actor);
     });
   });
@@ -64,7 +67,7 @@ describe("@curtain-call/contents.StaticLevel", () => {
     level.deactivate(world);
 
     actors.forEach((actor) => {
-      expect(actor.trans.detachFromParent).toBeCalled();
+      expect(actor.detachFromParent).toBeCalled();
       expect(world.removeActor).toBeCalledWith(actor);
     });
   });

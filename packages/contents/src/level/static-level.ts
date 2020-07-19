@@ -54,7 +54,7 @@ export class StaticLevel<T extends World> implements Level<T> {
     this.actors = this.actorsGenerator(world);
     this.actors.forEach((actor) => {
       world.addActor(actor);
-      actor.trans.attachTo(world.backgroundTrans);
+      actor.attachToTransformation(world.backgroundTrans);
     });
   }
 
@@ -68,7 +68,7 @@ export class StaticLevel<T extends World> implements Level<T> {
     this.activated = false;
     this.actors.forEach((actor) => {
       world.removeActor(actor);
-      actor.trans.detachFromParent();
+      actor.detachFromParent();
     });
   }
 

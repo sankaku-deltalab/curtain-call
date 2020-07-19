@@ -94,13 +94,24 @@ export class Actor<TWorld>
   }
 
   /**
-   * Attach self Transformation to another actor.
+   * Attach self Transformation to other actor.
    *
    * @param parent Parent Actor.
    * @returns this.
    */
   attachTo(parent: Actor<TWorld>): this {
     this.trans.attachTo(parent.trans);
+    return this;
+  }
+
+  /**
+   * Attach self Transformation to other transform.
+   *
+   * @param parent Parent Transformation.
+   * @returns this.
+   */
+  attachToTransformation(parent: Transformation): this {
+    this.trans.attachTo(parent);
     return this;
   }
 

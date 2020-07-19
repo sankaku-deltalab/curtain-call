@@ -7,15 +7,15 @@ const nonTargetableTeamCharacter = (): Character => {
   return new Character()
     .moveTo({ x: 0, y: 0 })
     .inTeam(Team.noSide)
-    .healthInitialized(1);
+    .initHealth(1, 1);
 };
 
 const daedCharacter = (): Character => {
   const character = new Character()
     .moveTo({ x: 0, y: 0 })
     .inTeam(Team.enemySide)
-    .healthInitialized(1);
-  jest.spyOn(character.health, "isDead").mockReturnValue(true);
+    .initHealth(1, 1);
+  jest.spyOn(character, "isDead").mockReturnValue(true);
   return character;
 };
 
@@ -34,22 +34,26 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     const nearTargetable = new Character()
       .moveTo({ x: 2, y: 0 })
       .inTeam(Team.enemySide)
-      .healthInitialized(1);
+      .initHealth(1, 1);
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
       .inTeam(Team.enemySide)
-      .healthInitialized(1);
+      .initHealth(1, 1);
     world.addActor(nearTargetable).addActor(farTargetable);
 
     const provider = new NearestCharacterProvider()
       .setTargetTeam(Team.enemySide)
       .attachTo(userTrans);
 
-    const targetTrans = provider.getTargetTrans(world);
+    const targetPos = provider.getTargetPosition(world);
 
-    expect(targetTrans).not.toBeUndefined();
-    if (targetTrans)
-      expect(targetTrans.getLocal()).toEqual(nearTargetable.trans.getLocal());
+    expect(targetPos).not.toBeUndefined();
+    if (targetPos) {
+      const {
+        translation: nearTargetablePos,
+      } = nearTargetable.getWorldTransform().decompose();
+      expect(targetPos).toEqual(nearTargetablePos);
+    }
   });
 
   it("provide some target while alive target", () => {
@@ -58,25 +62,29 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     const nearTargetable = new Character()
       .moveTo({ x: 2, y: 0 })
       .inTeam(Team.enemySide)
-      .healthInitialized(1);
+      .initHealth(1, 1);
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
       .inTeam(Team.enemySide)
-      .healthInitialized(1);
+      .initHealth(1, 1);
     world.addActor(nearTargetable).addActor(farTargetable);
 
     const provider = new NearestCharacterProvider()
       .setTargetTeam(Team.enemySide)
       .attachTo(userTrans);
 
-    const targetTrans1 = provider.getTargetTrans(world);
+    const targetPos1 = provider.getTargetPosition(world);
     farTargetable.moveTo({ x: 1, y: 0 });
-    const targetTrans2 = provider.getTargetTrans(world);
+    const targetPos2 = provider.getTargetPosition(world);
 
-    for (const targetTrans of [targetTrans1, targetTrans2]) {
-      expect(targetTrans).not.toBeUndefined();
-      if (targetTrans)
-        expect(targetTrans.getLocal()).toEqual(nearTargetable.trans.getLocal());
+    for (const targetPos of [targetPos1, targetPos2]) {
+      expect(targetPos).not.toBeUndefined();
+      if (targetPos) {
+        const {
+          translation: nearTargetablePos,
+        } = nearTargetable.getWorldTransform().decompose();
+        expect(targetPos).toEqual(nearTargetablePos);
+      }
     }
   });
 
@@ -95,17 +103,21 @@ describe("@curtain-call/contents.NearestCharacterProvider", () => {
     const farTargetable = new Character()
       .moveTo({ x: 3, y: 0 })
       .inTeam(Team.enemySide)
-      .healthInitialized(1);
+      .initHealth(1, 1);
     world.addActor(nearNonTargetable).addActor(farTargetable);
 
     const provider = new NearestCharacterProvider()
       .setTargetTeam(Team.enemySide)
       .attachTo(userTrans);
 
-    const targetTrans = provider.getTargetTrans(world);
+    const targetPos = provider.getTargetPosition(world);
 
-    expect(targetTrans).not.toBeUndefined();
-    if (targetTrans)
-      expect(targetTrans.getLocal()).toEqual(farTargetable.trans.getLocal());
+    expect(targetPos).not.toBeUndefined();
+    if (targetPos) {
+      const {
+        translation: nearTargetablePos,
+      } = farTargetable.getWorldTransform().decompose();
+      expect(targetPos).toEqual(nearTargetablePos);
+    }
   });
 });

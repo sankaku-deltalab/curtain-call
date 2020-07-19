@@ -8,6 +8,7 @@ import {
 import { Actor } from "../src";
 import { moverMock, spriteMock } from "./mock";
 import { DisplayObject } from "@curtain-call/display-object";
+import { Transformation } from "@curtain-call/util";
 
 describe("@curtain-call/actor.Actor", () => {
   describe("has transformation", () => {
@@ -48,6 +49,18 @@ describe("@curtain-call/actor.Actor", () => {
       });
       const parentActor = new Actor().setLocalTransform(parentTrans);
       const actor = new Actor().attachTo(parentActor);
+
+      expect(actor.getWorldTransform()).toEqual(parentTrans);
+    });
+
+    it("can attach to other Transformation", () => {
+      const parentTrans = Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
+      });
+      const actor = new Actor().attachToTransformation(
+        new Transformation().setLocal(parentTrans)
+      );
 
       expect(actor.getWorldTransform()).toEqual(parentTrans);
     });

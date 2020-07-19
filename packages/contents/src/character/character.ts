@@ -1,6 +1,6 @@
 import * as gt from "guntree";
-import { Actor, DisplayObjects, Movers } from "@curtain-call/actor";
-import { DamageInterceptor, Health, DamageDealer } from "@curtain-call/health";
+import { Actor } from "@curtain-call/actor";
+import { Health, DamageDealer, DamageType } from "@curtain-call/health";
 import {
   GuntreeWeapon,
   BulletGenerator,
@@ -12,21 +12,6 @@ import { NullPlan } from "./null-plan";
 import { Plan } from "./plan";
 import { Team } from "../team";
 import { Collision } from "@curtain-call/collision";
-
-class CharacterDamageInterceptor<T extends World = World>
-  implements DamageInterceptor<T> {
-  constructor(private readonly character: Character<T>) {}
-  /**
-   * Take damage to self.
-   *
-   * @param world World.
-   * @param damage Damage amount.
-   * @returns Modified damage.
-   */
-  interceptDamage(world: T, damage: number): number {
-    return this.character.isImmortal() ? 0 : damage;
-  }
-}
 
 /**
  * Character.
@@ -41,18 +26,14 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
 
   constructor(diArgs?: {
     trans?: Transformation;
-    displayObjects?: DisplayObjects<TWorld>;
-    movers?: Movers<TWorld>;
-    health?: Health<TWorld>;
-    damageDealer?: DamageDealer<TWorld>;
-    collision?: Collision<TWorld, Actor<TWorld>>;
+    health?: Health;
+    collision?: Collision;
     weapon?: GuntreeWeapon<TWorld, Actor<TWorld>>;
   }) {
     super(diArgs);
     this.weapon = diArgs?.weapon || new GuntreeWeapon();
 
-    this.health.addInterceptor(new CharacterDamageInterceptor(this));
-    this.weapon.damageDealer.chainedFrom(this.damageDealer);
+    this.weapon.damageDealer.setDamageDealerParent(this);
   }
 
   /**
@@ -76,6 +57,24 @@ export class Character<TWorld extends World = World> extends Actor<TWorld> {
   notifyAddedToWorld(world: TWorld): void {
     this.plan.start(world, this);
     super.notifyAddedToWorld(world);
+  }
+
+  /**
+   * Take damage to this.
+   *
+   * @param world World.
+   * @param damage Damage amount.
+   * @param type Damage type.
+   * @returns Damage taking result.
+   */
+  takeDamage(
+    world: TWorld,
+    damage: number,
+    dealer: DamageDealer<TWorld, Actor<TWorld>>,
+    type: DamageType
+  ): { actualDamage: number; died: boolean } {
+    const modifiedDamage = this.isImmortal() ? 0 : damage;
+    return super.takeDamage(world, modifiedDamage, dealer, type);
   }
 
   /**

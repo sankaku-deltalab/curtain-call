@@ -47,7 +47,7 @@ export class SimpleEnemyPlan<TWorld extends World> implements Plan<TWorld> {
       ) {
         this.state = EnemyState.exited;
         character.weapon.stop();
-        character.removeSelfFromWorld();
+        character.removeSelfFromWorld(true);
       }
     }
   }
@@ -56,7 +56,7 @@ export class SimpleEnemyPlan<TWorld extends World> implements Plan<TWorld> {
     world: TWorld,
     character: Character<TWorld>
   ): PositionStatusWithArea {
-    const { translation } = character.trans.getGlobal().decompose();
+    const { translation } = character.getWorldTransform().decompose();
     const coreStatus = world.calcPositionStatusWithCoreArea(translation, 0);
     const visualStatus = world.camera.calcVisibilityStatus(translation, 0);
     if (

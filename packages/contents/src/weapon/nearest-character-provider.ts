@@ -3,6 +3,7 @@ import { World } from "@curtain-call/world";
 import { Transformation } from "@curtain-call/util";
 import { Team } from "../team";
 import { Character } from "../character/character";
+import { Vector } from "trans-vector2d";
 
 /**
  * Provide nearest `Character` joined given team.
@@ -42,20 +43,21 @@ export class NearestCharacterProvider<TWorld extends World = World>
    * @param world Our world.
    * @returns Target transformation.
    */
-  getTargetTrans(world: TWorld): Transformation | undefined {
+  getTargetPosition(world: TWorld): Vector | undefined {
     if (!this.currentTarget || !this.targetIsAlive(world, this.currentTarget)) {
       this.currentTarget = this.searchTarget(world);
     }
 
     if (!this.currentTarget) return undefined;
-    return this.currentTarget.trans;
+    const { translation } = this.currentTarget.getWorldTransform().decompose();
+    return translation;
   }
 
   private targetIsAlive(world: TWorld, target: Character<TWorld>): boolean {
     return (
       world.hasActor(target) &&
       !target.shouldRemoveSelfFromWorld(world) &&
-      !target.health.isDead()
+      !target.isDead()
     );
   }
 
@@ -70,7 +72,7 @@ export class NearestCharacterProvider<TWorld extends World = World>
       if (!this.targetIsAlive(world, ac)) continue;
       if (ac.team() !== this.targeTeam) continue;
 
-      const { translation: targetPos } = ac.trans.getGlobal().decompose();
+      const { translation: targetPos } = ac.getWorldTransform().decompose();
       const distance = targetPos.distance(myPos);
       if (!target || (target && distance < targetDistance)) {
         target = ac;

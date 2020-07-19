@@ -40,7 +40,7 @@ export class SimpleBulletGenerator<TWorld extends World = World>
     const bullet = this.bullets.pop();
     if (!bullet) return undefined;
 
-    bullet.damageDealer.chainedFrom(weapon.damageDealer);
+    bullet.setDamageDealerParent(weapon.damageDealer);
     bullet.event.once("removedFromWorld", () => {
       this.usedBullets.push(bullet);
     });
@@ -64,8 +64,7 @@ export class SimpleBulletGenerator<TWorld extends World = World>
 
   private reuseBullets(): void {
     this.usedBullets.forEach((bullet) => {
-      bullet.damageDealer.event.removeAllListeners();
-      bullet.event.removeAllListeners();
+      bullet.clearSelfForReuse();
       this.bullets.push(bullet);
     });
   }
