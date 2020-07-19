@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object-manager";
+import { DisplayObject } from "./display-object";
 
 export const animSpriteFrom = (
   textures: PIXI.Texture[] | PIXI.AnimatedSprite.FrameObject[]
@@ -29,10 +29,9 @@ export const animSpriteFrom = (
  * sprite.update(world, 0.01); // update animation
  */
 export class MultiAnimatedSprite<
-  T,
   TState extends { [key: string]: PIXI.AnimatedSprite },
   TAnim extends { [key: string]: PIXI.AnimatedSprite }
-> implements DisplayObject<T> {
+> implements DisplayObject {
   /** Root container. */
   public readonly pixiObj = new PIXI.Container();
 
@@ -83,10 +82,9 @@ export class MultiAnimatedSprite<
   /**
    * Update self.
    *
-   * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void {
+  updatePixiObject(deltaSec: number): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

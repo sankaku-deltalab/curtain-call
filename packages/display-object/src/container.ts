@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object-manager";
+import { DisplayObject } from "./display-object";
 
 /**
  * Container.
@@ -15,7 +15,7 @@ import { DisplayObject } from "./display-object-manager";
  * container.trans.setLocal(Matrix.from({ translation: {x: 1, y: 2} }));
  * container.update();
  */
-export class Container<T> implements DisplayObject<T> {
+export class Container implements DisplayObject {
   /**
    * @param pixiObj Pixi container.
    * @param trans Transformation of self.
@@ -28,12 +28,10 @@ export class Container<T> implements DisplayObject<T> {
   /**
    * Update pixi sprite transformation.
    */
-  update(): void {
+  updatePixiObject(): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );
-
-    new PIXI.Sprite();
   }
 
   /**

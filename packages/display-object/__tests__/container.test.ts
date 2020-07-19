@@ -3,9 +3,9 @@ import { Matrix } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
 import { Container } from "../src";
 
-const createContainer = <T>(): {
+const createContainer = (): {
   pixiContainer: PIXI.Container;
-  container: Container<T>;
+  container: Container;
 } => {
   const pixiContainer = new PIXI.Container();
   jest.spyOn(pixiContainer, "addChild");
@@ -24,7 +24,7 @@ describe("@curtain-call/display-object.Container", () => {
     const { pixiContainer, container } = createContainer();
 
     container.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
-    container.update();
+    container.updatePixiObject();
 
     expect(pixiContainer.position.x).toBeCloseTo(1);
     expect(pixiContainer.position.y).toBeCloseTo(2);

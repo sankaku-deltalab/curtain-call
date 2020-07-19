@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Vector } from "trans-vector2d";
 import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object-manager";
+import { DisplayObject } from "./display-object";
 
 /**
  * Sprite.
@@ -16,7 +16,7 @@ import { DisplayObject } from "./display-object-manager";
  * sprite.trans.setLocal(Matrix.from({ translation: {x: 1, y: 2} }));
  * sprite.update();
  */
-export class Sprite<T> implements DisplayObject<T> {
+export class Sprite<T> implements DisplayObject {
   private size = Vector.one;
 
   /**
@@ -33,7 +33,7 @@ export class Sprite<T> implements DisplayObject<T> {
   /**
    * Update pixi sprite transformation.
    */
-  update(): void {
+  updatePixiObject(): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

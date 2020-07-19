@@ -42,7 +42,7 @@ describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
     const { sprite } = multiAnimatedSprite();
 
     sprite.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
-    sprite.update({}, 1);
+    sprite.updatePixiObject(1);
 
     expect(sprite.pixiObj.position.x).toBeCloseTo(1);
     expect(sprite.pixiObj.position.y).toBeCloseTo(2);
@@ -78,7 +78,7 @@ describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
 
     const deltaSec = 123;
     const deltaMS = 123 * 1000;
-    sprite.update({}, deltaSec);
+    sprite.updatePixiObject(deltaSec);
 
     expect(s1.visible).toBe(true);
     [s1, s2, a1, a2].forEach((as) => {
