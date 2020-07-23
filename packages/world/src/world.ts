@@ -119,6 +119,8 @@ export class World {
   update(deltaSec: number): void {
     this.removeDeadUpdatable();
 
+    this.addSubActorsIfNotAdded();
+
     this.updatable.forEach((up) => up.update(this, deltaSec));
     this.checkCollision();
     this.updatePixiDisplayObject();
@@ -132,10 +134,17 @@ export class World {
    * @returns this.
    */
   addActor(actor: Actor<this>): this {
-    if (this.actors.has(actor)) throw new Error("Actor was already added");
-    this.actors.add(actor);
-    this.addUpdatableInternal(actor);
-    actor.notifyAddedToWorld(this);
+    const adding = [actor, ...actor.getSubActors()];
+
+    if (adding.some((ac) => this.hasActor(ac)))
+      throw new Error("Actor was already added");
+
+    adding.forEach((ac) => {
+      this.actors.add(ac);
+      this.addUpdatableInternal(ac);
+      ac.notifyAddedToWorld(this);
+    });
+
     return this;
   }
 
@@ -146,11 +155,16 @@ export class World {
    * @returns this.
    */
   removeActor(actor: Actor<this>): this {
-    const removed = this.actors.delete(actor);
-    if (!removed) throw new Error("Actor was not added");
+    const removing = [actor, ...actor.getSubActors()];
 
-    this.removeUpdatableInternal(actor);
-    actor.notifyRemovedFromWorld(this);
+    if (removing.some((ac) => !this.hasActor(ac)))
+      throw new Error("Actor was not added");
+
+    removing.forEach((ac) => {
+      this.actors.delete(ac);
+      this.removeUpdatableInternal(ac);
+      ac.notifyRemovedFromWorld(this);
+    });
 
     return this;
   }
@@ -284,6 +298,15 @@ export class World {
       } else {
         this.removeUpdatable(up);
       }
+    });
+  }
+
+  private addSubActorsIfNotAdded(): void {
+    this.actors.forEach((owner) => {
+      owner.getSubActors().forEach((sub) => {
+        if (this.hasActor(sub)) return;
+        this.addActor(sub);
+      });
     });
   }
 

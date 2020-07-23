@@ -45,6 +45,8 @@ export class Actor<TWorld>
   private readonly movers = new Set<Mover<TWorld>>();
   private parent?: DamageDealer<TWorld, Actor<TWorld>>;
   private team = Team.noSide;
+  private ownerActor?: Actor<TWorld>;
+  private subActors = new Set<Actor<TWorld>>();
 
   constructor(diArgs?: {
     trans?: Transformation;
@@ -523,5 +525,78 @@ export class Actor<TWorld>
    */
   getTeam(): Team {
     return this.team;
+  }
+
+  /**
+   * Add sub actor to this.
+   * Sub actor would be attached to this.
+   *
+   * @param addingSubActor Adding actors.
+   * @returns this.
+   */
+  addSubActor(...addingSubActor: Actor<TWorld>[]): this {
+    const someSubActorsWasAlreadySubActor = addingSubActor.some(
+      (sub) => sub.getOwnerActor() !== undefined
+    );
+    if (someSubActorsWasAlreadySubActor)
+      throw new Error("Actor was already sub actor");
+
+    addingSubActor.forEach((sub) => {
+      this.subActors.add(sub);
+      sub.attachTo(this);
+      sub.ownerActor = this;
+    });
+
+    return this;
+  }
+
+  /**
+   * Remove sub actor from this.
+   * Sub actor would be detach from parent.
+   *
+   * @param removingSubActor Removing actors.
+   * @returns this.
+   */
+  removeSubActor(...removingSubActor: Actor<TWorld>[]): this {
+    const someActorIsNotOwnedByThis = removingSubActor.some(
+      (sub) => sub.getOwnerActor() !== this
+    );
+    if (someActorIsNotOwnedByThis)
+      throw new Error("Actor is not this sub actor");
+
+    removingSubActor.forEach((sub) => {
+      this.subActors.delete(sub);
+      sub.detachFromParent();
+      sub.ownerActor = undefined;
+    });
+
+    return this;
+  }
+
+  /**
+   * Check this has given actor as sub actor.
+   *
+   * @param subActor
+   * @returns this.
+   */
+  hasSubActor(subActor: Actor<TWorld>): boolean {
+    return this.subActors.has(subActor);
+  }
+
+  /**
+   * Get parent actor if this is sub-actor.
+   * If this is not sub-actor, return undefined.
+   *
+   * @returns Owner actor or undefined.
+   */
+  getOwnerActor(): Actor<TWorld> | undefined {
+    return this.ownerActor;
+  }
+
+  /**
+   * Get sub-actors.
+   */
+  getSubActors(): Actor<TWorld>[] {
+    return Array.from(this.subActors);
   }
 }

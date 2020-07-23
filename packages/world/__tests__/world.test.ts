@@ -144,6 +144,45 @@ describe("@curtain-call/world.World", () => {
       const actors = Array.from(world.iterateActors());
       expect(actors).toEqual([actor1, actor2]);
     });
+
+    it("and sub-actors were added too", () => {
+      const world = new World();
+      const subActors = [new Actor<typeof world>(), new Actor<typeof world>()];
+      const actor = new Actor<typeof world>().addSubActor(...subActors);
+
+      world.addActor(actor);
+
+      subActors.forEach((sub) => {
+        expect(world.hasActor(sub)).toBe(true);
+      });
+    });
+
+    it("and sub-actors were removed too", () => {
+      const world = new World();
+      const subActors = [new Actor<typeof world>(), new Actor<typeof world>()];
+      const actor = new Actor<typeof world>().addSubActor(...subActors);
+
+      world.addActor(actor);
+      world.removeActor(actor);
+
+      subActors.forEach((sub) => {
+        expect(world.hasActor(sub)).toBe(false);
+      });
+    });
+
+    it("and sub-actors were added after owner was added to world, sub-actors would be added when world updated", () => {
+      const world = new World();
+      const subActors = [new Actor<typeof world>(), new Actor<typeof world>()];
+      const actor = new Actor<typeof world>();
+      world.addActor(actor);
+
+      actor.addSubActor(...subActors);
+      world.update(1);
+
+      subActors.forEach((sub) => {
+        expect(world.hasActor(sub)).toBe(true);
+      });
+    });
   });
 
   describe("can remove actor", () => {

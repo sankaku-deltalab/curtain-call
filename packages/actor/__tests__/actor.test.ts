@@ -388,4 +388,81 @@ describe("@curtain-call/actor.Actor", () => {
       expect(actor.getTeam()).toBe(Team.playerSide);
     });
   });
+
+  describe("can add sub-actors", () => {
+    it("sub-actor could be removed after added", () => {
+      const subActors = [new Actor(), new Actor()];
+      const owner = new Actor().addSubActor(...subActors);
+
+      subActors.forEach((sub) => {
+        expect(() => owner.removeSubActor(sub)).not.toThrowError();
+      });
+    });
+
+    it("sub-actor can not add to multiple owner and same owner", () => {
+      const subActors = [new Actor(), new Actor()];
+
+      const owner1 = new Actor().addSubActor(...subActors);
+      const owner2 = new Actor();
+
+      subActors.forEach((sub) => {
+        expect(() => owner1.addSubActor(sub)).toThrowError();
+        expect(() => owner2.addSubActor(sub)).toThrowError();
+      });
+    });
+
+    it("sub-actor can tell owner", () => {
+      const addedSubActor = new Actor();
+      const owner = new Actor().addSubActor(addedSubActor);
+
+      expect(addedSubActor.getOwnerActor()).toBe(owner);
+    });
+
+    it("owner can tell sub-actors", () => {
+      const subActors = [new Actor(), new Actor()];
+
+      const owner = new Actor()
+        .addSubActor(subActors[0])
+        .addSubActor(subActors[1]);
+
+      expect(owner.getSubActors()).toEqual(subActors);
+    });
+
+    it("owner can check has sub-actor", () => {
+      const addedSubActor = new Actor();
+      const notAddedSubActor = new Actor();
+      const owner = new Actor().addSubActor(addedSubActor);
+
+      expect(owner.hasSubActor(addedSubActor)).toBe(true);
+      expect(owner.hasSubActor(notAddedSubActor)).toBe(false);
+    });
+
+    it("sub-actor was attached to owner", () => {
+      const subActors = [new Actor(), new Actor()];
+      subActors.forEach((ac) => {
+        jest.spyOn(ac, "attachTo");
+      });
+
+      const owner = new Actor().addSubActor(...subActors);
+
+      subActors.forEach((sub) => {
+        expect(sub.attachTo).toBeCalledWith(owner);
+      });
+    });
+
+    it("sub-actor was detach from owner when removed", () => {
+      const subActors = [new Actor(), new Actor()];
+
+      const owner = new Actor().addSubActor(...subActors);
+
+      subActors.forEach((ac) => {
+        jest.spyOn(ac, "detachFromParent");
+      });
+      owner.removeSubActor(...subActors);
+
+      subActors.forEach((sub) => {
+        expect(sub.detachFromParent).toBeCalled();
+      });
+    });
+  });
 });
