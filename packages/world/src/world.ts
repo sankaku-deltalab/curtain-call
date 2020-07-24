@@ -51,6 +51,7 @@ export class World {
   }) {
     this.head = diArgs?.head || new PIXI.Container();
     this.head.mask = this.mask;
+    this.head.addChild(this.mask);
     this.tail = diArgs?.tail || new PIXI.Container();
     this.camera = diArgs?.camera || new Camera();
     this.displayObject = diArgs?.displayObject || new DisplayObjectManager();
