@@ -51,7 +51,6 @@ export class World {
   }) {
     this.head = diArgs?.head || new PIXI.Container();
     this.head.mask = this.mask;
-    this.head.addChild(this.mask);
     this.tail = diArgs?.tail || new PIXI.Container();
     this.camera = diArgs?.camera || new Camera();
     this.displayObject = diArgs?.displayObject || new DisplayObjectManager();
@@ -70,9 +69,9 @@ export class World {
    * @example
    * const gameHeight = 400;
    * const gameWidth = 300;
-   * const canvasHeight = 1000;
-   * const canvasWidth = 600;
-   * const gameUnitPerPixel = Math.min(gameHeight / canvasHeight, gameWidth / canvasWidth);
+   * const canvasHeight = engine.canvasHeight();
+   * const canvasWidth = engine.canvasWidth();
+   * const gameUnitPerPixel = Math.min(canvasHeight / gameHeight, canvasWidth / gameWidth);
    * const world = new World().setDrawArea(
    *   { x: canvasWidth / 2, y: canvasHeight / 2 },
    *   { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
@@ -88,24 +87,23 @@ export class World {
     drawSizeInCanvas: VectorLike,
     gameUnitPerPixel: number
   ): this {
+    const drawSizeInGame = Vector.from(drawSizeInCanvas).mlt(gameUnitPerPixel);
     this.head.position = new PIXI.Point(
       drawCenterInCanvas.x,
       drawCenterInCanvas.y
     );
     this.head.scale = new PIXI.Point(gameUnitPerPixel, gameUnitPerPixel);
 
-    const maskSize = Vector.from(drawSizeInCanvas).div(gameUnitPerPixel);
-    const maskSizeHalf = maskSize.div(2);
-    const maskNW = maskSizeHalf.mlt(-1);
+    const maskSize = drawSizeInGame;
+    const maskNW = maskSize.div(2).mlt(-1);
 
     this.mask.position = this.head.position;
     this.mask
-      .clear()
       .beginFill()
       .drawRect(maskNW.x, maskNW.y, maskSize.x, maskSize.y)
       .endFill();
 
-    const gameVisibleSize = Vector.from(drawSizeInCanvas).mlt(gameUnitPerPixel);
+    const gameVisibleSize = drawSizeInCanvas;
     this.camera.setCameraResolution(gameVisibleSize);
 
     return this;
