@@ -2,6 +2,17 @@ import { promisify } from "util";
 import * as PIXI from "pixi.js";
 import { Asset } from "./asset";
 
+function simplePromisify(
+  func: (callback: () => void) => void
+): () => Promise<void> {
+  const cbFunc = (callback: (err: null) => void): void => {
+    func(() => {
+      callback(null);
+    });
+  };
+  return promisify(cbFunc);
+}
+
 /**
  * @example
  * import * as PIXI from "pixi.js";
@@ -43,7 +54,7 @@ export class PixiAsset<T extends { [key: string]: string }> implements Asset {
    * Load asset.
    */
   async load(): Promise<void> {
-    await promisify((cb) => this.loader.load(cb))();
+    await simplePromisify((cb) => this.loader.load(cb))();
     this.isLoadedInternal = true;
   }
 
