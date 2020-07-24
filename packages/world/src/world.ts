@@ -100,6 +100,7 @@ export class World {
 
     this.mask.position = this.head.position;
     this.mask
+      .clear()
       .beginFill()
       .drawRect(maskNW.x, maskNW.y, maskSize.x, maskSize.y)
       .endFill();
