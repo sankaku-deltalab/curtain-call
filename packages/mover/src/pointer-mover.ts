@@ -5,15 +5,15 @@ import { Mover } from "./mover";
 /**
  * Move by pointer movement.
  */
-export class PointerMover<T> implements Mover<T> {
+export class PointerMover<TWorld> implements Mover<TWorld> {
   private delta = Vector.zero;
   private scale = 1;
 
   /**
    * @param receiver PointerInputReceiver used in internal.
    */
-  constructor(private readonly receiver = new PointerInputReceiver()) {
-    receiver.event.on("move", (src, dest) => {
+  constructor(private readonly receiver = new PointerInputReceiver<TWorld>()) {
+    receiver.event.on("move", (world, src, dest) => {
       this.delta = this.delta.add(dest.sub(src));
     });
   }
@@ -38,7 +38,7 @@ export class PointerMover<T> implements Mover<T> {
    * @returns New transformation and movement was done.
    */
   update(
-    _world: T,
+    _world: TWorld,
     _deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
@@ -53,7 +53,7 @@ export class PointerMover<T> implements Mover<T> {
    *
    * @returns Using `PointerInputReceiver`.
    */
-  getInputReceiver(): PointerInputReceiver {
+  getInputReceiver(): PointerInputReceiver<TWorld> {
     return this.receiver;
   }
 }

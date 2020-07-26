@@ -1,7 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import * as PIXI from "pixi.js";
 import { World } from "@curtain-call/world";
-import { PointerInput } from "@curtain-call/input";
+import { PointerInput, PointerInputConnector } from "@curtain-call/input";
 
 /**
  * Engine is root of system.
@@ -16,6 +16,10 @@ export class Engine {
 
   private readonly app: PIXI.Application;
   private readonly worlds = new Set<World>();
+  private readonly pointerInputConnectors = new Map<
+    World,
+    PointerInputConnector<World>
+  >();
 
   /**
    *
@@ -76,7 +80,10 @@ export class Engine {
     if (this.worlds.has(world)) throw new Error("World was already added");
     this.worlds.add(world);
     this.app.stage.addChild(world.head);
-    this.pointerInput.addChild(world.pointerInput);
+    this.pointerInputConnectors.set(
+      world,
+      new PointerInputConnector(world, this.pointerInput, world.pointerInput)
+    );
 
     return this;
   }
@@ -90,8 +97,13 @@ export class Engine {
   removeWorld(world: World): this {
     if (!this.worlds.has(world)) throw new Error("World is not added");
     this.worlds.delete(world);
+
     this.app.stage.removeChild(world.head);
-    this.pointerInput.removeChild(world.pointerInput);
+
+    const inputConnector = this.pointerInputConnectors.get(world);
+    this.pointerInputConnectors.delete(world);
+    if (!inputConnector) throw new Error();
+    inputConnector.destroy(this.pointerInput);
 
     return this;
   }

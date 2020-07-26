@@ -7,10 +7,11 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
     const ev = jest.fn();
     receiver.event.on("down", ev);
 
+    const world = "world";
     const downPos = new Vector(1, 2);
-    receiver.notifyDown(downPos);
+    receiver.notifyDown(world, downPos);
 
-    expect(ev).toBeCalledWith(downPos);
+    expect(ev).toBeCalledWith(world, downPos);
   });
 
   it("can modify event pos", () => {
@@ -19,10 +20,11 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
     const ev = jest.fn();
     receiver.event.on("down", ev);
 
+    const world = "world";
     const downPos = new Vector(1, 2);
-    receiver.notifyDown(downPos);
+    receiver.notifyDown(world, downPos);
 
-    expect(ev).toBeCalledWith(new Vector(2, 4));
+    expect(ev).toBeCalledWith(world, new Vector(2, 4));
   });
 
   it("spread event to children", () => {
@@ -31,10 +33,11 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
 
     const parent = new PointerInputReceiver();
     parent.addChild(receiver);
+    const world = "world";
     const downPos = new Vector(1, 2);
-    parent.notifyDown(downPos);
+    parent.notifyDown(world, downPos);
 
-    expect(receiver.notifyDown).toBeCalledWith(downPos);
+    expect(receiver.notifyDown).toBeCalledWith(world, downPos);
   });
 
   it("can remove children", () => {
@@ -43,8 +46,9 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
 
     const parent = new PointerInputReceiver();
     parent.addChild(receiver).removeChild(receiver);
+    const world = "world";
     const downPos = new Vector(1, 2);
-    parent.notifyDown(downPos);
+    parent.notifyDown(world, downPos);
 
     expect(receiver.notifyDown).not.toBeCalled();
   });

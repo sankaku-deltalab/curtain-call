@@ -14,8 +14,9 @@ describe("@curtain-call/mover.PointerMover", () => {
       mover.getInputReceiver()
     );
 
+    const world = "world";
     const pointerDelta = new Vector(1, 2);
-    parent.notifyMove(Vector.zero, pointerDelta);
+    parent.notifyMove(world, Vector.zero, pointerDelta);
 
     expect(mover.update({}, 1, currentTrans)).toStrictEqual({
       done: false,
@@ -30,8 +31,9 @@ describe("@curtain-call/mover.PointerMover", () => {
       mover.getInputReceiver()
     );
 
+    const world = "world";
     const pointerDelta = new Vector(1, 2);
-    parent.notifyMove(Vector.zero, pointerDelta);
+    parent.notifyMove(world, Vector.zero, pointerDelta);
 
     expect(mover.update({}, 1, currentTrans)).toStrictEqual({
       done: false,

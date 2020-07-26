@@ -30,7 +30,7 @@ export class World {
   public readonly head: PIXI.Container;
   public readonly tail: PIXI.Container;
   public readonly camera: Camera;
-  public readonly pointerInput: PointerInputReceiver;
+  public readonly pointerInput: PointerInputReceiver<World>;
 
   private readonly displayObject: DisplayObjectManager;
   private readonly actors = new Set<Actor<this>>();
@@ -52,7 +52,7 @@ export class World {
     readonly tail?: PIXI.Container;
     readonly camera?: Camera;
     readonly displayObject?: DisplayObjectManager;
-    readonly pointerInput?: PointerInputReceiver;
+    readonly pointerInput?: PointerInputReceiver<World>;
     readonly coreArea?: RectArea;
   }) {
     this.head = diArgs?.head || new PIXI.Container();
@@ -233,7 +233,7 @@ export class World {
    * @param receiver
    * @returns this.
    */
-  addPointerInputReceiver(receiver: PointerInputReceiver): this {
+  addPointerInputReceiver(receiver: PointerInputReceiver<World>): this {
     this.pointerInput.addChild(receiver);
     return this;
   }
@@ -244,7 +244,7 @@ export class World {
    * @param receiver
    * @returns this.
    */
-  removePointerInputReceiver(receiver: PointerInputReceiver): this {
+  removePointerInputReceiver(receiver: PointerInputReceiver<World>): this {
     this.pointerInput.removeChild(receiver);
     return this;
   }

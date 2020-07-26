@@ -4,17 +4,16 @@ import { EventEmitter } from "eventemitter3";
 /**
  * Receive pointer event from PointerInput.
  */
-export class PointerInputReceiver {
-  /** Event positions. */
+export class PointerInputReceiver<TWorld> {
   public readonly event = new EventEmitter<{
-    down: [Vector];
-    up: [Vector];
-    move: [Vector, Vector];
-    tap: [ReadonlyArray<Vector>];
+    down: [TWorld, Vector];
+    up: [TWorld, Vector];
+    move: [TWorld, Vector, Vector];
+    tap: [TWorld, ReadonlyArray<Vector>];
   }>();
 
   private modifier: (pos: VectorLike) => Vector = (p) => Vector.from(p);
-  private children = new Set<PointerInputReceiver>();
+  private children = new Set<PointerInputReceiver<TWorld>>();
 
   /**
    * Set input point modifier used when event received.
@@ -34,7 +33,7 @@ export class PointerInputReceiver {
    * @param receiver Adding child receiver.
    * @returns this.
    */
-  addChild(receiver: PointerInputReceiver): this {
+  addChild(receiver: PointerInputReceiver<TWorld>): this {
     this.children.add(receiver);
     return this;
   }
@@ -45,7 +44,7 @@ export class PointerInputReceiver {
    * @param receiver Removing child receiver.
    * @returns this.
    */
-  removeChild(receiver: PointerInputReceiver): this {
+  removeChild(receiver: PointerInputReceiver<TWorld>): this {
     this.children.delete(receiver);
     return this;
   }
@@ -53,52 +52,56 @@ export class PointerInputReceiver {
   /**
    * Receive pointer down event.
    *
+   * @param world World.
    * @param pos Pointer down position.
    */
-  notifyDown(pos: Vector): void {
+  notifyDown(world: TWorld, pos: Vector): void {
     const convertedPos = this.modifier(pos);
 
-    this.event.emit("down", convertedPos);
-    this.children.forEach((child) => child.notifyDown(convertedPos));
+    this.event.emit("down", world, convertedPos);
+    this.children.forEach((child) => child.notifyDown(world, convertedPos));
   }
 
   /**
    * Receive pointer up event.
    *
+   * @param world World.
    * @param pos Pointer up position.
    */
-  notifyUp(pos: Vector): void {
+  notifyUp(world: TWorld, pos: Vector): void {
     const convertedPos = this.modifier(pos);
 
-    this.event.emit("up", convertedPos);
-    this.children.forEach((child) => child.notifyUp(convertedPos));
+    this.event.emit("up", world, convertedPos);
+    this.children.forEach((child) => child.notifyUp(world, convertedPos));
   }
 
   /**
    * Receive (multiple) tap event.
    *
+   * @param world World.
    * @param positions Tapped positions. First element is initial tapped position.
    */
-  notifyTap(positions: readonly Vector[]): void {
+  notifyTap(world: TWorld, positions: readonly Vector[]): void {
     const convertedPos = positions.map((p) => this.modifier(p));
 
-    this.event.emit("tap", convertedPos);
-    this.children.forEach((child) => child.notifyTap(convertedPos));
+    this.event.emit("tap", world, convertedPos);
+    this.children.forEach((child) => child.notifyTap(world, convertedPos));
   }
 
   /**
    * Receive pointer move event.
    *
+   * @param world World.
    * @param src Movement position source of this frame movement.
    * @param dest Movement position destination of this frame movement.
    */
-  notifyMove(src: Vector, dest: Vector): void {
+  notifyMove(world: TWorld, src: Vector, dest: Vector): void {
     const convertedSrc = this.modifier(src);
     const convertedDest = this.modifier(dest);
 
-    this.event.emit("move", convertedSrc, convertedDest);
+    this.event.emit("move", world, convertedSrc, convertedDest);
     this.children.forEach((child) =>
-      child.notifyMove(convertedSrc, convertedDest)
+      child.notifyMove(world, convertedSrc, convertedDest)
     );
   }
 }

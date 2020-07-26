@@ -33,7 +33,7 @@ const worldWithMock = (): {
     readonly tail: PIXI.Container;
     readonly camera: Camera;
     readonly displayObject: DisplayObjectManager;
-    readonly pointerInput: PointerInputReceiver;
+    readonly pointerInput: PointerInputReceiver<World>;
   };
   world: World;
 } => {
@@ -58,7 +58,7 @@ const worldWithMock = (): {
     tail: worldTail,
     camera,
     displayObject: DisplayObjectContainer,
-    pointerInput: new PointerInputReceiver(),
+    pointerInput: new PointerInputReceiver<World>(),
   };
 
   const world = new World(diArgs);
@@ -346,13 +346,13 @@ describe("@curtain-call/world.World", () => {
         diArgs: { pointerInput },
       } = worldWithMock();
 
-      const receiver = new PointerInputReceiver();
+      const receiver = new PointerInputReceiver<World>();
       jest.spyOn(receiver, "notifyDown");
 
       world.addPointerInputReceiver(receiver);
-      pointerInput.notifyDown(Vector.one);
+      pointerInput.notifyDown(world, Vector.one);
 
-      expect(receiver.notifyDown).toBeCalledWith(Vector.one);
+      expect(receiver.notifyDown).toBeCalledWith(world, Vector.one);
     });
 
     it("and can remove added receivers", () => {
@@ -361,13 +361,13 @@ describe("@curtain-call/world.World", () => {
         diArgs: { pointerInput },
       } = worldWithMock();
 
-      const receiver = new PointerInputReceiver();
+      const receiver = new PointerInputReceiver<World>();
       jest.spyOn(receiver, "notifyDown");
 
       world
         .addPointerInputReceiver(receiver)
         .removePointerInputReceiver(receiver);
-      pointerInput.notifyDown(Vector.one);
+      pointerInput.notifyDown(world, Vector.one);
 
       expect(receiver.notifyDown).not.toBeCalled();
     });
@@ -385,14 +385,14 @@ describe("@curtain-call/world.World", () => {
         .zoomTo(1 / 2);
       world.update(1);
 
-      const receiver = new PointerInputReceiver();
+      const receiver = new PointerInputReceiver<World>();
       jest.spyOn(receiver, "notifyDown");
       world.addPointerInputReceiver(receiver);
 
       const canvasDownPos = new Vector(200 + 2, 400 + 2);
-      pointerInput.notifyDown(canvasDownPos);
+      pointerInput.notifyDown(world, canvasDownPos);
 
-      expect(receiver.notifyDown).toBeCalledWith(new Vector(-7, 10));
+      expect(receiver.notifyDown).toBeCalledWith(world, new Vector(-7, 10));
     });
   });
 
