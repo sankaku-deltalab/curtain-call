@@ -1,6 +1,6 @@
 {
   "name": "curtain-call",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "shmup game engine with typescript",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -34,9 +34,9 @@
     "@curtain-call/asset": "^0.3.3",
     "@curtain-call/camera": "^0.3.3",
     "@curtain-call/collision": "^0.3.3",
-    "@curtain-call/contents": "^0.3.4",
+    "@curtain-call/contents": "^0.3.5",
     "@curtain-call/display-object": "^0.3.3",
-    "@curtain-call/engine": "^0.3.4",
+    "@curtain-call/engine": "^0.3.5",
     "@curtain-call/health": "^0.3.3",
     "@curtain-call/input": "^0.3.4",
     "@curtain-call/level": "^0.3.3",
@@ -44,6 +44,6 @@
     "@curtain-call/timer": "^0.3.3",
     "@curtain-call/util": "^0.3.3",
     "@curtain-call/weapon": "^0.3.3",
-    "@curtain-call/world": "^0.3.4"
+    "@curtain-call/world": "^0.3.5"
   }
 }
