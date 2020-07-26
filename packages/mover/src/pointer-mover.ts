@@ -48,6 +48,11 @@ export class PointerMover<T> implements Mover<T> {
     return { done: false, newTrans: currentTrans.translated(delta) };
   }
 
+  /**
+   * Get using `PointerInputReceiver`.
+   *
+   * @returns Using `PointerInputReceiver`.
+   */
   getInputReceiver(): PointerInputReceiver {
     return this.receiver;
   }
