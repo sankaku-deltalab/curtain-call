@@ -116,6 +116,18 @@ describe("@curtain-call/actor.Actor", () => {
       const world = "world";
       expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
     });
+
+    it("emit updated event", () => {
+      const actor = new Actor();
+      const ev = jest.fn();
+      actor.event.on("updated", ev);
+
+      const world = "world";
+      const deltaSec = 123;
+      actor.update(world, deltaSec);
+
+      expect(ev).toBeCalledWith(world, deltaSec);
+    });
   });
 
   describe("has single Collision", () => {

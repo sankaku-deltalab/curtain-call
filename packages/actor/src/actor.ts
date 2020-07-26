@@ -22,6 +22,7 @@ export class Actor<TWorld>
     // world
     addedToWorld: [TWorld];
     removedFromWorld: [TWorld];
+    updated: [TWorld, number];
     // collision
     overlapped: [TWorld, Set<Actor<TWorld>>];
     // health
@@ -243,6 +244,8 @@ export class Actor<TWorld>
       this.updateMovement(world, deltaSec, this.trans.getLocal()).newTrans
     );
     this.updateDisplayObject(deltaSec);
+
+    this.event.emit("updated", world, deltaSec);
   }
 
   // about collision
