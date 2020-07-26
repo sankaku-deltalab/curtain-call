@@ -30,28 +30,6 @@ export class PointerMover<T> implements Mover<T> {
   }
 
   /**
-   * Set PointerInputReceiver parent.
-   *
-   * @param parent
-   * @returns this.
-   */
-  setParent(parent: PointerInputReceiver): this {
-    parent.addChild(this.receiver);
-    return this;
-  }
-
-  /**
-   * Remove PointerInputReceiver parent.
-   *
-   * @param parent
-   * @returns this.
-   */
-  removeParent(parent: PointerInputReceiver): this {
-    parent.removeChild(this.receiver);
-    return this;
-  }
-
-  /**
    * Update movement and return transformation delta
    *
    * @param _world World.
@@ -68,5 +46,9 @@ export class PointerMover<T> implements Mover<T> {
     this.delta = Vector.zero;
 
     return { done: false, newTrans: currentTrans.translated(delta) };
+  }
+
+  getInputReceiver(): PointerInputReceiver {
+    return this.receiver;
   }
 }

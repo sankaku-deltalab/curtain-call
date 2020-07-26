@@ -9,11 +9,13 @@ const currentTrans = Matrix.from({
 
 describe("@curtain-call/mover.PointerMover", () => {
   it("move by pointer movement", () => {
-    const parent = new PointerInputReceiver();
-    const mover = new PointerMover().setParent(parent);
+    const mover = new PointerMover();
+    const parent = new PointerInputReceiver().addChild(
+      mover.getInputReceiver()
+    );
 
     const pointerDelta = new Vector(1, 2);
-    parent.event.emit("move", Vector.zero, pointerDelta);
+    parent.notifyMove(Vector.zero, pointerDelta);
 
     expect(mover.update({}, 1, currentTrans)).toStrictEqual({
       done: false,
@@ -23,28 +25,17 @@ describe("@curtain-call/mover.PointerMover", () => {
 
   it("can set movement scale", () => {
     const moveScale = 1.2;
-    const parent = new PointerInputReceiver();
-    const mover = new PointerMover().setParent(parent).setScale(moveScale);
+    const mover = new PointerMover().setScale(moveScale);
+    const parent = new PointerInputReceiver().addChild(
+      mover.getInputReceiver()
+    );
 
     const pointerDelta = new Vector(1, 2);
-    parent.event.emit("move", Vector.zero, pointerDelta);
+    parent.notifyMove(Vector.zero, pointerDelta);
 
     expect(mover.update({}, 1, currentTrans)).toStrictEqual({
       done: false,
       newTrans: currentTrans.translated(pointerDelta.mlt(moveScale)),
-    });
-  });
-
-  it("can remove parent", () => {
-    const parent = new PointerInputReceiver();
-    const mover = new PointerMover().setParent(parent).removeParent(parent);
-
-    const pointerDelta = new Vector(1, 2);
-    parent.event.emit("move", Vector.zero, pointerDelta);
-
-    expect(mover.update({}, 1, currentTrans)).toStrictEqual({
-      done: false,
-      newTrans: currentTrans,
     });
   });
 });

@@ -13,50 +13,29 @@ export class PointerInputReceiver {
     tap: [ReadonlyArray<Vector>];
   }>();
 
-  constructor() {
-    this.event.on("down", (pos) => {
-      this.children.forEach((converter, child) => {
-        child.event.emit("down", converter(pos));
-      });
-    });
-    this.event.on("up", (pos) => {
-      this.children.forEach((converter, child) => {
-        child.event.emit("up", converter(pos));
-      });
-    });
-    this.event.on("move", (src, dest) => {
-      this.children.forEach((converter, child) => {
-        child.event.emit("move", converter(src), converter(dest));
-      });
-    });
-    this.event.on("tap", (positions) => {
-      this.children.forEach((converter, child) => {
-        child.event.emit(
-          "tap",
-          positions.map((pos) => converter(pos))
-        );
-      });
-    });
-  }
+  private modifier: (pos: VectorLike) => Vector = (p) => Vector.from(p);
+  private children = new Set<PointerInputReceiver>();
 
-  private children = new Map<
-    PointerInputReceiver,
-    (pos: VectorLike) => Vector
-  >();
+  /**
+   * Set input point modifier used when event received.
+   *
+   * @param modifier Function convert original point to modified point.
+   * @returns this.
+   */
+  setModifier(modifier: (pos: VectorLike) => VectorLike): this {
+    this.modifier = (p): Vector => Vector.from(modifier(p));
+    return this;
+  }
 
   /**
    * Add child receiver.
    * When self event was emitted, child receiver event will be emitted.
    *
    * @param receiver Adding child receiver.
-   * @param converter Pointer position converter.
    * @returns this.
    */
-  addChild(
-    receiver: PointerInputReceiver,
-    converter = (pos: VectorLike): Vector => Vector.from(pos)
-  ): this {
-    this.children.set(receiver, converter);
+  addChild(receiver: PointerInputReceiver): this {
+    this.children.add(receiver);
     return this;
   }
 
@@ -69,5 +48,57 @@ export class PointerInputReceiver {
   removeChild(receiver: PointerInputReceiver): this {
     this.children.delete(receiver);
     return this;
+  }
+
+  /**
+   * Receive pointer down event.
+   *
+   * @param pos Pointer down position.
+   */
+  notifyDown(pos: Vector): void {
+    const convertedPos = this.modifier(pos);
+
+    this.event.emit("down", convertedPos);
+    this.children.forEach((child) => child.notifyDown(convertedPos));
+  }
+
+  /**
+   * Receive pointer up event.
+   *
+   * @param pos Pointer up position.
+   */
+  notifyUp(pos: Vector): void {
+    const convertedPos = this.modifier(pos);
+
+    this.event.emit("up", convertedPos);
+    this.children.forEach((child) => child.notifyUp(convertedPos));
+  }
+
+  /**
+   * Receive (multiple) tap event.
+   *
+   * @param positions Tapped positions. First element is initial tapped position.
+   */
+  notifyTap(positions: readonly Vector[]): void {
+    const convertedPos = positions.map((p) => this.modifier(p));
+
+    this.event.emit("tap", convertedPos);
+    this.children.forEach((child) => child.notifyTap(convertedPos));
+  }
+
+  /**
+   * Receive pointer move event.
+   *
+   * @param src Movement position source of this frame movement.
+   * @param dest Movement position destination of this frame movement.
+   */
+  notifyMove(src: Vector, dest: Vector): void {
+    const convertedSrc = this.modifier(src);
+    const convertedDest = this.modifier(dest);
+
+    this.event.emit("move", convertedSrc, convertedDest);
+    this.children.forEach((child) =>
+      child.notifyMove(convertedSrc, convertedDest)
+    );
   }
 }

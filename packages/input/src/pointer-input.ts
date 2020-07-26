@@ -14,7 +14,7 @@ export class PointerInput extends PointerInputReceiver {
   ) {
     super();
     this.tapRecognizer.event.on("tap", (positions) => {
-      this.event.emit("tap", positions);
+      this.notifyTap(positions);
     });
   }
 
@@ -37,26 +37,26 @@ export class PointerInput extends PointerInputReceiver {
     const inputToCanvas = canvasNW.sub(inputNW);
 
     input.addEventListener("pointerdown", (event) => {
-      const ev = event as PointerEvent;
-      const downPos = Vector.from(ev).add(inputToCanvas);
+      const downPos = Vector.from(event as PointerEvent).add(inputToCanvas);
       this.prevMovePos = downPos;
-      this.event.emit("down", downPos);
+
+      this.notifyDown(downPos);
       this.tapRecognizer.down(downPos, this.nowSec());
     });
 
     input.addEventListener("pointerup", (event) => {
-      const ev = event as PointerEvent;
-      const upPos = Vector.from(ev).add(inputToCanvas);
-      this.event.emit("up", upPos);
+      const upPos = Vector.from(event as PointerEvent).add(inputToCanvas);
+
+      this.notifyUp(upPos);
       this.tapRecognizer.up(upPos, this.nowSec());
     });
 
     input.addEventListener("pointermove", (event) => {
-      const ev = event as PointerEvent;
       const src = this.prevMovePos;
-      const dest = Vector.from(ev).add(inputToCanvas);
+      const dest = Vector.from(event as PointerEvent).add(inputToCanvas);
       this.prevMovePos = dest;
-      this.event.emit("move", src, dest);
+
+      this.notifyMove(src, dest);
     });
 
     return this;

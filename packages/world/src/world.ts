@@ -62,6 +62,10 @@ export class World {
     this.camera.tail.addChild(this.tail);
     this.tail.addChild(this.displayObject.container);
     this.displayObject = this.displayObject;
+
+    this.pointerInput.setModifier((canvasPos) =>
+      this.canvasPosToGamePos(canvasPos)
+    );
   }
 
   /**
@@ -223,9 +227,7 @@ export class World {
    * @returns this.
    */
   addPointerInputReceiver(receiver: PointerInputReceiver): this {
-    this.pointerInput.addChild(receiver, (canvasPos) =>
-      this.canvasPosToGamePos(canvasPos)
-    );
+    this.pointerInput.addChild(receiver);
     return this;
   }
 

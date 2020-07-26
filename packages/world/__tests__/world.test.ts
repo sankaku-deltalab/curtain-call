@@ -329,26 +329,58 @@ describe("@curtain-call/world.World", () => {
 
   describe("spread pointer input event", () => {
     it("to added receivers", () => {
-      const { world } = worldWithMock();
+      const {
+        world,
+        diArgs: { pointerInput },
+      } = worldWithMock();
+
       const receiver = new PointerInputReceiver();
-      jest.spyOn(receiver.event, "emit");
+      jest.spyOn(receiver, "notifyDown");
 
       world.addPointerInputReceiver(receiver);
-      world.pointerInput.event.emit("down", Vector.one);
+      pointerInput.notifyDown(Vector.one);
 
-      expect(receiver.event.emit).toBeCalledWith("down", Vector.one);
+      expect(receiver.notifyDown).toBeCalledWith(Vector.one);
     });
 
     it("and can remove added receivers", () => {
-      const { world } = worldWithMock();
+      const {
+        world,
+        diArgs: { pointerInput },
+      } = worldWithMock();
+
       const receiver = new PointerInputReceiver();
-      jest.spyOn(receiver.event, "emit");
+      jest.spyOn(receiver, "notifyDown");
 
+      world
+        .addPointerInputReceiver(receiver)
+        .removePointerInputReceiver(receiver);
+      pointerInput.notifyDown(Vector.one);
+
+      expect(receiver.notifyDown).not.toBeCalled();
+    });
+
+    it("and down position was converted to game position from canvas position", () => {
+      const {
+        world,
+        diArgs: { pointerInput },
+      } = worldWithMock();
+
+      world.setDrawArea({ x: 200, y: 400 }, { x: 1, y: 1 }, 1 / 2);
+      world.camera
+        .moveTo({ x: 1, y: 2 })
+        .rotateTo(Math.PI / 2)
+        .zoomTo(1 / 2);
+      world.update(1);
+
+      const receiver = new PointerInputReceiver();
+      jest.spyOn(receiver, "notifyDown");
       world.addPointerInputReceiver(receiver);
-      world.removePointerInputReceiver(receiver);
-      world.pointerInput.event.emit("down", Vector.one);
 
-      expect(receiver.event.emit).not.toBeCalled();
+      const canvasDownPos = new Vector(200 + 2, 400 + 2);
+      pointerInput.notifyDown(canvasDownPos);
+
+      expect(receiver.notifyDown).toBeCalledWith(new Vector(-7, 10));
     });
   });
 

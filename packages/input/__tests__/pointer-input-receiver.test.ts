@@ -2,36 +2,50 @@ import { PointerInputReceiver } from "../src";
 import { Vector } from "trans-vector2d";
 
 describe("@curtain-call/input.PointerInputReceiver", () => {
-  it("can spread event to children", () => {
-    const recParent = new PointerInputReceiver();
-    const recChild = new PointerInputReceiver();
-    jest.spyOn(recChild.event, "emit");
+  it("emit event when notified from parent", () => {
+    const receiver = new PointerInputReceiver();
+    const ev = jest.fn();
+    receiver.event.on("down", ev);
 
-    const convertedPoint = new Vector(1, 2);
-    const converter = jest.fn().mockReturnValue(convertedPoint);
-    recParent.addChild(recChild, converter);
+    const downPos = new Vector(1, 2);
+    receiver.notifyDown(downPos);
 
-    const eventPoint = new Vector(1, 2);
-    recParent.event.emit("down", eventPoint);
+    expect(ev).toBeCalledWith(downPos);
+  });
 
-    expect(converter).toBeCalledWith(eventPoint);
-    expect(recChild.event.emit).toBeCalledWith("down", convertedPoint);
+  it("can modify event pos", () => {
+    const modifier = jest.fn().mockImplementation((p: Vector) => p.mlt(2));
+    const receiver = new PointerInputReceiver().setModifier(modifier);
+    const ev = jest.fn();
+    receiver.event.on("down", ev);
+
+    const downPos = new Vector(1, 2);
+    receiver.notifyDown(downPos);
+
+    expect(ev).toBeCalledWith(new Vector(2, 4));
+  });
+
+  it("spread event to children", () => {
+    const receiver = new PointerInputReceiver();
+    jest.spyOn(receiver, "notifyDown");
+
+    const parent = new PointerInputReceiver();
+    parent.addChild(receiver);
+    const downPos = new Vector(1, 2);
+    parent.notifyDown(downPos);
+
+    expect(receiver.notifyDown).toBeCalledWith(downPos);
   });
 
   it("can remove children", () => {
-    const recParent = new PointerInputReceiver();
-    const recChild = new PointerInputReceiver();
-    jest.spyOn(recChild.event, "emit");
+    const receiver = new PointerInputReceiver();
+    jest.spyOn(receiver, "notifyDown");
 
-    const convertedPoint = new Vector(1, 2);
-    const converter = jest.fn().mockReturnValue(convertedPoint);
-    recParent.addChild(recChild, converter);
-    recParent.removeChild(recChild);
+    const parent = new PointerInputReceiver();
+    parent.addChild(receiver).removeChild(receiver);
+    const downPos = new Vector(1, 2);
+    parent.notifyDown(downPos);
 
-    const eventPoint = new Vector(1, 2);
-    recParent.event.emit("down", eventPoint);
-
-    expect(converter).not.toBeCalledWith(eventPoint);
-    expect(recChild.event.emit).not.toBeCalledWith("down", convertedPoint);
+    expect(receiver.notifyDown).not.toBeCalled();
   });
 });
