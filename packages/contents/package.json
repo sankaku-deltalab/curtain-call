@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/contents",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -33,15 +33,15 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/actor": "^0.3.3",
+    "@curtain-call/actor": "^0.3.4",
     "@curtain-call/asset": "^0.3.3",
     "@curtain-call/collision": "^0.3.3",
     "@curtain-call/health": "^0.3.3",
     "@curtain-call/level": "^0.3.3",
-    "@curtain-call/mover": "^0.3.3",
+    "@curtain-call/mover": "^0.3.4",
     "@curtain-call/util": "^0.3.3",
     "@curtain-call/weapon": "^0.3.3",
-    "@curtain-call/world": "^0.3.3",
+    "@curtain-call/world": "^0.3.4",
     "guntree": "^0.9.1",
     "trans-vector2d": "^2.0.0"
   }
