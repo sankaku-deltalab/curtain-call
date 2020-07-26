@@ -1,3 +1,4 @@
+import { EventEmitter } from "eventemitter3";
 import * as PIXI from "pixi.js";
 import { VectorLike, Vector } from "trans-vector2d";
 import { Actor } from "@curtain-call/actor";
@@ -20,6 +21,11 @@ import {
  * World is root of game world.
  */
 export class World {
+  /** Event. */
+  public readonly event = new EventEmitter<{
+    updated: [number];
+  }>();
+
   public readonly backgroundTrans = new Transformation();
   public readonly head: PIXI.Container;
   public readonly tail: PIXI.Container;
@@ -128,6 +134,8 @@ export class World {
     this.checkCollision();
     this.updatePixiDisplayObject();
     this.camera.update();
+
+    this.event.emit("updated", deltaSec);
   }
 
   /**

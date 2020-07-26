@@ -39,6 +39,7 @@
     "@curtain-call/display-object": "^0.3.3",
     "@curtain-call/input": "^0.3.4",
     "@curtain-call/util": "^0.3.3",
+    "eventemitter3": "^4.0.4",
     "pixi.js": "^5.3.0",
     "trans-vector2d": "^2.0.0"
   }

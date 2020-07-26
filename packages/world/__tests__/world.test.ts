@@ -95,6 +95,18 @@ describe("@curtain-call/world.World", () => {
     expect(canvasPos.y).toBeCloseTo(500 + 3 * gameUnitPerPixel);
   });
 
+  it("emit updated event", () => {
+    const world = new World();
+
+    const ev = jest.fn();
+    world.event.on("updated", ev);
+
+    const deltaSec = 123;
+    world.update(deltaSec);
+
+    expect(ev).toBeCalledWith(deltaSec);
+  });
+
   describe("can add actor", () => {
     it("by function", () => {
       const { world } = worldWithMock();
