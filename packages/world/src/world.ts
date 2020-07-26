@@ -50,14 +50,14 @@ export class World {
     readonly coreArea?: RectArea;
   }) {
     this.head = diArgs?.head || new PIXI.Container();
-    this.head.mask = this.mask;
-    this.head.addChild(this.mask);
     this.tail = diArgs?.tail || new PIXI.Container();
     this.camera = diArgs?.camera || new Camera();
     this.displayObject = diArgs?.displayObject || new DisplayObjectManager();
     this.pointerInput = diArgs?.pointerInput || new PointerInputReceiver();
     this.coreArea = diArgs?.coreArea || new RectArea();
 
+    this.head.mask = this.mask;
+    this.head.addChild(this.mask);
     this.head.addChild(this.camera.head);
     this.camera.tail.addChild(this.tail);
     this.tail.addChild(this.displayObject.container);
@@ -102,7 +102,6 @@ export class World {
     const maskSize = drawSizeInGame;
     const maskNW = maskSize.div(2).mlt(-1);
 
-    this.mask.position = this.head.position;
     this.mask
       .clear()
       .beginFill()
