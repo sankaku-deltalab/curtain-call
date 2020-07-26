@@ -1,3 +1,4 @@
+import { EventEmitter } from "eventemitter3";
 import * as PIXI from "pixi.js";
 import { World } from "@curtain-call/world";
 import { PointerInput } from "@curtain-call/input";
@@ -8,6 +9,11 @@ import { PointerInput } from "@curtain-call/input";
  * This class create pixi application and use it.
  */
 export class Engine {
+  /** Event. */
+  public readonly event = new EventEmitter<{
+    updated: [number];
+  }>();
+
   private readonly app: PIXI.Application;
   private readonly worlds = new Set<World>();
 
@@ -20,7 +26,7 @@ export class Engine {
   constructor(
     canvas: HTMLCanvasElement,
     sizeElement: Window | HTMLElement,
-    public readonly pointerInput = new PointerInput()
+    private readonly pointerInput = new PointerInput()
   ) {
     const resolution = window.devicePixelRatio;
     this.app = new PIXI.Application({
@@ -35,6 +41,7 @@ export class Engine {
     this.app.ticker.add((deltaRate: number): void => {
       const deltaSec = deltaRate / PIXI.settings.TARGET_FPMS / 1000;
       this.worlds.forEach((world) => world.update(deltaSec));
+      this.event.emit("updated", deltaSec);
     });
 
     this.pointerInput.apply(canvas, canvas);
