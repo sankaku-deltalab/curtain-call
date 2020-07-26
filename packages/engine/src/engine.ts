@@ -95,4 +95,14 @@ export class Engine {
 
     return this;
   }
+
+  /**
+   * Destroy this.
+   * Do not use this after destroyed.
+   * But added worlds would be still alive.
+   */
+  destroy(): void {
+    this.app.destroy();
+    this.worlds.forEach((w) => this.removeWorld(w));
+  }
 }
