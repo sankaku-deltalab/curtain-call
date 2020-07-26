@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/camera",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -33,7 +33,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/util": "^0.3.3",
+    "@curtain-call/util": "^0.4.0",
     "pixi.js": "^5.3.0",
     "trans-vector2d": "^2.0.0"
   }
