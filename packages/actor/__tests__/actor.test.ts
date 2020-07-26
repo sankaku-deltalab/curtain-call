@@ -75,6 +75,18 @@ describe("@curtain-call/actor.Actor", () => {
 
       expect(actor.getWorldTransform()).toEqual(Matrix.identity);
     });
+
+    it("can attach other transformation", () => {
+      const childTrans = new Transformation();
+      jest.spyOn(childTrans, "attachTo");
+
+      const actorTrans = new Transformation();
+      const _actor = new Actor({ trans: actorTrans }).attachTransformation(
+        childTrans
+      );
+
+      expect(childTrans.attachTo).toBeCalledWith(actorTrans);
+    });
   });
 
   describe("can use by world", () => {

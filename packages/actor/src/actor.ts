@@ -139,6 +139,17 @@ export class Actor<TWorld>
   }
 
   /**
+   * Attach other transformation to this transformation.
+   *
+   * @param trans Attaching trans.
+   * @returns this.
+   */
+  attachTransformation(trans: Transformation): this {
+    trans.attachTo(this.trans);
+    return this;
+  }
+
+  /**
    * Add mover.
    *
    * @param mover Adding mover.
