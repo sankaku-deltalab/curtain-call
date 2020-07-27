@@ -42,7 +42,7 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
     manager.updatePixiObjects([sprite]);
     manager.updatePixiObjects([]);
 
-    expect(pixiContainer.removeChild).toBeCalledWith(sprite.pixiObj);
+    expect(pixiContainer.children).toEqual([]);
   });
 
   it("do not update display object", () => {

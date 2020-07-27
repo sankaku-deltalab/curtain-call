@@ -18,9 +18,12 @@ export class DisplayObjectManager {
       notAddedYet.delete(obj);
     });
 
-    const removedObjects = displayObjects.filter(
-      (obj) => !this.objectSet.has(obj)
-    );
+    const newObjects = new Set(displayObjects);
+    const removedObjects: DisplayObject[] = [];
+    this.objectSet.forEach((contained) => {
+      if (newObjects.has(contained)) return;
+      removedObjects.push(contained);
+    });
 
     removedObjects.forEach((obj) => {
       this.objectSet.delete(obj);
