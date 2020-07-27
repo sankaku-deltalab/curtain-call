@@ -9,7 +9,7 @@ import { Actor } from "@curtain-call/actor";
  */
 export class SimpleBulletGenerator<TWorld extends World = World>
   implements BulletGenerator<TWorld, Actor<TWorld>> {
-  private readonly usedBullets: SimpleBullet<TWorld>[] = [];
+  private usedBullets: SimpleBullet<TWorld>[] = [];
 
   /**
    * @param bullets Bullets used in this generator
@@ -67,5 +67,7 @@ export class SimpleBulletGenerator<TWorld extends World = World>
       bullet.clearSelfForReuse();
       this.bullets.push(bullet);
     });
+
+    this.usedBullets = [];
   }
 }
