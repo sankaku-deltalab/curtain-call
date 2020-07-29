@@ -82,9 +82,9 @@ export class World {
    * const gameWidth = 300;
    * const canvasHeight = engine.canvasHeight();
    * const canvasWidth = engine.canvasWidth();
-   * const gameUnitPerPixel = Math.min(gameHeight / canvasHeight, gameWidth / canvasWidth);
+   * const gameUnitPerPixel = Math.max(gameHeight / canvasHeight, gameWidth / canvasWidth) * 1.25;
    * const world = new World().setDrawArea(
-   *   { x: canvasWidth / 2, y: canvasHeight / 2 },
+   *   { x: canvasWidth / 2, y: gameHeight / gameUnitPerPixel / 2 },
    *   { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
    *   gameUnitPerPixel
    * );
