@@ -79,7 +79,7 @@ describe("@curtain-call/world.World", () => {
     const gameWidth = 300;
     const canvasHeight = 1000;
     const canvasWidth = 600;
-    const gameUnitPerPixel = 2;
+    const gameUnitPerPixel = 1 / 2;
     const world = new World().setDrawArea(
       { x: canvasWidth / 2, y: canvasHeight / 2 },
       { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
@@ -91,8 +91,8 @@ describe("@curtain-call/world.World", () => {
     world.tail.addChild(obj);
 
     const canvasPos = obj.getGlobalPosition();
-    expect(canvasPos.x).toBeCloseTo(300 + 2 * gameUnitPerPixel);
-    expect(canvasPos.y).toBeCloseTo(500 + 3 * gameUnitPerPixel);
+    expect(canvasPos.x).toBeCloseTo(300 + 2 / gameUnitPerPixel);
+    expect(canvasPos.y).toBeCloseTo(500 + 3 / gameUnitPerPixel);
   });
 
   it("emit updated event", () => {
@@ -320,7 +320,7 @@ describe("@curtain-call/world.World", () => {
   describe("can convert position between canvas and game", () => {
     it("so can convert canvas position to game position", () => {
       const { world } = worldWithMock();
-      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 2);
+      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 1 / 2);
 
       const canvasPos = { x: 152, y: 206 };
       const gamePos = world.canvasPosToGamePos(canvasPos);
@@ -330,7 +330,7 @@ describe("@curtain-call/world.World", () => {
 
     it("so can convert game position to canvas position", () => {
       const { world } = worldWithMock();
-      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 2);
+      world.setDrawArea({ x: 150, y: 200 }, { x: 300, y: 400 }, 1 / 2);
 
       const gamePos = { x: 1, y: 3 };
       const canvasPos = world.gamePosToCanvasPos(gamePos);
@@ -378,7 +378,7 @@ describe("@curtain-call/world.World", () => {
         diArgs: { pointerInput },
       } = worldWithMock();
 
-      world.setDrawArea({ x: 200, y: 400 }, { x: 1, y: 1 }, 1 / 2);
+      world.setDrawArea({ x: 200, y: 400 }, { x: 1, y: 1 }, 2);
       world.camera
         .moveTo({ x: 1, y: 2 })
         .rotateTo(Math.PI / 2)

@@ -82,7 +82,7 @@ export class World {
    * const gameWidth = 300;
    * const canvasHeight = engine.canvasHeight();
    * const canvasWidth = engine.canvasWidth();
-   * const gameUnitPerPixel = Math.min(canvasHeight / gameHeight, canvasWidth / gameWidth);
+   * const gameUnitPerPixel = Math.min(gameHeight / canvasHeight, gameWidth / canvasWidth);
    * const world = new World().setDrawArea(
    *   { x: canvasWidth / 2, y: canvasHeight / 2 },
    *   { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
@@ -103,7 +103,10 @@ export class World {
       drawCenterInCanvas.x,
       drawCenterInCanvas.y
     );
-    this.head.scale = new PIXI.Point(gameUnitPerPixel, gameUnitPerPixel);
+    this.head.scale = new PIXI.Point(
+      1 / gameUnitPerPixel,
+      1 / gameUnitPerPixel
+    );
 
     const maskSize = drawSizeInGame;
     const maskNW = maskSize.div(2).mlt(-1);
@@ -114,8 +117,7 @@ export class World {
       .drawRect(maskNW.x, maskNW.y, maskSize.x, maskSize.y)
       .endFill();
 
-    const gameVisibleSize = drawSizeInCanvas;
-    this.camera.setCameraResolution(gameVisibleSize);
+    this.camera.setCameraResolution(drawSizeInCanvas);
 
     return this;
   }
