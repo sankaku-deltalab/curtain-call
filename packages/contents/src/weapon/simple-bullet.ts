@@ -26,12 +26,6 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     this.collisionShape = diArgs?.collisionShape || new RectCollisionShape();
 
     this.addMover(this.mover).addCollisionShape(this.collisionShape);
-    this.event.on("overlapped", (world, others) => {
-      others.forEach((other) => {
-        if (this.shouldRemoveSelfFromWorld(world)) return;
-        this.processHit(world, other);
-      });
-    });
   }
 
   setVisualRadius(radius: number): this {
@@ -89,6 +83,13 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     this.damageName = args.damageName;
     this.lifeTimeSec = args.lifeTimeSec;
     this.collisionShape.setSize(Vector.one.mlt(args.size));
+
+    this.event.on("overlapped", (world, others) => {
+      others.forEach((other) => {
+        if (this.shouldRemoveSelfFromWorld(world)) return;
+        this.processHit(world, other);
+      });
+    });
 
     return this;
   }

@@ -119,4 +119,36 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
     expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
   });
+
+  it("can clear for reuse self", () => {
+    const { bullet } = createInitializedBullet();
+    jest.spyOn(bullet.event, "removeAllListeners");
+    jest.spyOn(bullet, "removeSelfFromWorld");
+
+    bullet.clearSelfForReuse();
+
+    expect(bullet.event.removeAllListeners).toBeCalled();
+    expect(bullet.removeSelfFromWorld).toBeCalledWith(false);
+  });
+
+  it("can hit after reused", () => {
+    const { bullet } = createInitializedBullet();
+
+    bullet.clearSelfForReuse();
+    bullet.init({
+      trans: Matrix.identity,
+      damage: 1,
+      damageName: "testDamage",
+      lifeTimeSec: 2,
+      size: 64,
+      speed: 7,
+    });
+    const world = new World();
+    const victim = victimMock();
+    bullet.notifyOverlappedWith(world, new Set([victim]));
+
+    expect(victim.takeDamage).toBeCalledWith(world, 1, bullet, {
+      name: "testDamage",
+    });
+  });
 });
