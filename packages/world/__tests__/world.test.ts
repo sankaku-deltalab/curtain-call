@@ -80,7 +80,10 @@ describe("@curtain-call/world.World", () => {
     const canvasHeight = 1000;
     const canvasWidth = 600;
     const gameUnitPerPixel = 1 / 2;
-    const world = new World().setDrawArea(
+    const world = new World();
+    jest.spyOn(world.camera, "setCameraResolution");
+
+    world.setDrawArea(
       { x: canvasWidth / 2, y: canvasHeight / 2 },
       { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
       gameUnitPerPixel
@@ -89,10 +92,13 @@ describe("@curtain-call/world.World", () => {
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(2, 3);
     world.tail.addChild(obj);
-
     const canvasPos = obj.getGlobalPosition();
     expect(canvasPos.x).toBeCloseTo(300 + 2 / gameUnitPerPixel);
     expect(canvasPos.y).toBeCloseTo(500 + 3 / gameUnitPerPixel);
+    expect(world.camera.setCameraResolution).toBeCalledWith({
+      x: gameWidth,
+      y: gameHeight,
+    });
   });
 
   it("emit updated event", () => {

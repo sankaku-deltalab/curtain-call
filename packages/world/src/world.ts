@@ -117,7 +117,7 @@ export class World {
       .drawRect(maskNW.x, maskNW.y, maskSize.x, maskSize.y)
       .endFill();
 
-    this.camera.setCameraResolution(drawSizeInCanvas);
+    this.camera.setCameraResolution(drawSizeInGame);
 
     return this;
   }
