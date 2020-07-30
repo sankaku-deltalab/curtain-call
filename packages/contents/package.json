@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/contents",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -41,7 +41,7 @@
     "@curtain-call/mover": "^0.6.0",
     "@curtain-call/util": "^0.6.0",
     "@curtain-call/weapon": "^0.6.0",
-    "@curtain-call/world": "^0.6.2",
+    "@curtain-call/world": "^0.6.3",
     "guntree": "^0.9.1",
     "trans-vector2d": "^2.0.0"
   }
