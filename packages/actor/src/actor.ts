@@ -435,6 +435,7 @@ export class Actor<TWorld>
     dealer.notifyDealtDamage(world, r.actualDamage, this, type);
     this.event.emit("takenDamage", world, r.actualDamage, dealer, type);
     if (r.died) {
+      this.removeSelfFromWorld(true);
       dealer.notifyKilled(world, this, type);
       this.event.emit("dead", world, dealer, type);
     }

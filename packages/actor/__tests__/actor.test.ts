@@ -337,6 +337,19 @@ describe("@curtain-call/actor.Actor", () => {
       expect(ev).toBeCalledWith(world, dealer, damageType);
     });
 
+    it("remove self from world when died", () => {
+      const actor = new Actor().initHealth(1, 1);
+      jest.spyOn(actor, "removeSelfFromWorld");
+
+      const world = "world";
+      const damage = 1;
+      const dealer = new BasicDamageDealer();
+      const damageType = { name: "test" };
+      actor.takeDamage(world, damage, dealer, damageType);
+
+      expect(actor.removeSelfFromWorld).toBeCalledWith(true);
+    });
+
     it("can heal", () => {
       const actor = new Actor().initHealth(1000, 2000);
       const ev = jest.fn();
