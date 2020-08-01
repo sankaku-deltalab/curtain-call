@@ -48,6 +48,7 @@ export class Actor<TWorld>
   private team = Team.noSide;
   private ownerActor?: Actor<TWorld>;
   private subActors = new Set<Actor<TWorld>>();
+  private lifeTimeSec?: number;
 
   constructor(diArgs?: {
     trans?: Transformation;
@@ -221,7 +222,9 @@ export class Actor<TWorld>
    * @returns Self must remove from world.
    */
   shouldRemoveSelfFromWorld(_world: TWorld): boolean {
-    return this.shouldRemoveSelf;
+    const lifeTimeIsOver =
+      this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
+    return this.shouldRemoveSelf || lifeTimeIsOver;
   }
 
   /**
@@ -256,7 +259,21 @@ export class Actor<TWorld>
     );
     this.updateDisplayObject(deltaSec);
 
+    if (this.lifeTimeSec !== undefined) this.lifeTimeSec -= deltaSec;
+
     this.event.emit("updated", world, deltaSec);
+  }
+
+  /**
+   * Set life time.
+   * When life time was over, this should remove self from world.
+   *
+   * @param lifeTimeSec Life time in seconds.
+   * @returns this.
+   */
+  setLifeTime(lifeTimeSec: number): this {
+    this.lifeTimeSec = lifeTimeSec;
+    return this;
   }
 
   // about collision

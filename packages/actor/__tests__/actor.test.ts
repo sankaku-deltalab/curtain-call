@@ -140,6 +140,19 @@ describe("@curtain-call/actor.Actor", () => {
 
       expect(ev).toBeCalledWith(world, deltaSec);
     });
+
+    it("can set life time", () => {
+      const actor = new Actor();
+
+      const world = "world";
+      const lifeTime = 123;
+      actor.setLifeTime(lifeTime);
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
+
+      actor.update(world, lifeTime);
+
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(true);
+    });
   });
 
   describe("has single Collision", () => {
