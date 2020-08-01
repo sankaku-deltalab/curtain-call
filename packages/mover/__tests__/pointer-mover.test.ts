@@ -24,6 +24,31 @@ describe("@curtain-call/mover.PointerMover", () => {
     });
   });
 
+  it.each`
+    delta                   | expectedPos
+    ${{ x: 1, y: 2 }}       | ${{ x: 4, y: 6 }}
+    ${{ x: 5, y: 2 }}       | ${{ x: 5, y: 6 }}
+    ${{ x: -100, y: -100 }} | ${{ x: 0, y: 1 }}
+  `("can limit movement", ({ delta, expectedPos }) => {
+    const receiver = new PointerInputReceiver();
+    const mover = new PointerMover(receiver).setMovableArea(
+      new Vector(0, 1),
+      new Vector(5, 7)
+    );
+
+    const world = "world";
+    receiver.notifyMove(world, Vector.zero, delta);
+
+    expect(mover.update({}, 1, currentTrans)).toStrictEqual({
+      done: false,
+      newTrans: Matrix.from({
+        ...currentTrans,
+        e: expectedPos.x,
+        f: expectedPos.y,
+      }),
+    });
+  });
+
   it("can set movement scale", () => {
     const moveScale = 1.2;
     const mover = new PointerMover().setScale(moveScale);
