@@ -147,15 +147,14 @@ export class World {
    * @returns this.
    */
   addActor(actor: Actor<this>): this {
-    const adding = [actor, ...actor.getSubActors()];
+    if (this.hasActor(actor)) throw new Error("Actor was already added");
 
-    if (adding.some((ac) => this.hasActor(ac)))
-      throw new Error("Actor was already added");
+    this.actors.add(actor);
+    this.addUpdatableInternal(actor);
+    actor.notifyAddedToWorld(this);
 
-    adding.forEach((ac) => {
-      this.actors.add(ac);
-      this.addUpdatableInternal(ac);
-      ac.notifyAddedToWorld(this);
+    actor.getSubActors().forEach((sub) => {
+      this.addActor(sub);
     });
 
     return this;

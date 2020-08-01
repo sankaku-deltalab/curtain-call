@@ -165,12 +165,18 @@ describe("@curtain-call/world.World", () => {
 
     it("and sub-actors were added too", () => {
       const world = new World();
-      const subActors = [new Actor<typeof world>(), new Actor<typeof world>()];
+      const subActors = [new Actor<World>(), new Actor<World>()];
+      const subSubActors = [new Actor<World>(), new Actor<World>()];
+      subActors[0].addSubActor(...subSubActors);
       const actor = new Actor<typeof world>().addSubActor(...subActors);
 
       world.addActor(actor);
 
       subActors.forEach((sub) => {
+        expect(world.hasActor(sub)).toBe(true);
+      });
+
+      subSubActors.forEach((sub) => {
         expect(world.hasActor(sub)).toBe(true);
       });
     });
