@@ -33,6 +33,6 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "pixi.js": "^5.3.0"
+    "pixi.js": "^5.3.2"
   }
 }

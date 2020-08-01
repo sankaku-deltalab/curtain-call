@@ -34,7 +34,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/util": "^0.7.0",
-    "pixi.js": "^5.3.0",
+    "pixi.js": "^5.3.2",
     "trans-vector2d": "^2.0.0"
   }
 }
