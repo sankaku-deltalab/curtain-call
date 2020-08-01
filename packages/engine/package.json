@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/engine",
-  "version": "0.7.0",
+  "version": "0.7.2",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -34,7 +34,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/input": "^0.7.0",
-    "@curtain-call/world": "^0.7.0",
+    "@curtain-call/world": "^0.7.2",
     "eventemitter3": "^4.0.4",
     "pixi.js": "^5.3.0"
   }
