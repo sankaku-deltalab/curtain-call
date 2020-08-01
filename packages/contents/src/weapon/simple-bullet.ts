@@ -12,7 +12,6 @@ import { PositionStatusWithArea } from "@curtain-call/util";
 export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
   private damage = 0;
   private damageName = "";
-  private lifeTimeSec = 0;
   private visualRadius = 0;
   private readonly mover: RelativeMover<TWorld>;
   private readonly collisionShape: RectCollisionShape;
@@ -34,17 +33,6 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
   }
 
   /**
-   * Update self.
-   *
-   * @param world World.
-   * @param deltaSec Delta seconds.
-   */
-  update(world: TWorld, deltaSec: number): void {
-    super.update(world, deltaSec);
-    this.lifeTimeSec -= deltaSec;
-  }
-
-  /**
    * If remove self from world, this function must be true.
    *
    * @param world World.
@@ -55,11 +43,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     const isNotVisible =
       world.camera.calcVisibilityStatus(translation, this.visualRadius) ===
       PositionStatusWithArea.outOfArea;
-    return (
-      isNotVisible ||
-      this.lifeTimeSec <= 0 ||
-      super.shouldRemoveSelfFromWorld(world)
-    );
+    return isNotVisible || super.shouldRemoveSelfFromWorld(world);
   }
 
   /**
@@ -81,7 +65,7 @@ export class SimpleBullet<TWorld extends World = World> extends Actor<TWorld> {
     this.mover.setDelta(Matrix.from({ translation: { x: args.speed, y: 0 } }));
     this.damage = args.damage;
     this.damageName = args.damageName;
-    this.lifeTimeSec = args.lifeTimeSec;
+    this.setLifeTime(args.lifeTimeSec);
     this.collisionShape.setSize(Vector.one.mlt(args.size));
 
     this.event.on("overlapped", (world, others) => {
