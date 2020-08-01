@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/actor",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -33,11 +33,11 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/collision": "^0.7.2",
-    "@curtain-call/display-object": "^0.7.2",
-    "@curtain-call/health": "^0.7.0",
-    "@curtain-call/mover": "^0.7.2",
-    "@curtain-call/util": "^0.7.0",
+    "@curtain-call/collision": "^0.8.0",
+    "@curtain-call/display-object": "^0.8.0",
+    "@curtain-call/health": "^0.8.0",
+    "@curtain-call/mover": "^0.8.0",
+    "@curtain-call/util": "^0.8.0",
     "eventemitter3": "^4.0.4",
     "pixi.js": "^5.3.2",
     "trans-vector2d": "^2.0.0"
