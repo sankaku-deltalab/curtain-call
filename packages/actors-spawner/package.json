@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/actors-spawner",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -34,9 +34,9 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/actor": "^0.9.0",
+    "@curtain-call/actor": "^0.9.1",
     "@curtain-call/util": "^0.9.0",
-    "@curtain-call/world": "^0.9.0",
+    "@curtain-call/world": "^0.9.1",
     "eventemitter3": "^4.0.4",
     "trans-vector2d": "^2.0.0"
   }
