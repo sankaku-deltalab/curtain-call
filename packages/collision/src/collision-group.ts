@@ -20,15 +20,15 @@ const constructCollisionGroup = (): {
   terrain: CollisionGroup;
   playerSensor: CollisionGroup;
 } => {
-  const nothing = 2 * 0;
-  const all = 2 * 1;
-  const player = 2 * 2;
-  const enemy = 2 * 3;
-  const playerBullet = 2 * 4;
-  const enemyBullet = 2 * 5;
-  const item = 2 * 6;
-  const terrain = 2 * 7;
-  const playerSensor = 2 * 8;
+  const nothing = 2 ** 0;
+  const all = 2 ** 1;
+  const player = 2 ** 2;
+  const enemy = 2 ** 3;
+  const playerBullet = 2 ** 4;
+  const enemyBullet = 2 ** 5;
+  const item = 2 ** 6;
+  const terrain = 2 ** 7;
+  const playerSensor = 2 ** 8;
 
   return {
     nothing: {
