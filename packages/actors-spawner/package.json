@@ -1,7 +1,7 @@
 {
-  "name": "curtain-call",
+  "name": "@curtain-call/actors-spawner",
   "version": "0.8.0",
-  "description": "shmup game engine with typescript",
+  "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
   "license": "ISC",
@@ -14,6 +14,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sankaku-deltalab/curtain-call.git"
@@ -26,25 +29,15 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "@curtain-call/health": "^0.8.0",
     "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/actor": "^0.8.0",
-    "@curtain-call/actors-spawner": "^0.8.0",
-    "@curtain-call/asset": "^0.8.0",
-    "@curtain-call/camera": "^0.8.0",
-    "@curtain-call/collision": "^0.8.0",
-    "@curtain-call/contents": "^0.8.0",
-    "@curtain-call/display-object": "^0.8.0",
-    "@curtain-call/engine": "^0.8.0",
-    "@curtain-call/health": "^0.8.0",
-    "@curtain-call/input": "^0.8.0",
-    "@curtain-call/level": "^0.8.0",
-    "@curtain-call/mover": "^0.8.0",
-    "@curtain-call/timer": "^0.8.0",
     "@curtain-call/util": "^0.8.0",
-    "@curtain-call/weapon": "^0.8.0",
-    "@curtain-call/world": "^0.8.0"
+    "@curtain-call/world": "^0.8.0",
+    "eventemitter3": "^4.0.4",
+    "trans-vector2d": "^2.0.0"
   }
 }

@@ -1,4 +1,5 @@
 export * from "@curtain-call/actor";
+export * from "@curtain-call/actors-spawner";
 export * from "@curtain-call/asset";
 export * from "@curtain-call/camera";
 export * from "@curtain-call/collision";
