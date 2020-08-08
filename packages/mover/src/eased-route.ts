@@ -1,4 +1,4 @@
-import { Vector } from "trans-vector2d";
+import { Vector, VectorLike } from "trans-vector2d";
 import EasingFunction from "bezier-easing";
 import { MoveRoute } from "./route-mover";
 
@@ -11,7 +11,7 @@ export const easeInOut = EasingFunction(0.42, 0, 0.58, 1);
  * Eased moving route.
  *
  * @example
- * const route = new EasedRoute().init(new Vector(0, -50), 1, EasedRoute.easeIn);
+ * const route = new EasedRoute().init({ x: 0, y: -50 }, 1, EasedRoute.easeIn);
  */
 export class EasedRoute<T> implements MoveRoute<T> {
   private destination = Vector.zero;
@@ -27,17 +27,17 @@ export class EasedRoute<T> implements MoveRoute<T> {
    * Init route.
    *
    * @example
-   * const route = new EasedRoute().init(new Vector(0, -50), 1, EasedRoute.easeIn);
+   * const route = new EasedRoute().init({ x: 0, y: -50 }, 1, EasedRoute.easeIn);
    * @param destination Route terminal.
    * @param durationSec Moving duration.
    * @param easer Moving easer.
    */
   init(
-    destination: Vector,
+    destination: VectorLike,
     durationSec: number,
     easer: (p: number) => number
   ): this {
-    this.destination = destination;
+    this.destination = Vector.from(destination);
     this.durationSec = durationSec;
     this.easer = easer;
     return this;

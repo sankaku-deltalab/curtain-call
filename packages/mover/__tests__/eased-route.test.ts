@@ -3,11 +3,7 @@ import { EasedRoute } from "../src";
 
 describe("@curtain-call/mover.EasedRoute", () => {
   it("deal position by elapsed time", () => {
-    const route = new EasedRoute().init(
-      new Vector(1, 2),
-      60,
-      EasedRoute.linear
-    );
+    const route = new EasedRoute().init({ x: 1, y: 2 }, 60, EasedRoute.linear);
 
     expect(route.getPosition({}, 0)).toStrictEqual({
       done: false,
@@ -25,7 +21,7 @@ describe("@curtain-call/mover.EasedRoute", () => {
 
   it("deal position by easer", () => {
     const zeroEaser = jest.fn().mockReturnValue(0);
-    const route = new EasedRoute().init(new Vector(1, 2), 60, zeroEaser);
+    const route = new EasedRoute().init({ x: 1, y: 2 }, 60, zeroEaser);
 
     expect(route.getPosition({}, 0)).toStrictEqual({
       done: false,
