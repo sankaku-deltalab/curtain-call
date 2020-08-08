@@ -118,9 +118,6 @@ export class ActorsSpawner<TWorld extends World = World> {
       actor.setLocalTransform(this.schedule[this.spawnedCount][0]);
       this.spawnedCount += 1;
       world.addActor(actor);
-
-      if (this.spawnedCount === this.schedule.length)
-        this.possessingActor.removeSelfFromWorld(true);
     }
   }
 
@@ -139,6 +136,7 @@ export class ActorsSpawner<TWorld extends World = World> {
       this.removedActors.add(actor);
       if (this.removedActors.size === this.schedule.length) {
         this.event.emit("allActorsWereRemoved", Array.from(this.removedActors));
+        this.destroy();
       }
     });
     return actor;
@@ -147,5 +145,6 @@ export class ActorsSpawner<TWorld extends World = World> {
   private destroy(): void {
     this.isActive = false;
     this.event.removeAllListeners();
+    if (this.possessingActor) this.possessingActor.removeSelfFromWorld(true);
   }
 }

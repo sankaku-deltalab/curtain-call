@@ -70,17 +70,6 @@ describe("@curtain-call/actors-spawner", () => {
 
       expect(spawner.update).toBeCalledWith(world, deltaSec);
     });
-
-    it("remove possessed actor when finished", () => {
-      const spawner = new ActorsSpawner();
-      const { baseActor, world } = setupSpawner(spawner);
-
-      spawner.start(world);
-      expect(baseActor.removeSelfFromWorld).not.toBeCalled();
-
-      spawner.update(world, 10);
-      expect(baseActor.removeSelfFromWorld).toBeCalledWith(true);
-    });
   });
 
   it("spawn actors with given transformation and times", () => {
@@ -153,6 +142,25 @@ describe("@curtain-call/actors-spawner", () => {
     removedActors.forEach((ac) => world.removeActor(ac));
 
     expect(removedEvent).toBeCalledWith(removedActors);
+  });
+
+  it("remove possessed actor when all spawned actors were removed from world", () => {
+    const spawner = new ActorsSpawner();
+    const { baseActor, actors, world } = setupSpawner(spawner);
+
+    const removedEvent = jest.fn();
+    spawner.event.on("allActorsWereRemoved", removedEvent);
+
+    spawner.start(world);
+    spawner.update(world, 10);
+
+    expect(baseActor.removeSelfFromWorld).not.toBeCalled();
+
+    const removedActors = [2, 1, 0, 3].map((i) => actors[i]);
+    removedActors.forEach((ac) => world.removeActor(ac));
+
+    spawner.update(world, 10);
+    expect(baseActor.removeSelfFromWorld).toBeCalledWith(true);
   });
 
   it("do not emit event if possessed actor was removed", () => {
