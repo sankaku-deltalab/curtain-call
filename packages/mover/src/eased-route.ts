@@ -2,11 +2,6 @@ import { Vector, VectorLike } from "trans-vector2d";
 import EasingFunction from "bezier-easing";
 import { MoveRoute } from "./route-mover";
 
-export const linear = EasingFunction(0, 0, 1, 1);
-export const easeIn = EasingFunction(0.42, 0, 1, 1);
-export const easeOut = EasingFunction(0, 0, 0.58, 1);
-export const easeInOut = EasingFunction(0.42, 0, 0.58, 1);
-
 /**
  * Eased moving route.
  *
