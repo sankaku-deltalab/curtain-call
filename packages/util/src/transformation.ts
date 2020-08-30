@@ -51,8 +51,46 @@ export class Transformation {
   }
 
   /**
+   * Attach other Transformation to self.
+   *
+   * @param child Attaching child Transformation.
+   * @param keepWorldTransform When attached, keep world transform of child.
+   * @returns this.
+   */
+  attachChild(child: Transformation, keepWorldTransform: boolean): this {
+    if (child.parent) child.parent.detachChild(child, keepWorldTransform);
+
+    child.parent = this;
+    this.children.add(this);
+    if (keepWorldTransform) {
+      const newChildLocal = child.getGlobal().localizedBy(this.getGlobal());
+      child.setLocal(newChildLocal);
+    }
+    child.updateGlobal(this.global);
+    return this;
+  }
+
+  /**
+   * Detach child Actor from self.
+   *
+   * @param child Detaching child Transformation.
+   * @param keepWorldTransform When detached, keep world transform of child.
+   * @return this.
+   */
+  detachChild(child: Transformation, keepWorldTransform: boolean): this {
+    if (keepWorldTransform) {
+      const newChildLocal = child.getGlobal();
+      child.setLocal(newChildLocal);
+    }
+    child.parent = undefined;
+    this.updateGlobal(Matrix.identity);
+    return this;
+  }
+
+  /**
    * Attach self to other Transformation and update global matrix.
    *
+   * @deprecated Use `attachChild`.
    * @param parent Other Transformation.
    * @returns this.
    */
@@ -67,6 +105,7 @@ export class Transformation {
   /**
    * Detach self from parent.
    *
+   * @deprecated Use `detachChild`.
    * @return this.
    */
   detachFromParent(): this {

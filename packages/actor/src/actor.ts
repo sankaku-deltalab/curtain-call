@@ -1,65 +1,104 @@
 import { EventEmitter } from "eventemitter3";
-import { Updatable, Transformation, Team } from "@curtain-call/util";
-import { DamageDealer, Health, DamageType } from "@curtain-call/health";
-import { Mover } from "@curtain-call/mover";
-import { DisplayObject } from "@curtain-call/display-object";
-import {
-  CollisionGroup,
-  CollisionShape,
-  Collision,
-} from "@curtain-call/collision";
 import { Matrix, VectorLike } from "trans-vector2d";
+import { autoInjectable, container as diContainer } from "tsyringe";
+import {
+  World,
+  FiniteResource,
+  Collision,
+  DisplayObject,
+  Mover,
+  CollisionShape,
+  CollisionGroup,
+  ActorController,
+  Transformation,
+} from "./interface";
+
+export { diContainer };
+
+export interface DamageType {
+  name: string;
+}
+
+export enum Team {
+  playerSide = "player",
+  enemySide = "enemy",
+  noSide = "noSide",
+}
+
+export enum ActorRole {
+  character = "character",
+  bullet = "bullet",
+  visual = "visual",
+  misc = "misc",
+}
 
 /**
  * Actor is main object used in World.
  */
-export class Actor<TWorld>
-  implements Updatable<TWorld>, DamageDealer<TWorld, Actor<TWorld>> {
-  private shouldRemoveSelf = false;
-
+@autoInjectable()
+export class Actor implements Actor {
   /** Event. */
   public readonly event = new EventEmitter<{
     // world
-    addedToWorld: [TWorld];
-    removedFromWorld: [TWorld];
-    updated: [TWorld, number];
+    addedToWorld: [World];
+    removedFromWorld: [World];
+    updated: [World, number];
     // collision
-    overlapped: [TWorld, Set<Actor<TWorld>>];
+    overlapped: [World, Set<Actor>];
     // health
-    takenDamage: [
-      TWorld,
-      number,
-      DamageDealer<TWorld, Actor<TWorld>>,
-      DamageType
-    ];
-    dead: [TWorld, DamageDealer<TWorld, Actor<TWorld>>, DamageType];
-    beHealed: [TWorld, number];
+    takenDamage: [World, number, Actor, DamageType];
+    dead: [World, Actor, DamageType];
+    beHealed: [World, number];
     // damage dealer
-    dealDamage: [TWorld, number, Actor<TWorld>, DamageType];
-    killed: [TWorld, Actor<TWorld>, DamageType];
+    dealDamage: [World, number, Actor, DamageType];
+    killed: [World, Actor, DamageType];
   }>();
 
   private readonly trans: Transformation;
-  private readonly healthComponent: Health;
+  private readonly healthComponent: FiniteResource;
   private readonly collision: Collision;
   private readonly objects = new Set<DisplayObject>();
-  private readonly movers = new Set<Mover<TWorld>>();
-  private parent?: DamageDealer<TWorld, Actor<TWorld>>;
+  private readonly movers = new Set<Mover>();
+  private controller: ActorController | undefined;
   private team = Team.noSide;
-  private ownerActor?: Actor<TWorld>;
-  private subActors = new Set<Actor<TWorld>>();
+  private role = ActorRole.misc;
+  private ownerActor?: Actor;
+  private subActors = new Set<Actor>();
   private lifeTimeSec?: number;
+  private shouldRemoveSelf = false;
 
-  constructor(diArgs?: {
-    trans?: Transformation;
-    health?: Health;
-    collision?: Collision;
-  }) {
-    this.trans = diArgs?.trans || new Transformation();
-    this.healthComponent = diArgs?.health || new Health();
-    this.collision = (diArgs?.collision || new Collision()).attachTo(
-      this.trans
-    );
+  constructor(
+    trans?: Transformation,
+    health?: FiniteResource,
+    collision?: Collision
+  ) {
+    if (!(trans && health && collision))
+      throw new Error("DI object is not exist");
+    this.trans = trans;
+    this.healthComponent = health.init(0, 0);
+    this.collision = collision;
+    this.attachTransformation(collision.trans, false);
+  }
+
+  /**
+   * Get controller.
+   * If self is not controlled by ActorController, return undefined.
+   *
+   * @returns Controller.
+   */
+  getController(): ActorController | undefined {
+    return this.controller;
+  }
+
+  /**
+   * Set controller.
+   *
+   * @param controller Controller.
+   * @returns this.
+   */
+  notifyControlledBy(controller: ActorController): this {
+    this.controller = controller;
+    return this;
   }
 
   // about transform
@@ -90,63 +129,76 @@ export class Actor<TWorld>
 
   /**
    * Set local transform.
-   * @param newTrans New local transform.
+   *
+   * @param newLocalTrans New local transform.
    * @returns this.
    */
-  setLocalTransform(newTrans: Matrix): this {
-    this.trans.setLocal(newTrans);
+  setLocalTransform(newLocalTrans: Matrix): this {
+    this.trans.setLocal(newLocalTrans);
     return this;
   }
 
   /**
-   * Attach self Transformation to other actor.
+   * Get Transformation of self.
    *
-   * @param parent Parent Actor.
+   * @returns Transformation of self.
+   */
+  getTransformation(): Transformation {
+    return this.trans;
+  }
+
+  /**
+   * Attach other actor to self.
+   *
+   * @param child Attaching child Actor.
+   * @param keepWorldTransform When attached, keep world transform of child.
    * @returns this.
    */
-  attachTo(parent: Actor<TWorld>): this {
-    this.trans.attachTo(parent.trans);
+  attachActor(child: Actor, keepWorldTransform: boolean): this {
+    return this.attachTransformation(child.trans, keepWorldTransform);
+  }
+
+  /**
+   * Attach other Transformation to self.
+   *
+   * @param child Attaching child Transformation.
+   * @param keepWorldTransform When attached, keep world transform of child.
+   * @returns this.
+   */
+  attachTransformation(
+    child: Transformation,
+    keepWorldTransform: boolean
+  ): this {
+    this.trans.attachChild(child, keepWorldTransform);
     return this;
   }
 
   /**
-   * Attach self Transformation to other transform.
+   * Detach child Actor from self.
    *
-   * @param parent Parent Transformation.
-   * @returns this.
-   */
-  attachToTransformation(parent: Transformation): this {
-    this.trans.attachTo(parent);
-    return this;
-  }
-
-  /**
-   * Detach self Transformation from parent.
-   *
+   * @param child Detaching child Actor.
+   * @param keepWorldTransform When detached, keep world transform of child.
    * @return this.
    */
-  detachFromParent(): this {
-    this.trans.detachFromParent();
-    return this;
+  detachActor(child: Actor, keepWorldTransform: boolean): this {
+    return this.detachTransformation(
+      child.getTransformation(),
+      keepWorldTransform
+    );
   }
 
   /**
-   * Get world transform.
+   * Detach child Actor from self.
    *
-   * @return This transform on global space.
+   * @param child Detaching child Transformation.
+   * @param keepWorldTransform When detached, keep world transform of child.
+   * @return this.
    */
-  getWorldTransform(): Matrix {
-    return this.trans.getGlobal();
-  }
-
-  /**
-   * Attach other transformation to this transformation.
-   *
-   * @param trans Attaching trans.
-   * @returns this.
-   */
-  attachTransformation(trans: Transformation): this {
-    trans.attachTo(this.trans);
+  detachTransformation(
+    child: Transformation,
+    keepWorldTransform: boolean
+  ): this {
+    this.trans.detachChild(child, keepWorldTransform);
     return this;
   }
 
@@ -156,7 +208,7 @@ export class Actor<TWorld>
    * @param mover Adding mover.
    * @returns this.
    */
-  addMover(mover: Mover<TWorld>): this {
+  addMover(mover: Mover): this {
     this.movers.add(mover);
     return this;
   }
@@ -167,7 +219,7 @@ export class Actor<TWorld>
    * @param mover Removing mover.
    * @returns this.
    */
-  removeMover(mover: Mover<TWorld>): this {
+  removeMover(mover: Mover): this {
     this.movers.delete(mover);
     return this;
   }
@@ -181,7 +233,7 @@ export class Actor<TWorld>
    * @returns New transformation and movement was done.
    */
   protected updateMovement(
-    world: TWorld,
+    world: World,
     deltaSec: number,
     currentTrans: Matrix
   ): {
@@ -205,23 +257,32 @@ export class Actor<TWorld>
   // about world
 
   /**
-   * Remove self from world at next update.
+   * Remove self from world at next world update.
    *
-   * @param removeSelf Remove self if true.
-   * @returns Self must remove from world.
+   * @returns this.
    */
-  removeSelfFromWorld(removeSelf: boolean): this {
-    this.shouldRemoveSelf = removeSelf;
+  reserveRemovingSelfFromWorld(): this {
+    this.shouldRemoveSelf = true;
+    return this;
+  }
+
+  /**
+   * Cancel removing self from world at next world update.
+   *
+   * @returns this.
+   */
+  cancelRemovingSelfFromWorld(): this {
+    this.shouldRemoveSelf = false;
     return this;
   }
 
   /**
    * If remove self from world, this function must be true.
    *
-   * @param _world World.
+   * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(_world: TWorld): boolean {
+  shouldRemoveSelfFromWorld(): boolean {
     const lifeTimeIsOver =
       this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
     return this.shouldRemoveSelf || lifeTimeIsOver;
@@ -233,7 +294,7 @@ export class Actor<TWorld>
    *
    * @param world Added World.
    */
-  notifyAddedToWorld(world: TWorld): void {
+  notifyAddedToWorld(world: World): void {
     this.event.emit("addedToWorld", world);
   }
 
@@ -243,7 +304,7 @@ export class Actor<TWorld>
    *
    * @param world Removed World.
    */
-  notifyRemovedFromWorld(world: TWorld): void {
+  notifyRemovedFromWorld(world: World): void {
     this.event.emit("removedFromWorld", world);
   }
 
@@ -253,11 +314,10 @@ export class Actor<TWorld>
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: TWorld, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     this.trans.setLocal(
       this.updateMovement(world, deltaSec, this.trans.getLocal()).newTrans
     );
-    this.updateDisplayObject(deltaSec);
 
     if (this.lifeTimeSec !== undefined) this.lifeTimeSec -= deltaSec;
 
@@ -285,7 +345,7 @@ export class Actor<TWorld>
    * @returns this.
    */
   addCollisionShape(shape: CollisionShape): this {
-    this.collision.add(shape);
+    this.collision.addShape(shape);
     return this;
   }
 
@@ -296,7 +356,7 @@ export class Actor<TWorld>
    * @returns this.
    */
   removeCollisionShape(shape: CollisionShape): this {
-    this.collision.remove(shape);
+    this.collision.removeShape(shape);
     return this;
   }
 
@@ -350,7 +410,7 @@ export class Actor<TWorld>
    * @param world Our world.
    * @param others Collided Other actors.
    */
-  notifyOverlappedWith(world: TWorld, others: Set<Actor<TWorld>>): void {
+  notifyOverlappedWith(world: World, others: Set<Actor>): void {
     this.event.emit("overlapped", world, others);
   }
 
@@ -364,7 +424,7 @@ export class Actor<TWorld>
    */
   addDisplayObject(obj: DisplayObject): this {
     this.objects.add(obj);
-    obj.trans.attachTo(this.trans);
+    this.attachTransformation(obj.trans, false);
     return this;
   }
 
@@ -388,10 +448,6 @@ export class Actor<TWorld>
     this.objects.forEach((o) => callback(o));
   }
 
-  protected updateDisplayObject(deltaSec: number): void {
-    this.objects.forEach((o) => o.updatePixiObject(deltaSec));
-  }
-
   // about health
 
   /**
@@ -412,7 +468,7 @@ export class Actor<TWorld>
    * @returns Current health.
    */
   health(): number {
-    return this.healthComponent.current();
+    return this.healthComponent.value();
   }
 
   /**
@@ -430,7 +486,7 @@ export class Actor<TWorld>
    * @returns Self is dead.
    */
   isDead(): boolean {
-    return this.healthComponent.isDead();
+    return this.healthComponent.value() === 0;
   }
 
   /**
@@ -443,20 +499,23 @@ export class Actor<TWorld>
    * @returns Damage taking result.
    */
   takeDamage(
-    world: TWorld,
+    world: World,
     damage: number,
-    dealer: DamageDealer<TWorld, Actor<TWorld>>,
+    dealer: Actor,
     type: DamageType
   ): { actualDamage: number; died: boolean } {
-    const r = this.healthComponent.takeDamage(damage);
-    dealer.notifyDealtDamage(world, r.actualDamage, this, type);
-    this.event.emit("takenDamage", world, r.actualDamage, dealer, type);
-    if (r.died) {
-      this.removeSelfFromWorld(true);
+    const r = this.healthComponent.sub(damage);
+    const actualDamage = -r.variation;
+    const died = r.zeroed;
+
+    dealer.notifyDealtDamage(world, actualDamage, this, type);
+    this.event.emit("takenDamage", world, actualDamage, dealer, type);
+    if (died) {
+      this.reserveRemovingSelfFromWorld();
       dealer.notifyKilled(world, this, type);
       this.event.emit("dead", world, dealer, type);
     }
-    return r;
+    return { actualDamage, died };
   }
 
   /**
@@ -466,15 +525,12 @@ export class Actor<TWorld>
    * @param dealer Damage dealer killing this directly.
    * @param type Damage type.
    */
-  kill(
-    world: TWorld,
-    dealer: DamageDealer<TWorld, Actor<TWorld>>,
-    type: DamageType
-  ): void {
-    const r = this.healthComponent.kill();
+  kill(world: World, dealer: Actor, type: DamageType): void {
+    if (this.healthComponent.value() === 0) return;
+
+    this.healthComponent.init(0, this.healthComponent.max());
     dealer.notifyKilled(world, this, type);
     this.event.emit("dead", world, dealer, type);
-    return r;
   }
 
   /**
@@ -483,10 +539,10 @@ export class Actor<TWorld>
    * @param world World.
    * @param amount Healing amount.
    */
-  heal(world: TWorld, amount: number): { actualHealed: number } {
-    const r = this.healthComponent.heal(amount);
-    this.event.emit("beHealed", world, amount);
-    return r;
+  heal(world: World, amount: number): { actualHealed: number } {
+    const r = this.healthComponent.add(amount);
+    this.event.emit("beHealed", world, r.variation);
+    return { actualHealed: r.variation };
   }
 
   // about damage dealer
@@ -500,14 +556,12 @@ export class Actor<TWorld>
    * @param type Damage type.
    */
   notifyDealtDamage(
-    world: TWorld,
+    world: World,
     damage: number,
-    taker: Actor<TWorld>,
+    taker: Actor,
     type: DamageType
   ): void {
     this.event.emit("dealDamage", world, damage, taker, type);
-    if (!this.parent) return;
-    this.parent.notifyDealtDamage(world, damage, taker, type);
   }
 
   /**
@@ -517,24 +571,8 @@ export class Actor<TWorld>
    * @param taker Damaged Actor.
    * @param type Damage type.
    */
-  notifyKilled(world: TWorld, taker: Actor<TWorld>, type: DamageType): void {
+  notifyKilled(world: World, taker: Actor, type: DamageType): void {
     this.event.emit("killed", world, taker, type);
-    if (!this.parent) return;
-    this.parent.notifyKilled(world, taker, type);
-  }
-
-  /**
-   * Set damaging chain parent.
-   * When this dealt damage, this tell damaging and killing to parent `DamageDealer`.
-   *
-   * @param parentDealer Parent.
-   * @returns this.
-   */
-  setDamageDealerParent(
-    parentDealer: DamageDealer<TWorld, Actor<TWorld>>
-  ): this {
-    this.parent = parentDealer;
-    return this;
   }
 
   // about team
@@ -560,13 +598,33 @@ export class Actor<TWorld>
   }
 
   /**
+   * Set ActorRole.
+   *
+   * @param role ActorRole of self.
+   * @returns this.
+   */
+  setRole(role: ActorRole): this {
+    this.role = role;
+    return this;
+  }
+
+  /**
+   * Get ActorRole of self.
+   *
+   * @returns ActorRole of self.
+   */
+  getRole(): ActorRole {
+    return this.role;
+  }
+
+  /**
    * Add sub actor to this.
    * Sub actor would be attached to this.
    *
    * @param addingSubActor Adding actors.
    * @returns this.
    */
-  addSubActor(...addingSubActor: Actor<TWorld>[]): this {
+  addSubActor(...addingSubActor: Actor[]): this {
     const someSubActorsWasAlreadySubActor = addingSubActor.some(
       (sub) => sub.getOwnerActor() !== undefined
     );
@@ -575,7 +633,7 @@ export class Actor<TWorld>
 
     addingSubActor.forEach((sub) => {
       this.subActors.add(sub);
-      sub.attachTo(this);
+      this.attachActor(sub, false);
       sub.ownerActor = this;
     });
 
@@ -589,7 +647,7 @@ export class Actor<TWorld>
    * @param removingSubActor Removing actors.
    * @returns this.
    */
-  removeSubActor(...removingSubActor: Actor<TWorld>[]): this {
+  removeSubActor(...removingSubActor: Actor[]): this {
     const someActorIsNotOwnedByThis = removingSubActor.some(
       (sub) => sub.getOwnerActor() !== this
     );
@@ -598,7 +656,7 @@ export class Actor<TWorld>
 
     removingSubActor.forEach((sub) => {
       this.subActors.delete(sub);
-      sub.detachFromParent();
+      this.detachActor(sub, true);
       sub.ownerActor = undefined;
     });
 
@@ -611,7 +669,7 @@ export class Actor<TWorld>
    * @param subActor
    * @returns this.
    */
-  hasSubActor(subActor: Actor<TWorld>): boolean {
+  hasSubActor(subActor: Actor): boolean {
     return this.subActors.has(subActor);
   }
 
@@ -621,14 +679,14 @@ export class Actor<TWorld>
    *
    * @returns Owner actor or undefined.
    */
-  getOwnerActor(): Actor<TWorld> | undefined {
+  getOwnerActor(): Actor | undefined {
     return this.ownerActor;
   }
 
   /**
    * Get sub-actors.
    */
-  getSubActors(): Actor<TWorld>[] {
+  getSubActors(): Actor[] {
     return Array.from(this.subActors);
   }
 }
