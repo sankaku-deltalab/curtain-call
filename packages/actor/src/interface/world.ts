@@ -29,8 +29,7 @@ export interface World {
    *
    * @example
    * const gameSize = new Vector(300, 400);
-   * const world = new World().setDrawAreaUpdater((engine) => {
-   *   const canvasSize = engine.canvasSize();
+   * const world = new World().setDrawAreaUpdater((canvasSize) => {
    *   const gameUnitPerPixel =
    *     Math.max(gameSize.x / canvasSize.x, gameSize.y / gameSize.y) * 1.25;
    *   const gameSizeInCanvas = gameSize.div(gameUnitPerPixel);
@@ -45,7 +44,7 @@ export interface World {
    */
   setDrawAreaUpdater(
     updater: (
-      engine: Engine
+      canvasSize: Vector
     ) => {
       drawCenterInCanvas: VectorLike;
       drawSizeInCanvas: VectorLike;
@@ -56,9 +55,10 @@ export interface World {
   /**
    * Update this and contained Updatable object.
    *
+   * @param engine Engine owning self.
    * @param deltaSec Update delta seconds.
    */
-  update(deltaSec: number): void;
+  update(engine: Engine, deltaSec: number): void;
 
   /**
    * Add actor to this.

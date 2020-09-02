@@ -4,6 +4,8 @@ export * from "./display-object";
 export * from "./engine";
 export * from "./finite-resource";
 export * from "./mover";
+export * from "./pointer-input";
+export * from "./pointer-input-receiver";
 export * from "./transformation";
 export * from "./updatable";
 export * from "./world";

@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { Matrix, VectorLike } from "trans-vector2d";
-import { autoInjectable, container as diContainer } from "tsyringe";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
   World,
   FiniteResource,
@@ -11,6 +11,7 @@ import {
   CollisionGroup,
   ActorController,
   Transformation,
+  Updatable,
 } from "./interface";
 
 export { diContainer };
@@ -33,10 +34,10 @@ export enum ActorRole {
 }
 
 /**
- * Actor is main object used in World.
+ * Actor is individual in world.
  */
 @autoInjectable()
-export class Actor implements Actor {
+export class Actor implements Updatable {
   /** Event. */
   public readonly event = new EventEmitter<{
     // world
@@ -68,9 +69,9 @@ export class Actor implements Actor {
   private shouldRemoveSelf = false;
 
   constructor(
-    trans?: Transformation,
-    health?: FiniteResource,
-    collision?: Collision
+    @inject("Transformation") trans?: Transformation,
+    @inject("FiniteResource") health?: FiniteResource,
+    @inject("Collision") collision?: Collision
   ) {
     if (!(trans && health && collision))
       throw new Error("DI object is not exist");

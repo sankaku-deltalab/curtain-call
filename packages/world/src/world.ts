@@ -1,73 +1,100 @@
 import { EventEmitter } from "eventemitter3";
 import * as PIXI from "pixi.js";
 import { VectorLike, Vector } from "trans-vector2d";
-import { Actor } from "@curtain-call/actor";
-import { Camera } from "@curtain-call/camera";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
-  DisplayObjectManager,
-  DisplayObject,
-} from "@curtain-call/display-object";
-import { PointerInputReceiver } from "@curtain-call/input";
-import { OverlapChecker, Collision } from "@curtain-call/collision";
-import {
-  pixiMatrixToMatrix2d,
+  Actor,
+  World as IWorld,
   Updatable,
+  Engine,
+  PositionInAreaStatus,
+  PointerInputReceiver,
+  Collision,
+  DisplayObject,
   Transformation,
+} from "@curtain-call/actor";
+import {
+  Camera,
+  DisplayObjectManager,
+  OverlapChecker,
   RectArea,
-  PositionStatusWithArea,
-} from "@curtain-call/util";
+} from "./interface";
+import { pixiMatrixToMatrix2d } from "@curtain-call/util";
+
+export { diContainer };
 
 /**
  * World is root of game world.
  */
-export class World {
+@autoInjectable()
+export class World implements IWorld {
   /** Event. */
   public readonly event = new EventEmitter<{
     updated: [number];
   }>();
 
-  public readonly backgroundTrans = new Transformation();
-  public readonly head: PIXI.Container;
-  public readonly tail: PIXI.Container;
+  public readonly backgroundTrans: Transformation;
+  public readonly pixiHead: PIXI.Container;
+  public readonly pixiTail: PIXI.Container;
   public readonly camera: Camera;
-  public readonly pointerInput: PointerInputReceiver<World>;
+  public readonly pointerInput: PointerInputReceiver;
 
-  private readonly displayObject: DisplayObjectManager;
-  private readonly actors = new Set<Actor<this>>();
-  private readonly updatable = new Set<Updatable<this>>();
-  private readonly overlapChecker = new OverlapChecker();
+  private readonly displayObjectManager: DisplayObjectManager;
+  private readonly actors = new Set<Actor>();
+  private readonly updatable = new Set<Updatable>();
+  private readonly overlapChecker: OverlapChecker;
   private readonly mask = new PIXI.Graphics();
   private readonly coreArea: RectArea;
+  private drawAreaUpdater = (
+    canvasSize: Vector
+  ): {
+    drawCenterInCanvas: VectorLike;
+    drawSizeInCanvas: VectorLike;
+    gameUnitPerPixel: number;
+  } => ({
+    drawCenterInCanvas: canvasSize.div(2),
+    drawSizeInCanvas: canvasSize,
+    gameUnitPerPixel: 1,
+  });
 
-  /**
-   * @param diArgs.head Root of PIXI objects.
-   * @param diArgs.tail Tail of PIXI objects.
-   * @param diArgs.camera Camera.
-   * @param diArgs.displayObject DisplayObjectContainer.
-   * @param diArgs.pointerInput PointerInputReceiver.
-   * @param diArgs.coreArea Rectangle area for game.
-   */
-  constructor(diArgs?: {
-    readonly head?: PIXI.Container;
-    readonly tail?: PIXI.Container;
-    readonly camera?: Camera;
-    readonly displayObject?: DisplayObjectManager;
-    readonly pointerInput?: PointerInputReceiver<World>;
-    readonly coreArea?: RectArea;
-  }) {
-    this.head = diArgs?.head || new PIXI.Container();
-    this.tail = diArgs?.tail || new PIXI.Container();
-    this.camera = diArgs?.camera || new Camera();
-    this.displayObject = diArgs?.displayObject || new DisplayObjectManager();
-    this.pointerInput = diArgs?.pointerInput || new PointerInputReceiver();
-    this.coreArea = diArgs?.coreArea || new RectArea();
+  constructor(
+    @inject("pixiHead") pixiHead?: PIXI.Container,
+    @inject("pixiTail") pixiTail?: PIXI.Container,
+    @inject("camera") camera?: Camera,
+    @inject("displayObjectManager") displayObjectManager?: DisplayObjectManager,
+    @inject("pointerInput") pointerInput?: PointerInputReceiver,
+    @inject("coreArea") coreArea?: RectArea,
+    @inject("overlapChecker") overlapChecker?: OverlapChecker,
+    @inject("backgroundTrans") backgroundTrans?: Transformation
+  ) {
+    if (
+      !(
+        pixiHead &&
+        pixiTail &&
+        camera &&
+        displayObjectManager &&
+        pointerInput &&
+        coreArea &&
+        overlapChecker &&
+        backgroundTrans
+      )
+    )
+      throw new Error("DI objects is not exists");
+    this.pixiHead = pixiHead;
+    this.pixiTail = pixiTail;
+    this.camera = camera;
+    this.displayObjectManager = displayObjectManager;
+    this.pointerInput = pointerInput;
+    this.coreArea = coreArea;
+    this.overlapChecker = overlapChecker;
+    this.backgroundTrans = backgroundTrans;
 
-    this.head.mask = this.mask;
-    this.head.addChild(this.mask);
-    this.head.addChild(this.camera.head);
-    this.camera.tail.addChild(this.tail);
-    this.tail.addChild(this.displayObject.container);
-    this.displayObject = this.displayObject;
+    this.pixiHead.mask = this.mask;
+    this.pixiHead.addChild(this.mask);
+    this.pixiHead.addChild(this.camera.pixiHead);
+    this.camera.pixiTail.addChild(this.pixiTail);
+    this.pixiTail.addChild(this.displayObjectManager.container);
+    this.displayObjectManager = this.displayObjectManager;
 
     this.pointerInput.setModifier((canvasPos) =>
       this.canvasPosToGamePos(canvasPos)
@@ -75,35 +102,50 @@ export class World {
   }
 
   /**
-   * Set canvas drawing property.
+   * Set canvas drawing method.
    *
    * @example
-   * const gameHeight = 400;
-   * const gameWidth = 300;
-   * const canvasHeight = engine.canvasHeight();
-   * const canvasWidth = engine.canvasWidth();
-   * const gameUnitPerPixel = Math.max(gameHeight / canvasHeight, gameWidth / canvasWidth) * 1.25;
-   * const world = new World().setDrawArea(
-   *   { x: canvasWidth / 2, y: gameHeight / gameUnitPerPixel / 2 },
-   *   { x: gameWidth / gameUnitPerPixel, y: gameHeight / gameUnitPerPixel },
-   *   gameUnitPerPixel
-   * );
-   * @param drawCenterInCanvas Drawing center.
-   * @param drawSizeInCanvas Drawing size.
-   * @param gameUnitPerPixel Game unit per pixel.
+   * const gameSize = new Vector(300, 400);
+   * const world = new World().setDrawAreaUpdater((engine) => {
+   *   const canvasSize = engine.canvasSize();
+   *   const gameUnitPerPixel =
+   *     Math.max(gameSize.x / canvasSize.x, gameSize.y / gameSize.y) * 1.25;
+   *   const gameSizeInCanvas = gameSize.div(gameUnitPerPixel);
+   *   return {
+   *     drawCenterInCanvas: { x: canvasSize.x / 2, y: gameSizeInCanvas.y / 2 },
+   *     drawSizeInCanvas: gameSizeInCanvas,
+   *     gameUnitPerPixel,
+   *   };
+   * });
+   * @param updater Drawing area updater. Called at every pre update.
    * @returns this.
    */
-  setDrawArea(
-    drawCenterInCanvas: VectorLike,
-    drawSizeInCanvas: VectorLike,
-    gameUnitPerPixel: number
+  setDrawAreaUpdater(
+    updater: (
+      canvasSize: Vector
+    ) => {
+      drawCenterInCanvas: VectorLike;
+      drawSizeInCanvas: VectorLike;
+      gameUnitPerPixel: number;
+    }
   ): this {
+    this.drawAreaUpdater = updater;
+    return this;
+  }
+
+  private updateDrawArea(canvasSize: Vector): this {
+    const {
+      drawCenterInCanvas,
+      drawSizeInCanvas,
+      gameUnitPerPixel,
+    } = this.drawAreaUpdater(canvasSize);
+
     const drawSizeInGame = Vector.from(drawSizeInCanvas).mlt(gameUnitPerPixel);
-    this.head.position = new PIXI.Point(
+    this.pixiHead.position = new PIXI.Point(
       drawCenterInCanvas.x,
       drawCenterInCanvas.y
     );
-    this.head.scale = new PIXI.Point(
+    this.pixiHead.scale = new PIXI.Point(
       1 / gameUnitPerPixel,
       1 / gameUnitPerPixel
     );
@@ -127,15 +169,17 @@ export class World {
    *
    * @param deltaSec Update delta seconds.
    */
-  update(deltaSec: number): void {
+  update(engine: Engine, deltaSec: number): void {
     this.removeDeadUpdatable();
+
+    this.updateDrawArea(engine.canvasSize());
 
     this.addSubActorsIfNotAdded();
 
     this.updatable.forEach((up) => up.update(this, deltaSec));
     this.checkCollision();
     this.updatePixiDisplayObject();
-    this.camera.update();
+    this.camera.update(deltaSec);
 
     this.event.emit("updated", deltaSec);
   }
@@ -146,7 +190,7 @@ export class World {
    * @param actor Adding actor.
    * @returns this.
    */
-  addActor(actor: Actor<this>): this {
+  addActor(actor: Actor): this {
     if (this.hasActor(actor)) throw new Error("Actor was already added");
 
     this.actors.add(actor);
@@ -166,7 +210,7 @@ export class World {
    * @param actor Removing actor.
    * @returns this.
    */
-  removeActor(actor: Actor<this>): this {
+  removeActor(actor: Actor): this {
     const removing = [actor, ...actor.getSubActors()];
 
     if (removing.some((ac) => !this.hasActor(ac)))
@@ -187,7 +231,7 @@ export class World {
    * @param actor Checking actor.
    * @returns This has given actor.
    */
-  hasActor(actor: Actor<this>): boolean {
+  hasActor(actor: Actor): boolean {
     return this.actors.has(actor);
   }
 
@@ -196,7 +240,7 @@ export class World {
    *
    * @returns Added actors iterator.
    */
-  iterateActors(): IterableIterator<Actor<this>> {
+  iterateActors(): IterableIterator<Actor> {
     return this.actors.values();
   }
 
@@ -207,7 +251,7 @@ export class World {
    * @param updatable Adding Updatable object.
    * @returns this.
    */
-  addUpdatable(updatable: Updatable<this>): this {
+  addUpdatable(updatable: Updatable): this {
     if (updatable instanceof Actor)
       throw new Error("Do not add Actor as Updatable");
     this.updatable.add(updatable);
@@ -221,7 +265,7 @@ export class World {
    * @param updatable Removing Updatable object.
    * @returns this.
    */
-  removeUpdatable(updatable: Updatable<this>): this {
+  removeUpdatable(updatable: Updatable): this {
     if (updatable instanceof Actor)
       throw new Error("Do not remove Actor as Updatable");
     this.updatable.delete(updatable);
@@ -234,7 +278,7 @@ export class World {
    * @param receiver
    * @returns this.
    */
-  addPointerInputReceiver(receiver: PointerInputReceiver<World>): this {
+  addPointerInputReceiver(receiver: PointerInputReceiver): this {
     this.pointerInput.addChild(receiver);
     return this;
   }
@@ -245,9 +289,18 @@ export class World {
    * @param receiver
    * @returns this.
    */
-  removePointerInputReceiver(receiver: PointerInputReceiver<World>): this {
+  removePointerInputReceiver(receiver: PointerInputReceiver): this {
     this.pointerInput.removeChild(receiver);
     return this;
+  }
+
+  /**
+   * get pointer input receiver.
+   *
+   * @returns Receiver.
+   */
+  getPointerInputReceiver(): PointerInputReceiver {
+    return this.pointerInput;
   }
 
   /**
@@ -256,9 +309,11 @@ export class World {
    * @param canvasPos Canvas position.
    * @returns Game position.
    */
-  public canvasPosToGamePos(canvasPos: VectorLike): Vector {
-    this.head.updateTransform();
-    const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+  canvasPosToGamePos(canvasPos: VectorLike): Vector {
+    this.pixiHead.updateTransform();
+    const worldTrans = pixiMatrixToMatrix2d(
+      this.pixiTail.transform.worldTransform
+    );
     return worldTrans.localizePoint(canvasPos);
   }
 
@@ -268,9 +323,11 @@ export class World {
    * @param gamePos Game position.
    * @returns Canvas position.
    */
-  public gamePosToCanvasPos(gamePos: VectorLike): Vector {
-    this.head.updateTransform();
-    const worldTrans = pixiMatrixToMatrix2d(this.tail.transform.worldTransform);
+  gamePosToCanvasPos(gamePos: VectorLike): Vector {
+    this.pixiHead.updateTransform();
+    const worldTrans = pixiMatrixToMatrix2d(
+      this.pixiTail.transform.worldTransform
+    );
     return worldTrans.globalizePoint(gamePos);
   }
 
@@ -296,7 +353,7 @@ export class World {
   calcPositionStatusWithCoreArea(
     globalPos: VectorLike,
     radius: number
-  ): PositionStatusWithArea {
+  ): PositionInAreaStatus {
     return this.coreArea.calcPositionStatus(globalPos, radius);
   }
 
@@ -320,12 +377,12 @@ export class World {
     });
   }
 
-  private addUpdatableInternal(updatable: Updatable<this>): this {
+  private addUpdatableInternal(updatable: Updatable): this {
     this.updatable.add(updatable);
     return this;
   }
 
-  private removeUpdatableInternal(updatable: Updatable<this>): this {
+  private removeUpdatableInternal(updatable: Updatable): this {
     this.updatable.delete(updatable);
     return this;
   }
@@ -338,14 +395,14 @@ export class World {
       });
     });
 
-    this.displayObject.updatePixiObjects(displayObjects);
+    this.displayObjectManager.updatePixiObjects(displayObjects);
   }
 
   private checkCollision(): void {
     const collisionToActor = new Map(
       Array.from(this.actors).map((ac) => [ac.getCollision(), ac])
     );
-    const getActor = (col: Collision): Actor<this> => {
+    const getActor = (col: Collision): Actor => {
       const ac = collisionToActor.get(col);
       if (!ac) throw new Error();
       return ac;
