@@ -1,13 +1,14 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { RectArea, PositionStatusWithArea, Transformation } from "../src";
+import { PositionInAreaStatus } from "@curtain-call/actor";
+import { RectArea, Transformation } from "../src";
 
 describe("@curtain-call/util.RectArea", () => {
   it.each`
-    status                               | pos                 | radius
-    ${PositionStatusWithArea.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${1.1}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: -1, y: -1 }} | ${0}
-    ${PositionStatusWithArea.outOfArea}  | ${{ x: -2, y: -2 }} | ${0.9}
+    status                             | pos                 | radius
+    ${PositionInAreaStatus.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
+    ${PositionInAreaStatus.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${1.1}
+    ${PositionInAreaStatus.onAreaEdge} | ${{ x: -1, y: -1 }} | ${0}
+    ${PositionInAreaStatus.outOfArea}  | ${{ x: -2, y: -2 }} | ${0.9}
   `("calc given position is $status", ({ status, pos, radius }) => {
     const areaParentTrans = new Transformation().setLocal(
       Matrix.from({

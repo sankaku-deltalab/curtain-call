@@ -1,11 +1,6 @@
 import { VectorLike, Vector } from "trans-vector2d";
+import { PositionInAreaStatus } from "@curtain-call/actor";
 import { Transformation } from "./transformation";
-
-export enum PositionStatusWithArea {
-  inArea = "inArea",
-  onAreaEdge = "onAreaEdge",
-  outOfArea = "outOfArea",
-}
 
 export class RectArea {
   private nw = Vector.zero;
@@ -47,7 +42,7 @@ export class RectArea {
   calcPositionStatus(
     globalPos: VectorLike,
     globalRadius: number
-  ): PositionStatusWithArea {
+  ): PositionInAreaStatus {
     const relPos = this.trans.getGlobal().localizePoint(globalPos);
     const { scale } = this.trans.getGlobal().decompose();
     const mapping: [boolean, number, number, number][] = [
@@ -59,11 +54,11 @@ export class RectArea {
     const statuses = mapping.map(([positive, threshold, value, localRadius]) =>
       this.calcThresholdStatus(threshold, value, localRadius, positive)
     );
-    if (statuses.some((st) => st === PositionStatusWithArea.outOfArea))
-      return PositionStatusWithArea.outOfArea;
-    if (statuses.every((st) => st === PositionStatusWithArea.inArea))
-      return PositionStatusWithArea.inArea;
-    return PositionStatusWithArea.onAreaEdge;
+    if (statuses.some((st) => st === PositionInAreaStatus.outOfArea))
+      return PositionInAreaStatus.outOfArea;
+    if (statuses.every((st) => st === PositionInAreaStatus.inArea))
+      return PositionInAreaStatus.inArea;
+    return PositionInAreaStatus.onAreaEdge;
   }
 
   private calcThresholdStatus(
@@ -71,7 +66,7 @@ export class RectArea {
     value: number,
     radius: number,
     isPositiveThreshold: boolean
-  ): PositionStatusWithArea {
+  ): PositionInAreaStatus {
     const statusValue = ((): number => {
       if (threshold > value + radius) return -1;
       if (threshold < value - radius) return 1;
@@ -79,8 +74,8 @@ export class RectArea {
     })();
     const sign = isPositiveThreshold ? 1 : -1;
 
-    if (sign * statusValue > 0) return PositionStatusWithArea.inArea;
-    if (sign * statusValue < 0) return PositionStatusWithArea.outOfArea;
-    return PositionStatusWithArea.onAreaEdge;
+    if (sign * statusValue > 0) return PositionInAreaStatus.inArea;
+    if (sign * statusValue < 0) return PositionInAreaStatus.outOfArea;
+    return PositionInAreaStatus.onAreaEdge;
   }
 }

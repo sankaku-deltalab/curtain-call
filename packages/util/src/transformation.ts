@@ -1,9 +1,10 @@
 import { Matrix } from "trans-vector2d";
+import { Transformation as ITransformation } from "@curtain-call/actor";
 
 /**
  * Transformation manage translation, rotation and scale.
  */
-export class Transformation {
+export class Transformation implements ITransformation {
   private local = Matrix.identity;
   private global = Matrix.identity;
   private parent?: Transformation;
