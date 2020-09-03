@@ -19,7 +19,7 @@ import {
   OverlapChecker,
   RectArea,
 } from "./interface";
-import { pixiMatrixToMatrix2d } from "@curtain-call/util";
+import { pixiMatrixToMatrix2d } from "./matrix-convert";
 
 export { diContainer };
 

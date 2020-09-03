@@ -34,7 +34,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/actor": "^0.10.0",
-    "@curtain-call/util": "^0.10.0",
     "eventemitter3": "^4.0.4",
     "pixi.js": "^5.3.2",
     "reflect-metadata": "^0.1.13",
