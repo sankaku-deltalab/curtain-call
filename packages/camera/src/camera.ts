@@ -1,26 +1,39 @@
 import * as PIXI from "pixi.js";
 import { VectorLike, Matrix, Vector } from "trans-vector2d";
-import {
-  Transformation,
-  RectArea,
-  PositionStatusWithArea,
-} from "@curtain-call/util";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
+import { Camera as ICamera, RectArea } from "@curtain-call/world";
+import { PositionInAreaStatus, Transformation } from "@curtain-call/actor";
+
+export { diContainer };
 
 /**
  * Camera transform graphics.
  */
-export class Camera {
+@autoInjectable()
+export class Camera implements ICamera {
+  public readonly trans: Transformation;
+  public readonly pixiHead: PIXI.Container;
+  public readonly pixiTail: PIXI.Container;
+  private readonly visibleArea: RectArea;
+
   /**
    * @param tail Pixi container.
    */
   constructor(
-    public readonly trans = new Transformation(),
-    public readonly head = new PIXI.Container(),
-    public readonly tail = new PIXI.Container(),
-    private readonly visibleArea = new RectArea()
+    @inject("Transformation") trans?: Transformation,
+    @inject("PIXI.Container") pixiHead?: PIXI.Container,
+    @inject("PIXI.Container") pixiTail?: PIXI.Container,
+    @inject("RectArea") visibleArea?: RectArea
   ) {
-    this.head.addChild(tail);
-    visibleArea.attachTo(trans);
+    if (!(trans && pixiHead && pixiTail && visibleArea))
+      throw new Error("DI objects is not exists");
+
+    this.trans = trans;
+    this.pixiHead = pixiHead;
+    this.pixiTail = pixiTail;
+    this.visibleArea = visibleArea;
+    pixiHead.addChild(pixiTail);
+    trans.attachChild(visibleArea.trans, false);
   }
 
   /**
@@ -29,9 +42,9 @@ export class Camera {
   update(): void {
     const { translation, rotation, scale } = this.trans.getGlobal().decompose();
 
-    this.tail.position = new PIXI.Point(-translation.x, -translation.y);
-    this.head.scale = new PIXI.Point(1 / scale.x, 1 / scale.y);
-    this.head.rotation = -rotation;
+    this.pixiTail.position = new PIXI.Point(-translation.x, -translation.y);
+    this.pixiHead.scale = new PIXI.Point(1 / scale.x, 1 / scale.y);
+    this.pixiHead.rotation = -rotation;
   }
 
   /**
@@ -98,7 +111,7 @@ export class Camera {
   calcVisibilityStatus(
     globalPos: VectorLike,
     radius: number
-  ): PositionStatusWithArea {
+  ): PositionInAreaStatus {
     return this.visibleArea.calcPositionStatus(globalPos, radius);
   }
 }

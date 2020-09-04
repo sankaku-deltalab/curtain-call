@@ -1,65 +1,85 @@
 import * as PIXI from "pixi.js";
-import { PositionStatusWithArea } from "@curtain-call/util";
-import { Camera } from "../src";
+import { PositionInAreaStatus } from "@curtain-call/actor";
+import { createCamera } from "./mock";
+import { Matrix } from "trans-vector2d";
 
 describe("@curtain-call/camera.Camera", () => {
   it("can move", () => {
-    const camera = new Camera();
+    const camera = createCamera().camera;
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
-    camera.tail.addChild(obj);
+    camera.pixiTail.addChild(obj);
 
+    const setLocal = jest.spyOn(camera.trans, "setLocal");
     camera.moveTo({ x: 3, y: 1 });
-    camera.update();
-    const viewPos = obj.getGlobalPosition();
 
-    expect(viewPos.x).toBeCloseTo(-2);
-    expect(viewPos.y).toBeCloseTo(1);
+    expect(
+      setLocal.mock.calls[0][0].isClosedTo(Matrix.translation({ x: 3, y: 1 }))
+    ).toBe(true);
   });
 
   it("can rotate", () => {
-    const camera = new Camera();
+    const camera = createCamera().camera;
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
-    camera.tail.addChild(obj);
+    camera.pixiTail.addChild(obj);
 
-    camera.moveTo({ x: 3, y: 1 });
     camera.rotateTo(Math.PI / 2);
-    camera.update();
-    const viewPos = obj.getGlobalPosition();
 
-    expect(viewPos.x).toBeCloseTo(1);
-    expect(viewPos.y).toBeCloseTo(2);
+    expect(camera.trans.setLocal).toBeCalledWith(Matrix.rotation(Math.PI / 2));
   });
 
   it("can zoom", () => {
-    const camera = new Camera();
+    const camera = createCamera().camera;
     const obj = new PIXI.Container();
     obj.position = new PIXI.Point(1, 2);
-    camera.tail.addChild(obj);
+    camera.pixiTail.addChild(obj);
 
-    camera.moveTo({ x: 3, y: 1 });
+    const setLocal = jest.spyOn(camera.trans, "setLocal");
     camera.zoomTo(2);
-    camera.update();
-    const viewPos = obj.getGlobalPosition();
 
-    expect(viewPos.x).toBeCloseTo(-4);
-    expect(viewPos.y).toBeCloseTo(2);
+    expect(
+      setLocal.mock.calls[0][0].isClosedTo(
+        Matrix.scaling({ x: 1 / 2, y: 1 / 2 })
+      )
+    ).toBe(true);
   });
 
-  it.each`
-    status                               | pos                 | radius
-    ${PositionStatusWithArea.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: 0, y: 0 }}   | ${1.1}
-    ${PositionStatusWithArea.onAreaEdge} | ${{ x: -1, y: -1 }} | ${0}
-    ${PositionStatusWithArea.outOfArea}  | ${{ x: -2, y: -2 }} | ${0.9}
-  `("can calc position status with visible area", ({ status, pos, radius }) => {
-    const camera = new Camera()
-      .setCameraResolution({ x: 12, y: 8 })
-      .moveTo({ x: 1, y: 2 })
-      .rotateTo(Math.PI / 2)
-      .zoomTo(2);
+  it("update pixi objects when updated", () => {
+    const { camera, trans, pixiHead, pixiTail } = createCamera();
+    jest.spyOn(trans, "getGlobal").mockReturnValue(
+      Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
+        scale: { x: 1 / 4, y: 1 / 4 },
+      })
+    );
+    camera.update();
 
-    expect(camera.calcVisibilityStatus(pos, radius)).toBe(status);
+    expect(pixiTail.position.x).toBeCloseTo(-1);
+    expect(pixiTail.position.y).toBeCloseTo(-2);
+    expect(pixiHead.rotation).toEqual(-3);
+    expect(pixiHead.scale.x).toBeCloseTo(4);
+    expect(pixiHead.scale.y).toBeCloseTo(4);
+  });
+
+  it("attach visible area at constructor", () => {
+    const { camera, visibleArea } = createCamera();
+
+    expect(camera.trans.attachChild).toBeCalledWith(visibleArea.trans, false);
+  });
+
+  it("use visible area", () => {
+    const { camera, visibleArea } = createCamera();
+    jest
+      .spyOn(visibleArea, "calcPositionStatus")
+      .mockReturnValue(PositionInAreaStatus.inArea);
+
+    const pos = { x: 1, y: 2 };
+    const radius = 3;
+    const r = camera.calcVisibilityStatus(pos, radius);
+
+    expect(r).toBe(PositionInAreaStatus.inArea);
+    expect(visibleArea.calcPositionStatus).toBeCalledWith(pos, radius);
   });
 });
