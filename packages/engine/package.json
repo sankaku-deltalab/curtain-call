@@ -33,9 +33,12 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/input": "^0.10.0",
+    "@curtain-call/actor": "^0.10.0",
     "@curtain-call/world": "^0.10.0",
     "eventemitter3": "^4.0.4",
-    "pixi.js": "^5.3.2"
+    "pixi.js": "^5.3.2",
+    "reflect-metadata": "^0.1.13",
+    "trans-vector2d": "^2.0.0",
+    "tsyringe": "^4.3.0"
   }
 }

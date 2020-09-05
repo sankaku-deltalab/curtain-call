@@ -1,25 +1,26 @@
 import { EventEmitter } from "eventemitter3";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import * as PIXI from "pixi.js";
-import { World } from "@curtain-call/world";
-import { PointerInput, PointerInputConnector } from "@curtain-call/input";
+import { Vector } from "trans-vector2d";
+import { PointerInput, World, Engine as IEngine } from "@curtain-call/actor";
+
+export { diContainer };
 
 /**
  * Engine is root of system.
  *
  * This class create pixi application and use it.
  */
-export class Engine {
+@autoInjectable()
+export class Engine implements IEngine {
   /** Event. */
   public readonly event = new EventEmitter<{
     updated: [number];
   }>();
 
+  private readonly pointerInput: PointerInput;
   private readonly app: PIXI.Application;
   private readonly worlds = new Set<World>();
-  private readonly pointerInputConnectors = new Map<
-    World,
-    PointerInputConnector<World>
-  >();
 
   /**
    *
@@ -30,8 +31,12 @@ export class Engine {
   constructor(
     canvas: HTMLCanvasElement,
     sizeElement: Window | HTMLElement,
-    private readonly pointerInput = new PointerInput()
+    @inject("PointerInput") pointerInput?: PointerInput
   ) {
+    if (!pointerInput) throw new Error("DI failed");
+
+    this.pointerInput = pointerInput;
+
     const resolution = window.devicePixelRatio;
     this.app = new PIXI.Application({
       resolution,
@@ -44,7 +49,7 @@ export class Engine {
 
     this.app.ticker.add((deltaRate: number): void => {
       const deltaSec = deltaRate / PIXI.settings.TARGET_FPMS / 1000;
-      this.worlds.forEach((world) => world.update(deltaSec));
+      this.worlds.forEach((world) => world.update(this, deltaSec));
       this.event.emit("updated", deltaSec);
     });
 
@@ -52,21 +57,15 @@ export class Engine {
   }
 
   /**
-   * Canvas width.
+   * Canvas size.
    *
-   * @returns Canvas width.
+   * @returns Canvas size { x: width, y: height }.
    */
-  canvasWidth(): number {
-    return this.app.view.width / this.app.renderer.resolution;
-  }
-
-  /**
-   * Canvas height.
-   *
-   * @returns Canvas height.
-   */
-  canvasHeight(): number {
-    return this.app.view.height / this.app.renderer.resolution;
+  canvasSize(): Vector {
+    return new Vector(
+      this.app.view.width / this.app.renderer.resolution,
+      this.app.view.height / this.app.renderer.resolution
+    );
   }
 
   /**
@@ -79,11 +78,8 @@ export class Engine {
   addWorld(world: World): this {
     if (this.worlds.has(world)) throw new Error("World was already added");
     this.worlds.add(world);
-    this.app.stage.addChild(world.head);
-    this.pointerInputConnectors.set(
-      world,
-      new PointerInputConnector(world, this.pointerInput, world.pointerInput)
-    );
+    this.app.stage.addChild(world.pixiHead);
+    this.pointerInput.addReceiver(world.getPointerInputReceiver());
 
     return this;
   }
@@ -97,13 +93,8 @@ export class Engine {
   removeWorld(world: World): this {
     if (!this.worlds.has(world)) throw new Error("World is not added");
     this.worlds.delete(world);
-
-    this.app.stage.removeChild(world.head);
-
-    const inputConnector = this.pointerInputConnectors.get(world);
-    this.pointerInputConnectors.delete(world);
-    if (!inputConnector) throw new Error();
-    inputConnector.destroy(this.pointerInput);
+    this.app.stage.removeChild(world.pixiHead);
+    this.pointerInput.removeReceiver(world.getPointerInputReceiver());
 
     return this;
   }

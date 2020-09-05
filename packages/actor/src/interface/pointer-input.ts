@@ -1,17 +1,9 @@
-import { Vector } from "trans-vector2d";
-import EventEmitter from "eventemitter3";
+import { PointerInputReceiver } from "./pointer-input-receiver";
 
 /**
  * Receive pointer event from dom element.
  */
 export interface PointerInput {
-  readonly event: EventEmitter<{
-    down: [Vector];
-    up: [Vector];
-    move: [Vector, Vector];
-    tap: [ReadonlyArray<Vector>];
-  }>;
-
   /**
    * Add event to element.
    *
@@ -23,4 +15,21 @@ export interface PointerInput {
     canvas: HTMLCanvasElement,
     input: HTMLElement | Document | Window
   ): this;
+
+  /**
+   * Add child receiver.
+   * When self catch pointer event, child receiver event will be emitted.
+   *
+   * @param receiver Adding child receiver.
+   * @returns this.
+   */
+  addReceiver(receiver: PointerInputReceiver): this;
+
+  /**
+   * Remove child receiver.
+   *
+   * @param receiver Removing child receiver.
+   * @returns this.
+   */
+  removeReceiver(receiver: PointerInputReceiver): this;
 }
