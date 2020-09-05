@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js";
 import { Matrix } from "trans-vector2d";
-import { Transformation } from "@curtain-call/util";
+import { containerMock, transMockClass, worldMockClass } from "./mock";
 import { MultiAnimatedSprite } from "../src";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const multiAnimatedSprite = () => {
-  const createAS = (): PIXI.AnimatedSprite => {
+  const createAnimatedSprite = (): PIXI.AnimatedSprite => {
     const texture = new PIXI.Texture(new PIXI.BaseTexture());
     const sprite = new PIXI.AnimatedSprite([texture]);
     jest.spyOn(sprite, "gotoAndPlay");
@@ -13,36 +13,41 @@ const multiAnimatedSprite = () => {
     return sprite;
   };
 
-  const s1 = createAS();
-  const s2 = createAS();
-  const a1 = createAS();
-  const a2 = createAS();
-  const sprite = new MultiAnimatedSprite({
-    initialState: "s1",
-    state: { s1, s2 },
-    anim: { a1, a2 },
-  });
+  const s1 = createAnimatedSprite();
+  const s2 = createAnimatedSprite();
+  const a1 = createAnimatedSprite();
+  const a2 = createAnimatedSprite();
+  const pixiObj = containerMock();
+  const trans = new transMockClass();
+  const sprite = new MultiAnimatedSprite(
+    {
+      initialState: "s1",
+      state: { s1, s2 },
+      anim: { a1, a2 },
+    },
+    pixiObj,
+    trans
+  );
 
   return {
     s1,
     s2,
     a1,
     a2,
+    pixiObj,
+    trans,
     sprite,
   };
 };
 
 describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
-  it("has Transformation", () => {
-    const { sprite } = multiAnimatedSprite();
-    expect(sprite.trans).toBeInstanceOf(Transformation);
-  });
-
   it("update pixi transform by Transformation", () => {
-    const { sprite } = multiAnimatedSprite();
+    const { sprite, trans } = multiAnimatedSprite();
 
-    sprite.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
-    sprite.updatePixiObject(1);
+    jest
+      .spyOn(trans, "getGlobal")
+      .mockReturnValue(Matrix.translation({ x: 1, y: 2 }));
+    sprite.notifyPreDraw(new worldMockClass(), 1);
 
     expect(sprite.pixiObj.position.x).toBeCloseTo(1);
     expect(sprite.pixiObj.position.y).toBeCloseTo(2);
@@ -78,7 +83,7 @@ describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
 
     const deltaSec = 123;
     const deltaMS = 123 * 1000;
-    sprite.updatePixiObject(deltaSec);
+    sprite.notifyPreDraw(new worldMockClass(), deltaSec);
 
     expect(s1.visible).toBe(true);
     [s1, s2, a1, a2].forEach((as) => {

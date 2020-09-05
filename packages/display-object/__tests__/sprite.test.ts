@@ -1,38 +1,44 @@
 import * as PIXI from "pixi.js";
 import { Matrix, Vector } from "trans-vector2d";
-import { Transformation } from "@curtain-call/util";
+import { Transformation } from "@curtain-call/actor";
+import { spriteMock, transMockClass } from "./mock";
 import { Sprite } from "../src";
 
+const createSprite = (): {
+  pixiObj: PIXI.Sprite;
+  trans: Transformation;
+  sprite: Sprite;
+} => {
+  const pixiObj = spriteMock();
+  const trans = new transMockClass();
+  const sprite = new Sprite(pixiObj, trans);
+  return { pixiObj, trans, sprite };
+};
+
 describe("@curtain-call/display-object.Sprite", () => {
-  it("has Transformation", () => {
-    const sprite = new Sprite();
-    expect(sprite.trans).toBeInstanceOf(Transformation);
-  });
-
   it("update sprite transform by Transformation", () => {
-    const pixiSprite = new PIXI.Sprite();
-    const sprite = new Sprite(pixiSprite);
+    const { pixiObj, trans, sprite } = createSprite();
 
-    sprite.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
-    sprite.updatePixiObject();
+    jest
+      .spyOn(trans, "getGlobal")
+      .mockReturnValue(Matrix.translation({ x: 1, y: 2 }));
+    sprite.notifyPreDraw();
 
-    expect(pixiSprite.position.x).toBeCloseTo(1);
-    expect(pixiSprite.position.y).toBeCloseTo(2);
+    expect(pixiObj.position.x).toBeCloseTo(1);
+    expect(pixiObj.position.y).toBeCloseTo(2);
   });
 
   it("can set texture", () => {
-    const pixiSprite = new PIXI.Sprite();
-    const sprite = new Sprite(pixiSprite);
+    const { pixiObj, sprite } = createSprite();
 
     const texture = new PIXI.Texture(new PIXI.BaseTexture());
     sprite.setTexture(texture);
 
-    expect(pixiSprite.texture).toBe(texture);
+    expect(pixiObj.texture).toBe(texture);
   });
 
   it("can set size", () => {
-    const pixiSprite = new PIXI.Sprite();
-    const sprite = new Sprite(pixiSprite);
+    const { pixiObj, sprite } = createSprite();
 
     const texture = new PIXI.Texture(new PIXI.BaseTexture());
     jest.spyOn(texture, "width", "get").mockReturnValue(3);
@@ -40,7 +46,7 @@ describe("@curtain-call/display-object.Sprite", () => {
     sprite.setTexture(texture);
     sprite.setSize(new Vector(1, 2));
 
-    expect(pixiSprite.scale.x).toBeCloseTo(1 / 3);
-    expect(pixiSprite.scale.y).toBeCloseTo(2 / 4);
+    expect(pixiObj.scale.x).toBeCloseTo(1 / 3);
+    expect(pixiObj.scale.y).toBeCloseTo(2 / 4);
   });
 });

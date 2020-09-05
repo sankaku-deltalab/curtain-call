@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
-import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object";
+import { DisplayObject, World, Transformation } from "@curtain-call/actor";
+import { matrix2dToPixiMatrix } from "@curtain-call/world";
+import { inject, autoInjectable } from "tsyringe";
 
 export const animSpriteFrom = (
   textures: PIXI.Texture[] | PIXI.AnimatedSprite.FrameObject[]
@@ -28,15 +29,13 @@ export const animSpriteFrom = (
  * sprite.playAnim("kick"); // sprite play kick animation and replay dash when complete kick animation
  * sprite.update(world, 0.01); // update animation
  */
+@autoInjectable()
 export class MultiAnimatedSprite<
   TState extends { [key: string]: PIXI.AnimatedSprite },
   TAnim extends { [key: string]: PIXI.AnimatedSprite }
 > implements DisplayObject {
-  /** Root container. */
-  public readonly pixiObj = new PIXI.Container();
-
-  /** Transformation. */
-  public readonly trans = new Transformation();
+  public readonly pixiObj: PIXI.Container;
+  public readonly trans: Transformation;
 
   private currentState: keyof TState;
   private playingAnim?: keyof TAnim;
@@ -48,11 +47,20 @@ export class MultiAnimatedSprite<
    * @param args.state States.
    * @param args.anim Animations.
    */
-  constructor(args: {
-    readonly initialState: keyof TState;
-    readonly state: TState;
-    readonly anim: TAnim;
-  }) {
+  constructor(
+    args: {
+      readonly initialState: keyof TState;
+      readonly state: TState;
+      readonly anim: TAnim;
+    },
+    @inject("PIXI.Container") pixiObj?: PIXI.Container,
+    @inject("Transformation") trans?: Transformation
+  ) {
+    if (!(pixiObj && trans)) throw new Error("DI failed");
+
+    this.pixiObj = pixiObj;
+    this.trans = trans;
+
     const state = new Map<keyof TState, PIXI.AnimatedSprite>();
     for (const [key, sprite] of Object.entries(args.state)) {
       sprite.visible = false;
@@ -84,7 +92,7 @@ export class MultiAnimatedSprite<
    *
    * @param deltaSec Delta seconds.
    */
-  updatePixiObject(deltaSec: number): void {
+  notifyPreDraw(world: World, deltaSec: number): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

@@ -1,12 +1,12 @@
-import * as PIXI from "pixi.js";
-import { DisplayObjectManager, Sprite } from "../src";
+import { DisplayObject } from "@curtain-call/actor";
+import { containerMock, transMockClass } from "./mock";
+import { DisplayObjectManager } from "../src";
 
-const pixiConteinerMock = (): PIXI.Container => {
-  const pixiContainer = new PIXI.Container();
-  jest.spyOn(pixiContainer, "addChild");
-  jest.spyOn(pixiContainer, "removeChild");
-  return pixiContainer;
-};
+export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
+  pixiObj: containerMock(),
+  trans: new transMockClass(),
+  notifyPreDraw: jest.fn(),
+}));
 
 describe("@curtain-call/display-object.DisplayObjectManager", () => {
   it("can construct without arguments", () => {
@@ -14,20 +14,20 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
   });
 
   it("can add pixi sprite to pixi container", () => {
-    const pixiContainer = pixiConteinerMock();
+    const pixiContainer = containerMock();
     const manager = new DisplayObjectManager(pixiContainer);
 
-    const sprite = new Sprite();
+    const sprite = new displayObjectMockClass();
     manager.updatePixiObjects([sprite]);
 
     expect(pixiContainer.addChild).toBeCalledWith(sprite.pixiObj);
   });
 
   it("do not add pixi sprite twice", () => {
-    const pixiContainer = pixiConteinerMock();
+    const pixiContainer = containerMock();
     const manager = new DisplayObjectManager(pixiContainer);
 
-    const sprite = new Sprite();
+    const sprite = new displayObjectMockClass();
     manager.updatePixiObjects([sprite]);
     manager.updatePixiObjects([sprite]);
 
@@ -35,10 +35,10 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
   });
 
   it("can remove pixi sprite from pixi container", () => {
-    const pixiContainer = pixiConteinerMock();
+    const pixiContainer = containerMock();
     const manager = new DisplayObjectManager(pixiContainer);
 
-    const sprite = new Sprite();
+    const sprite = new displayObjectMockClass();
     manager.updatePixiObjects([sprite]);
     manager.updatePixiObjects([]);
 
@@ -46,13 +46,13 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
   });
 
   it("do not update display object", () => {
-    const pixiContainer = pixiConteinerMock();
+    const pixiContainer = containerMock();
     const manager = new DisplayObjectManager(pixiContainer);
 
-    const sprite = new Sprite();
-    jest.spyOn(sprite, "updatePixiObject");
+    const sprite = new displayObjectMockClass();
+    jest.spyOn(sprite, "notifyPreDraw");
     manager.updatePixiObjects([sprite]);
 
-    expect(sprite.updatePixiObject).not.toBeCalled();
+    expect(sprite.notifyPreDraw).not.toBeCalled();
   });
 });

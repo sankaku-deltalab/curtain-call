@@ -1,51 +1,49 @@
 import * as PIXI from "pixi.js";
 import { Matrix } from "trans-vector2d";
-import { Transformation } from "@curtain-call/util";
+import { Transformation } from "@curtain-call/actor";
+import { containerMock, transMockClass } from "./mock";
 import { Container } from "../src";
 
 const createContainer = (): {
-  pixiContainer: PIXI.Container;
+  pixiObj: PIXI.Container;
+  trans: Transformation;
   container: Container;
 } => {
-  const pixiContainer = new PIXI.Container();
-  jest.spyOn(pixiContainer, "addChild");
-  jest.spyOn(pixiContainer, "removeChild");
-  const container = new Container(pixiContainer);
-  return { pixiContainer, container };
+  const pixiObj = containerMock();
+  const trans = new transMockClass();
+  const container = new Container(pixiObj, trans);
+  return { pixiObj, trans, container };
 };
 
 describe("@curtain-call/display-object.Container", () => {
-  it("has Transformation", () => {
-    const container = new Container();
-    expect(container.trans).toBeInstanceOf(Transformation);
-  });
+  it("update pixi container transform by Transformation", () => {
+    const { pixiObj, trans, container } = createContainer();
 
-  it("update container transform by Transformation", () => {
-    const { pixiContainer, container } = createContainer();
+    jest
+      .spyOn(trans, "getGlobal")
+      .mockReturnValue(Matrix.translation({ x: 1, y: 2 }));
+    container.notifyPreDraw();
 
-    container.trans.setLocal(Matrix.translation({ x: 1, y: 2 }));
-    container.updatePixiObject();
-
-    expect(pixiContainer.position.x).toBeCloseTo(1);
-    expect(pixiContainer.position.y).toBeCloseTo(2);
+    expect(pixiObj.position.x).toBeCloseTo(1);
+    expect(pixiObj.position.y).toBeCloseTo(2);
   });
 
   it("can add child", () => {
-    const { pixiContainer, container } = createContainer();
+    const { pixiObj, container } = createContainer();
 
     const child = new PIXI.Sprite();
     container.addChild(child);
 
-    expect(pixiContainer.addChild).toBeCalledWith(child);
+    expect(pixiObj.addChild).toBeCalledWith(child);
   });
 
   it("can remove child", () => {
-    const { pixiContainer, container } = createContainer();
+    const { pixiObj, container } = createContainer();
 
     const child = new PIXI.Sprite();
     container.addChild(child);
     container.removeChild(child);
 
-    expect(pixiContainer.removeChild).toBeCalledWith(child);
+    expect(pixiObj.removeChild).toBeCalledWith(child);
   });
 });

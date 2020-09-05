@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
-import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object";
+import { inject, autoInjectable } from "tsyringe";
+import { DisplayObject, Transformation } from "@curtain-call/actor";
+import { matrix2dToPixiMatrix } from "@curtain-call/world";
 
 /**
  * Container.
@@ -15,20 +16,24 @@ import { DisplayObject } from "./display-object";
  * container.trans.setLocal(Matrix.from({ translation: {x: 1, y: 2} }));
  * container.update();
  */
+@autoInjectable()
 export class Container implements DisplayObject {
-  /**
-   * @param pixiObj Pixi container.
-   * @param trans Transformation of self.
-   */
+  public readonly pixiObj: PIXI.Container;
+  public readonly trans: Transformation;
+
   constructor(
-    public readonly pixiObj = new PIXI.Container(),
-    public readonly trans = new Transformation()
-  ) {}
+    @inject("PIXI.Container") pixiObj?: PIXI.Container,
+    @inject("Transformation") trans?: Transformation
+  ) {
+    if (!(pixiObj && trans)) throw new Error("DI failed");
+    this.pixiObj = pixiObj;
+    this.trans = trans;
+  }
 
   /**
    * Update pixi sprite transformation.
    */
-  updatePixiObject(): void {
+  notifyPreDraw(): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

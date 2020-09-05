@@ -1,10 +1,11 @@
 import * as PIXI from "pixi.js";
-import { DisplayObject } from "./display-object";
+import { DisplayObject } from "@curtain-call/actor";
+import { DisplayObjectManager as IDisplayObjectManager } from "@curtain-call/world";
 
 /**
  * DisplayObjectManager contain DisplayObjects with pixi object.
  */
-export class DisplayObjectManager {
+export class DisplayObjectManager implements IDisplayObjectManager {
   private readonly objectSet = new Set<DisplayObject>();
 
   /**

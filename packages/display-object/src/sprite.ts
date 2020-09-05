@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Vector } from "trans-vector2d";
-import { Transformation, matrix2dToPixiMatrix } from "@curtain-call/util";
-import { DisplayObject } from "./display-object";
+import { inject, autoInjectable } from "tsyringe";
+import { DisplayObject, Transformation } from "@curtain-call/actor";
+import { matrix2dToPixiMatrix } from "@curtain-call/world";
 
 /**
  * Sprite.
@@ -16,24 +17,25 @@ import { DisplayObject } from "./display-object";
  * sprite.trans.setLocal(Matrix.from({ translation: {x: 1, y: 2} }));
  * sprite.update();
  */
-export class Sprite<T> implements DisplayObject {
+@autoInjectable()
+export class Sprite implements DisplayObject {
+  public readonly pixiObj: PIXI.Sprite;
+  public readonly trans: Transformation;
   private size = Vector.one;
 
-  /**
-   * @param pixiObj Pixi sprite.
-   * @param trans Transformation of self.
-   */
   constructor(
-    public readonly pixiObj = new PIXI.Sprite(),
-    public readonly trans = new Transformation()
+    @inject("PIXI.Sprite") pixiObj?: PIXI.Sprite,
+    @inject("Transformation") trans?: Transformation
   ) {
-    pixiObj.anchor = new PIXI.Point(0.5, 0.5);
+    if (!(pixiObj && trans)) throw new Error("DI failed");
+    this.pixiObj = pixiObj;
+    this.trans = trans;
   }
 
   /**
    * Update pixi sprite transformation.
    */
-  updatePixiObject(): void {
+  notifyPreDraw(): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );
