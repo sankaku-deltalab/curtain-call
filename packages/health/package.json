@@ -33,6 +33,6 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "eventemitter3": "^4.0.4"
+    "eventemitter3": "^4.0.7"
   }
 }

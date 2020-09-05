@@ -35,8 +35,8 @@
   "dependencies": {
     "@curtain-call/asset": "^0.10.0",
     "@curtain-call/util": "^0.10.0",
-    "@types/graphlib": "^2.1.6",
-    "eventemitter3": "^4.0.4",
+    "@types/graphlib": "^2.1.7",
+    "eventemitter3": "^4.0.7",
     "graphlib": "^2.1.8"
   }
 }

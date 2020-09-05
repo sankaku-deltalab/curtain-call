@@ -35,7 +35,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/actor": "^0.10.0",
-    "eventemitter3": "^4.0.4",
+    "eventemitter3": "^4.0.7",
     "trans-vector2d": "^2.0.0"
   }
 }
