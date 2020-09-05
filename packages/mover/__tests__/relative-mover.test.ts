@@ -1,4 +1,5 @@
 import { Matrix, Vector } from "trans-vector2d";
+import { worldMockClass } from "./mock";
 import { RelativeMover } from "../src";
 
 const currentTrans = Matrix.from({
@@ -14,7 +15,7 @@ describe("@curtain-call/mover.RelativeMover", () => {
     });
     const mover = new RelativeMover().setDelta(delta);
 
-    const r = mover.update({}, 0.5, currentTrans);
+    const r = mover.update(new worldMockClass(), 0.5, currentTrans);
 
     const rc = r.newTrans.decompose();
     expect(r.done).toBe(false);

@@ -1,7 +1,8 @@
 import { Matrix, Vector } from "trans-vector2d";
+import { worldMockClass } from "./mock";
 import { MoveRoute, RouteMover } from "../src";
 
-const routeMock = <T>(done: boolean, x: number, y: number): MoveRoute<T> => {
+const routeMock = (done: boolean, x: number, y: number): MoveRoute => {
   const cls = jest.fn(() => ({
     getPosition: jest
       .fn()
@@ -22,7 +23,7 @@ describe("@curtain-call/mover.RouteMover", () => {
 
     mover.start(route);
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     const deltaSec = 123;
     const expectedTrans = Matrix.from({
       translation: new Vector(4, 6),
@@ -41,7 +42,7 @@ describe("@curtain-call/mover.RouteMover", () => {
     mover.start(route);
     mover.abort();
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     const deltaSec = 123;
     expect(mover.update(world, deltaSec, currentTrans)).toStrictEqual({
       done: true,

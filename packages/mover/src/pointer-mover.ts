@@ -1,11 +1,15 @@
 import { Vector, Matrix, VectorLike } from "trans-vector2d";
-import { PointerInputReceiver } from "@curtain-call/input";
-import { Mover } from "./mover";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
+import { Mover, World, PointerInputReceiver } from "@curtain-call/actor";
+
+export { diContainer };
 
 /**
  * Move by pointer movement.
  */
-export class PointerMover<TWorld> implements Mover<TWorld> {
+@autoInjectable()
+export class PointerMover implements Mover {
+  private readonly receiver: PointerInputReceiver;
   private delta = Vector.zero;
   private scale = 1;
   private movableAreaNW = Vector.one.mlt(Number.NEGATIVE_INFINITY);
@@ -14,7 +18,13 @@ export class PointerMover<TWorld> implements Mover<TWorld> {
   /**
    * @param receiver PointerInputReceiver used in internal.
    */
-  constructor(private readonly receiver = new PointerInputReceiver<TWorld>()) {
+  constructor(
+    @inject("PointerInputReceiver")
+    receiver?: PointerInputReceiver
+  ) {
+    if (!receiver) throw new Error("DI failed");
+    this.receiver = receiver;
+
     receiver.event.on("move", (world, src, dest) => {
       this.delta = this.delta.add(dest.sub(src));
     });
@@ -47,14 +57,14 @@ export class PointerMover<TWorld> implements Mover<TWorld> {
   /**
    * Update movement and return transformation delta
    *
-   * @param _world World.
-   * @param _deltaSec Delta seconds.
+   * @param world World.
+   * @param deltaSec Delta seconds.
    * @param currentTrans Current transform.
    * @returns New transformation and movement was done.
    */
   update(
-    _world: TWorld,
-    _deltaSec: number,
+    world: World,
+    deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
     const delta = this.delta.mlt(this.scale);
@@ -85,7 +95,7 @@ export class PointerMover<TWorld> implements Mover<TWorld> {
    *
    * @returns Using `PointerInputReceiver`.
    */
-  getInputReceiver(): PointerInputReceiver<TWorld> {
+  getInputReceiver(): PointerInputReceiver {
     return this.receiver;
   }
 }

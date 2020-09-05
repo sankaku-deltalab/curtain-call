@@ -1,7 +1,7 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { Mover } from "./mover";
+import { Mover, World } from "@curtain-call/actor";
 
-export class RelativeMover<T> implements Mover<T> {
+export class RelativeMover implements Mover {
   private delta = Matrix.identity;
 
   setDelta(delta: Matrix): this {
@@ -18,7 +18,7 @@ export class RelativeMover<T> implements Mover<T> {
    * @returns New transformation and movement was done.
    */
   update(
-    world: T,
+    world: World,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {

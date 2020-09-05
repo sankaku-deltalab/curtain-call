@@ -29,13 +29,16 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "eventemitter3": "^4.0.7",
+    "pixi.js": "^5.3.3",
     "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/input": "^0.10.0",
-    "@curtain-call/util": "^0.10.0",
+    "@curtain-call/actor": "^0.10.0",
     "bezier-easing": "^2.1.0",
-    "trans-vector2d": "^2.0.0"
+    "reflect-metadata": "^0.1.13",
+    "trans-vector2d": "^2.0.0",
+    "tsyringe": "^4.3.0"
   }
 }

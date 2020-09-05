@@ -1,13 +1,13 @@
 import { Matrix } from "trans-vector2d";
-import { Mover } from "./mover";
+import { Mover, World } from "@curtain-call/actor";
 
 /**
  * Use multiple mover parallel.
  */
-export class ParallelMover<T> implements Mover<T> {
-  private movers: readonly Mover<T>[] = [];
+export class ParallelMover implements Mover {
+  private movers: readonly Mover[] = [];
 
-  init(movers: Mover<T>[]): this {
+  init(movers: Mover[]): this {
     this.movers = movers;
     return this;
   }
@@ -21,7 +21,7 @@ export class ParallelMover<T> implements Mover<T> {
    * @returns New transformation and movement was done.
    */
   update(
-    world: T,
+    world: World,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {

@@ -1,6 +1,28 @@
+import { EventEmitter } from "eventemitter3";
 import { Matrix, Vector } from "trans-vector2d";
+import { PointerInputReceiver } from "@curtain-call/actor";
+import { worldMockClass } from "./mock";
 import { PointerMover } from "../src";
-import { PointerInputReceiver } from "@curtain-call/input";
+
+const pointerInputReceiverMockClass = jest.fn<PointerInputReceiver, []>(() => ({
+  event: new EventEmitter(),
+  setModifier: jest.fn().mockReturnThis(),
+  addChild: jest.fn().mockReturnThis(),
+  removeChild: jest.fn().mockReturnThis(),
+  notifyDown: jest.fn(),
+  notifyUp: jest.fn(),
+  notifyTap: jest.fn(),
+  notifyMove: jest.fn(),
+}));
+
+const createPointerMover = (): {
+  receiver: PointerInputReceiver;
+  pointerMover: PointerMover;
+} => {
+  const receiver = new pointerInputReceiverMockClass();
+  const pointerMover = new PointerMover(receiver);
+  return { receiver, pointerMover };
+};
 
 const currentTrans = Matrix.from({
   translation: new Vector(3, 4),
@@ -9,16 +31,13 @@ const currentTrans = Matrix.from({
 
 describe("@curtain-call/mover.PointerMover", () => {
   it("move by pointer movement", () => {
-    const mover = new PointerMover();
-    const parent = new PointerInputReceiver().addChild(
-      mover.getInputReceiver()
-    );
+    const { receiver, pointerMover } = createPointerMover();
 
-    const world = "world";
+    const world = new worldMockClass();
     const pointerDelta = new Vector(1, 2);
-    parent.notifyMove(world, Vector.zero, pointerDelta);
+    receiver.event.emit("move", world, Vector.zero, Vector.from(pointerDelta));
 
-    expect(mover.update({}, 1, currentTrans)).toStrictEqual({
+    expect(pointerMover.update(world, 1, currentTrans)).toStrictEqual({
       done: false,
       newTrans: currentTrans.translated(pointerDelta),
     });
@@ -30,16 +49,13 @@ describe("@curtain-call/mover.PointerMover", () => {
     ${{ x: 5, y: 2 }}       | ${{ x: 5, y: 6 }}
     ${{ x: -100, y: -100 }} | ${{ x: 0, y: 1 }}
   `("can limit movement", ({ delta, expectedPos }) => {
-    const receiver = new PointerInputReceiver();
-    const mover = new PointerMover(receiver).setMovableArea(
-      new Vector(0, 1),
-      new Vector(5, 7)
-    );
+    const { receiver, pointerMover } = createPointerMover();
+    pointerMover.setMovableArea(new Vector(0, 1), new Vector(5, 7));
 
-    const world = "world";
-    receiver.notifyMove(world, Vector.zero, delta);
+    const world = new worldMockClass();
+    receiver.event.emit("move", world, Vector.zero, Vector.from(delta));
 
-    expect(mover.update({}, 1, currentTrans)).toStrictEqual({
+    expect(pointerMover.update(world, 1, currentTrans)).toStrictEqual({
       done: false,
       newTrans: Matrix.from({
         ...currentTrans,
@@ -51,16 +67,14 @@ describe("@curtain-call/mover.PointerMover", () => {
 
   it("can set movement scale", () => {
     const moveScale = 1.2;
-    const mover = new PointerMover().setScale(moveScale);
-    const parent = new PointerInputReceiver().addChild(
-      mover.getInputReceiver()
-    );
+    const { receiver, pointerMover } = createPointerMover();
+    pointerMover.setScale(moveScale);
 
-    const world = "world";
+    const world = new worldMockClass();
     const pointerDelta = new Vector(1, 2);
-    parent.notifyMove(world, Vector.zero, pointerDelta);
+    receiver.event.emit("move", world, Vector.zero, Vector.from(pointerDelta));
 
-    expect(mover.update({}, 1, currentTrans)).toStrictEqual({
+    expect(pointerMover.update(world, 1, currentTrans)).toStrictEqual({
       done: false,
       newTrans: currentTrans.translated(pointerDelta.mlt(moveScale)),
     });

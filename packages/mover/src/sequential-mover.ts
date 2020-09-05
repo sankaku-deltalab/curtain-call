@@ -1,14 +1,14 @@
 import { Matrix } from "trans-vector2d";
-import { Mover } from "./mover";
+import { Mover, World } from "@curtain-call/actor";
 
 /**
  * Use multiple mover sequentially.
  */
-export class SequentialMover<T> implements Mover<T> {
-  private movers: readonly Mover<T>[] = [];
+export class SequentialMover implements Mover {
+  private movers: readonly Mover[] = [];
   private currentMoverIndex = 0;
 
-  init(movers: Mover<T>[]): this {
+  init(movers: Mover[]): this {
     this.currentMoverIndex = 0;
     this.movers = movers;
     return this;
@@ -23,7 +23,7 @@ export class SequentialMover<T> implements Mover<T> {
    * @returns New transformation and movement was done.
    */
   update(
-    world: T,
+    world: World,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {

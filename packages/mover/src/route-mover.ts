@@ -1,7 +1,7 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { Mover } from "./mover";
+import { Mover, World } from "@curtain-call/actor";
 
-export interface MoveRoute<T> {
+export interface MoveRoute {
   /**
    * Get route position and route finished.
    *
@@ -10,7 +10,7 @@ export interface MoveRoute<T> {
    * @returns Route position and route finished.
    */
   getPosition(
-    world: T,
+    world: World,
     elapsedSec: number
   ): { done: boolean; position: Vector };
 }
@@ -18,8 +18,8 @@ export interface MoveRoute<T> {
 /**
  * Compute movement with route.
  */
-export class RouteMover<T> implements Mover<T> {
-  private route?: MoveRoute<T>;
+export class RouteMover implements Mover {
+  private route?: MoveRoute;
   private elapsedSec = 0;
   private isRunning = false;
   private prevPos = Vector.zero;
@@ -30,7 +30,7 @@ export class RouteMover<T> implements Mover<T> {
    * @param route
    * @returns this.
    */
-  start(route: MoveRoute<T>): this {
+  start(route: MoveRoute): this {
     this.route = route;
     this.elapsedSec = 0;
     this.isRunning = true;
@@ -53,7 +53,7 @@ export class RouteMover<T> implements Mover<T> {
    * @returns New transformation and movement was done.
    */
   update(
-    world: T,
+    world: World,
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {

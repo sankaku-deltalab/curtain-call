@@ -1,5 +1,6 @@
 import { Vector, VectorLike } from "trans-vector2d";
 import EasingFunction from "bezier-easing";
+import { World } from "@curtain-call/actor";
 import { MoveRoute } from "./route-mover";
 
 /**
@@ -8,7 +9,7 @@ import { MoveRoute } from "./route-mover";
  * @example
  * const route = new EasedRoute().init({ x: 0, y: -50 }, 1, EasedRoute.easeIn);
  */
-export class EasedRoute<T> implements MoveRoute<T> {
+export class EasedRoute implements MoveRoute {
   private destination = Vector.zero;
   private durationSec = 0;
   private easer: (p: number) => number = EasedRoute.linear;
@@ -41,12 +42,12 @@ export class EasedRoute<T> implements MoveRoute<T> {
   /**
    * Get route position and route finished.
    *
-   * @param _world World.
+   * @param world World.
    * @param elapsedSec Elapsed seconds.
    * @returns Route position and route finished.
    */
   getPosition(
-    _world: T,
+    world: World,
     elapsedSec: number
   ): { done: boolean; position: Vector } {
     const p = Math.max(0, Math.min(1, elapsedSec / this.durationSec));
