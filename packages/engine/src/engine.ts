@@ -79,7 +79,7 @@ export class Engine implements IEngine {
     if (this.worlds.has(world)) throw new Error("World was already added");
     this.worlds.add(world);
     this.app.stage.addChild(world.pixiHead);
-    this.pointerInput.addReceiver(world.getPointerInputReceiver());
+    this.pointerInput.addReceiver(world, world.getPointerInputReceiver());
 
     return this;
   }

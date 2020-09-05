@@ -1,11 +1,6 @@
 import { Vector } from "trans-vector2d";
-import { EventEmitter } from "eventemitter3";
 
 export class TapRecognizer {
-  public readonly event = new EventEmitter<{
-    tap: [ReadonlyArray<Vector>];
-  }>();
-
   private lastDownPos = Vector.zero;
   private lastUpPos = Vector.zero;
   private tapPosStack: Vector[] = [];
@@ -36,7 +31,10 @@ export class TapRecognizer {
     this.lastDownTime = sec;
   }
 
-  up(pos: Vector, sec: number): void {
+  up(
+    pos: Vector,
+    sec: number
+  ): { tapped: boolean; tapPositions: ReadonlyArray<Vector> } {
     const prevUpTime = this.lastUpTime;
     this.lastUpTime = sec;
     this.lastUpPos = pos;
@@ -55,9 +53,11 @@ export class TapRecognizer {
         : this.lastDownPos.distance(
             this.tapPosStack[this.tapPosStack.length - 1]
           ) <= this.tapDistance;
-    if (isTapTime && isTapPos && isMultiTapPos) {
+    const isTap = isTapTime && isTapPos && isMultiTapPos;
+    if (isTap) {
       this.tapPosStack.push(this.lastDownPos);
-      this.event.emit("tap", this.tapPosStack);
+      return { tapped: true, tapPositions: this.tapPosStack };
     }
+    return { tapped: false, tapPositions: [] };
   }
 }

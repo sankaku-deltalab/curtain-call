@@ -1,4 +1,5 @@
 import { PointerInputReceiver } from "./pointer-input-receiver";
+import { World } from "./world";
 
 /**
  * Receive pointer event from dom element.
@@ -20,10 +21,11 @@ export interface PointerInput {
    * Add child receiver.
    * When self catch pointer event, child receiver event will be emitted.
    *
+   * @param world World using receiver.
    * @param receiver Adding child receiver.
    * @returns this.
    */
-  addReceiver(receiver: PointerInputReceiver): this;
+  addReceiver(world: World, receiver: PointerInputReceiver): this;
 
   /**
    * Remove child receiver.

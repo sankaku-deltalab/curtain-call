@@ -1,5 +1,6 @@
-import { PointerInputReceiver } from "../src";
 import { Vector } from "trans-vector2d";
+import { worldMockClass } from "./mock";
+import { PointerInputReceiver } from "../src";
 
 describe("@curtain-call/input.PointerInputReceiver", () => {
   it("emit event when notified from parent", () => {
@@ -7,7 +8,7 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
     const ev = jest.fn();
     receiver.event.on("down", ev);
 
-    const world = "world";
+    const world = new worldMockClass();
     const downPos = new Vector(1, 2);
     receiver.notifyDown(world, downPos);
 
@@ -20,7 +21,7 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
     const ev = jest.fn();
     receiver.event.on("down", ev);
 
-    const world = "world";
+    const world = new worldMockClass();
     const downPos = new Vector(1, 2);
     receiver.notifyDown(world, downPos);
 
@@ -33,7 +34,7 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
 
     const parent = new PointerInputReceiver();
     parent.addChild(receiver);
-    const world = "world";
+    const world = new worldMockClass();
     const downPos = new Vector(1, 2);
     parent.notifyDown(world, downPos);
 
@@ -46,7 +47,7 @@ describe("@curtain-call/input.PointerInputReceiver", () => {
 
     const parent = new PointerInputReceiver();
     parent.addChild(receiver).removeChild(receiver);
-    const world = "world";
+    const world = new worldMockClass();
     const downPos = new Vector(1, 2);
     parent.notifyDown(world, downPos);
 

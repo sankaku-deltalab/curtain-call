@@ -1,6 +1,6 @@
-import { PointerInput } from "./pointer-input";
-import { PointerInputReceiver } from "./pointer-input-receiver";
 import { Vector } from "trans-vector2d";
+import { World, PointerInputReceiver } from "@curtain-call/actor";
+import { PointerInput } from "./pointer-input";
 
 /**
  * Connect pointer event to `PointerInputReceiver` from `PointerInput`.
@@ -16,16 +16,16 @@ import { Vector } from "trans-vector2d";
  *
  * connector.destroy();
  */
-export class PointerInputConnector<TWorld> {
+export class PointerInputConnector {
   private readonly downEvent: (pos: Vector) => void;
   private readonly upEvent: (pos: Vector) => void;
   private readonly moveEvent: (src: Vector, dest: Vector) => void;
   private readonly tapEvent: (positions: readonly Vector[]) => void;
 
   constructor(
-    world: TWorld,
+    world: World,
     input: PointerInput,
-    receiver: PointerInputReceiver<TWorld>
+    receiver: PointerInputReceiver
   ) {
     this.downEvent = (pos: Vector): void => receiver.notifyDown(world, pos);
     this.upEvent = (pos: Vector): void => receiver.notifyUp(world, pos);
