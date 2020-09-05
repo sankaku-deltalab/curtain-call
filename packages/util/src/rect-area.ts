@@ -1,8 +1,9 @@
 import { VectorLike, Vector } from "trans-vector2d";
 import { PositionInAreaStatus } from "@curtain-call/actor";
+import { RectArea as IRectArea } from "@curtain-call/world";
 import { Transformation } from "./transformation";
 
-export class RectArea {
+export class RectArea implements IRectArea {
   private nw = Vector.zero;
   private se = Vector.zero;
 
