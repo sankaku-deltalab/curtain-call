@@ -29,10 +29,12 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "eventemitter3": "^4.0.7",
+    "pixi.js": "^5.3.3",
     "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/util": "^0.10.0"
+    "@curtain-call/actor": "^0.10.0"
   }
 }

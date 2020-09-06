@@ -1,4 +1,4 @@
-import { Updatable } from "@curtain-call/util";
+import { Updatable, World } from "@curtain-call/actor";
 
 /**
  * Timer.
@@ -10,14 +10,14 @@ import { Updatable } from "@curtain-call/util";
  *
  * world.addUpdatable(timer);
  */
-export class Timer<T> implements Updatable<T> {
+export class Timer implements Updatable {
   private elapsedSec = 0;
   private active = true;
 
   constructor(
     private readonly loop: boolean,
     private readonly durationSec: number,
-    private readonly callback: (world: T, wastedSec: number) => void
+    private readonly callback: (world: World, wastedSec: number) => void
   ) {}
 
   /**
@@ -54,7 +54,7 @@ export class Timer<T> implements Updatable<T> {
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     this.elapsedSec += deltaSec;
     while (this.active && this.elapsedSec >= this.durationSec) {
       this.elapsedSec -= this.durationSec;
