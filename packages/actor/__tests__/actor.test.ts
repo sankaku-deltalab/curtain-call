@@ -1,105 +1,12 @@
-import { EventEmitter } from "eventemitter3";
 import { Matrix, Vector } from "trans-vector2d";
-import * as PIXI from "pixi.js";
+import { DisplayObject, Team } from "../src";
 import {
-  Actor,
-  Transformation,
-  FiniteResource,
-  Collision,
-  DisplayObject,
-  Team,
-  CollisionShape,
-  World,
-} from "../src";
-import { moverMock } from "./mock";
-
-const transMockClass = jest.fn<Transformation, []>(() => ({
-  setLocal: jest.fn(),
-  getLocal: jest.fn().mockReturnValue(Matrix.identity),
-  getGlobal: jest.fn().mockReturnValue(Matrix.identity),
-  calcRelative: jest.fn(),
-  attachChild: jest.fn(),
-  detachChild: jest.fn(),
-}));
-
-const healthMockClass = jest.fn<FiniteResource, []>(() => ({
-  init: jest.fn().mockReturnThis(),
-  value: jest.fn(),
-  max: jest.fn(),
-  add: jest.fn(),
-  sub: jest.fn(),
-}));
-
-const collisionMockClass = jest.fn<Collision, [Transformation]>(
-  (trans: Transformation) => ({
-    trans,
-    addShape: jest.fn(),
-    removeShape: jest.fn(),
-    getBox2Ds: jest.fn(),
-    setIsHugeNumber: jest.fn(),
-    isHugeNumber: jest.fn(),
-    getGroup: jest.fn(),
-    setGroup: jest.fn(),
-    canCollideWith: jest.fn(),
-    setEnable: jest.fn(),
-    isEnabled: jest.fn(),
-  })
-);
-
-const createActor = (): {
-  actor: Actor;
-  trans: Transformation;
-  health: FiniteResource;
-  collisionTrans: Transformation;
-  collision: Collision;
-} => {
-  const trans = new transMockClass();
-  const health = new healthMockClass();
-  const collisionTrans = new transMockClass();
-  const collision = new collisionMockClass(collisionTrans);
-  const actor = new Actor(trans, health, collision);
-  return {
-    actor,
-    trans,
-    health,
-    collisionTrans,
-    collision,
-  };
-};
-
-const collisionShapeMock = jest.fn<CollisionShape, []>(() => ({
-  trans: new transMockClass(),
-  getBox2Ds: jest.fn(),
-}));
-
-const worldMock = jest.fn<World, []>(() => ({
-  event: new EventEmitter<{
-    updated: [number];
-  }>(),
-  pixiHead: new PIXI.Container(),
-  pixiTail: new PIXI.Container(),
-  setDrawAreaUpdater: jest.fn(),
-  update: jest.fn(),
-  addActor: jest.fn(),
-  removeActor: jest.fn(),
-  hasActor: jest.fn(),
-  iterateActors: jest.fn(),
-  addUpdatable: jest.fn(),
-  removeUpdatable: jest.fn(),
-  addPointerInputReceiver: jest.fn(),
-  removePointerInputReceiver: jest.fn(),
-  getPointerInputReceiver: jest.fn(),
-  canvasPosToGamePos: jest.fn(),
-  gamePosToCanvasPos: jest.fn(),
-  setCoreArea: jest.fn(),
-  calcPositionStatusWithCoreArea: jest.fn(),
-}));
-
-const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
-  pixiObj: new PIXI.Container(),
-  trans: new transMockClass(),
-  notifyPreDraw: jest.fn(),
-}));
+  createActor,
+  moverMockClass,
+  worldMock,
+  collisionShapeMock,
+  displayObjectMock,
+} from "./mocks";
 
 describe("@curtain-call/actor.Actor", () => {
   describe("has transformation", () => {
@@ -316,7 +223,7 @@ describe("@curtain-call/actor.Actor", () => {
   describe("can use Mover", () => {
     it("can add Mover and use it when updated", () => {
       const movementDelta = new Vector(1, 2);
-      const mover = moverMock(false, movementDelta);
+      const mover = new moverMockClass(false, movementDelta);
       const { actor, trans } = createActor();
       trans.getLocal = jest.fn().mockReturnValue(Matrix.identity);
       const r = actor.addMover(mover);
@@ -334,7 +241,7 @@ describe("@curtain-call/actor.Actor", () => {
 
     it("can remove Mover", () => {
       const movementDelta = new Vector(1, 2);
-      const mover = moverMock(false, movementDelta);
+      const mover = new moverMockClass(false, movementDelta);
       const actor = createActor().actor.addMover(mover).removeMover(mover);
 
       const world = new worldMock();

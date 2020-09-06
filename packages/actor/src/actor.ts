@@ -1,4 +1,3 @@
-import { EventEmitter } from "eventemitter3";
 import { Matrix, VectorLike } from "trans-vector2d";
 import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
@@ -12,6 +11,7 @@ import {
   ActorController,
   Transformation,
   Updatable,
+  EventEmitter as IEventEmitter,
 } from "./interface";
 
 export { diContainer };
@@ -33,27 +33,29 @@ export enum ActorRole {
   misc = "misc",
 }
 
+type ActorEvent = IEventEmitter<{
+  // world
+  addedToWorld: [World];
+  removedFromWorld: [World];
+  updated: [World, number];
+  // collision
+  overlapped: [World, Set<Actor>];
+  // health
+  takenDamage: [World, number, Actor, DamageType];
+  dead: [World, Actor, DamageType];
+  beHealed: [World, number];
+  // damage dealer
+  dealDamage: [World, number, Actor, DamageType];
+  killed: [World, Actor, DamageType];
+}>;
+
 /**
  * Actor is individual in world.
  */
 @autoInjectable()
 export class Actor implements Updatable {
   /** Event. */
-  public readonly event = new EventEmitter<{
-    // world
-    addedToWorld: [World];
-    removedFromWorld: [World];
-    updated: [World, number];
-    // collision
-    overlapped: [World, Set<Actor>];
-    // health
-    takenDamage: [World, number, Actor, DamageType];
-    dead: [World, Actor, DamageType];
-    beHealed: [World, number];
-    // damage dealer
-    dealDamage: [World, number, Actor, DamageType];
-    killed: [World, Actor, DamageType];
-  }>();
+  public readonly event: ActorEvent;
 
   private readonly trans: Transformation;
   private readonly healthComponent: FiniteResource;
@@ -69,12 +71,14 @@ export class Actor implements Updatable {
   private shouldRemoveSelf = false;
 
   constructor(
+    @inject("EventEmitter") event?: ActorEvent,
     @inject("Transformation") trans?: Transformation,
     @inject("FiniteResource") health?: FiniteResource,
     @inject("Collision") collision?: Collision
   ) {
-    if (!(trans && health && collision))
+    if (!(event && trans && health && collision))
       throw new Error("DI object is not exist");
+    this.event = event;
     this.trans = trans;
     this.healthComponent = health.init(0, 0);
     this.collision = collision;
