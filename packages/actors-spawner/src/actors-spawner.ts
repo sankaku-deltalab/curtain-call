@@ -1,8 +1,36 @@
-import { EventEmitter } from "eventemitter3";
 import { Matrix } from "trans-vector2d";
-import { Actor } from "@curtain-call/actor";
-import { World } from "@curtain-call/world";
-import { Transformation } from "@curtain-call/util";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
+import {
+  Actor,
+  World,
+  Transformation,
+  EventEmitter as IEventEmitter,
+  DamageType,
+  FiniteResource,
+  Collision,
+} from "@curtain-call/actor";
+import EventEmitter from "eventemitter3";
+
+export { diContainer };
+
+type ActorsSpawnerEvent = IEventEmitter<{
+  // world
+  addedToWorld: [World];
+  removedFromWorld: [World];
+  updated: [World, number];
+  // collision
+  overlapped: [World, Set<Actor>];
+  // health
+  takenDamage: [World, number, Actor, DamageType];
+  dead: [World, Actor, DamageType];
+  beHealed: [World, number];
+  // damage dealer
+  dealDamage: [World, number, Actor, DamageType];
+  killed: [World, Actor, DamageType];
+  // spawner
+  allActorsWereDead: [World, readonly Actor[]];
+  allActorsWereRemoved: [World, readonly Actor[]];
+}>;
 
 /**
  * ActorsSpawner spawn multiple actors.
@@ -20,48 +48,51 @@ import { Transformation } from "@curtain-call/util";
  *   ]);
  *
  * const world = new World();
- * world.addActor(world);
+ * world.addActor(spawner);
  * world.update(0.125);
  */
-export class ActorsSpawner<TWorld extends World = World> {
+@autoInjectable()
+export class ActorsSpawner extends Actor {
   /** Events. */
-  public readonly event = new EventEmitter<{
-    allActorsWereDead: [readonly Actor<TWorld>[]];
-    allActorsWereRemoved: [readonly Actor<TWorld>[]];
+  public readonly event: ActorsSpawnerEvent = new EventEmitter<{
+    // world
+    addedToWorld: [World];
+    removedFromWorld: [World];
+    updated: [World, number];
+    // collision
+    overlapped: [World, Set<Actor>];
+    // health
+    takenDamage: [World, number, Actor, DamageType];
+    dead: [World, Actor, DamageType];
+    beHealed: [World, number];
+    // damage dealer
+    dealDamage: [World, number, Actor, DamageType];
+    killed: [World, Actor, DamageType];
+    // spawner
+    allActorsWereDead: [World, readonly Actor[]];
+    allActorsWereRemoved: [World, readonly Actor[]];
   }>();
 
   private spawningFunction: (
     spawnedCount: number,
     spawnNum: number
-  ) => Actor<TWorld> = (): Actor<TWorld> => new Actor();
+  ) => Actor = (): Actor => new Actor();
   private schedule: readonly [Matrix, number][] = [];
   private isActive = false;
   private spawnedCount = 0;
   private elapsedSec = 0;
-  private possessingActor?: Actor<TWorld>;
-  private readonly deadActors = new Set<Actor<TWorld>>();
-  private readonly removedActors = new Set<Actor<TWorld>>();
+  private readonly deadActors = new Set<Actor>();
+  private readonly removedActors = new Set<Actor>();
 
-  constructor(private readonly trans: Transformation = new Transformation()) {}
-
-  /**
-   * Possess to Actor.
-   * This would act with given actor.
-   *
-   * @param actor Base actor.
-   * @returns this.
-   */
-  possessTo(actor: Actor<TWorld>): this {
-    if (this.possessingActor) throw new Error("Do not possess twice");
-    this.possessingActor = actor;
-    actor.attachTransformation(this.trans);
-    actor.event.on("updated", (world, deltaSec) =>
-      this.update(world, deltaSec)
-    );
-    actor.event.on("removedFromWorld", () => {
-      this.destroy();
-    });
-    return this;
+  constructor(
+    @inject("EventEmitter") event?: ActorsSpawnerEvent,
+    @inject("Transformation") trans?: Transformation,
+    @inject("FiniteResource") health?: FiniteResource,
+    @inject("Collision") collision?: Collision
+  ) {
+    super(event, trans, health, collision);
+    if (!event) throw new Error("DI failed");
+    this.event = event;
   }
 
   /**
@@ -70,7 +101,7 @@ export class ActorsSpawner<TWorld extends World = World> {
    * @param func Actor spawning function.
    * @returns this.
    */
-  setSpawningFunction(func: () => Actor<TWorld>): this {
+  setSpawningFunction(func: () => Actor): this {
     this.spawningFunction = func;
     return this;
   }
@@ -91,7 +122,7 @@ export class ActorsSpawner<TWorld extends World = World> {
    *
    * @param world World.
    */
-  start(world: TWorld): this {
+  start(world: World): this {
     this.isActive = true;
     this.progress(world, 0);
     return this;
@@ -103,12 +134,11 @@ export class ActorsSpawner<TWorld extends World = World> {
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: TWorld, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     if (this.isActive) this.progress(world, deltaSec);
   }
 
-  private progress(world: TWorld, deltaSec: number): void {
-    if (!this.possessingActor) throw new Error();
+  private progress(world: World, deltaSec: number): void {
     this.elapsedSec += deltaSec;
     while (
       this.spawnedCount < this.schedule.length &&
@@ -121,30 +151,30 @@ export class ActorsSpawner<TWorld extends World = World> {
     }
   }
 
-  private spawnActor(spawnedCount: number, spawnNum: number): Actor<TWorld> {
+  private spawnActor(spawnedCount: number, spawnNum: number): Actor {
     const actor = this.spawningFunction(spawnedCount, spawnNum);
-    actor.event.on("dead", () => {
-      this.deadActors.delete(actor);
+    actor.event.on("dead", (world) => {
       this.deadActors.add(actor);
       if (this.deadActors.size === this.schedule.length) {
-        this.event.emit("allActorsWereDead", Array.from(this.deadActors));
+        this.event.emit(
+          "allActorsWereDead",
+          world,
+          Array.from(this.deadActors)
+        );
       }
     });
 
-    actor.event.once("removedFromWorld", () => {
-      this.removedActors.delete(actor);
+    actor.event.once("removedFromWorld", (world) => {
       this.removedActors.add(actor);
       if (this.removedActors.size === this.schedule.length) {
-        this.event.emit("allActorsWereRemoved", Array.from(this.removedActors));
-        this.destroy();
+        this.event.emit(
+          "allActorsWereRemoved",
+          world,
+          Array.from(this.removedActors)
+        );
+        this.reserveRemovingSelfFromWorld();
       }
     });
     return actor;
-  }
-
-  private destroy(): void {
-    this.isActive = false;
-    this.event.removeAllListeners();
-    if (this.possessingActor) this.possessingActor.removeSelfFromWorld(true);
   }
 }
