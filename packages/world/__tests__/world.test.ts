@@ -16,9 +16,11 @@ import {
   healthMockClass,
   collisionMockClass,
 } from "./mock";
+import EventEmitter from "eventemitter3";
 
 describe("@curtain-call/world.World", () => {
   beforeAll(() => {
+    actorDiContainer.register("EventEmitter", EventEmitter);
     actorDiContainer.register("Transformation", transMockClass);
     actorDiContainer.register("FiniteResource", healthMockClass);
     actorDiContainer.register("Collision", collisionMockClass);
