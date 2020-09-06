@@ -18,10 +18,10 @@ describe("@curtain-call/level.NullLevel", () => {
 
     expect(level.isActive()).toBe(false);
 
-    level.activate({});
+    level.activate();
     expect(level.isActive()).toBe(true);
 
-    level.deactivate({});
+    level.deactivate();
     expect(level.isActive()).toBe(false);
   });
 });

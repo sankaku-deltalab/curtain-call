@@ -1,10 +1,10 @@
 import { Asset } from "@curtain-call/asset";
-import { Updatable } from "@curtain-call/util";
+import { Updatable, World } from "@curtain-call/actor";
 
 /**
  * Level manage asset loading.
  */
-export interface Level<T> extends Updatable<T> {
+export interface Level extends Updatable {
   /**
    * Load assets.
    *
@@ -31,14 +31,14 @@ export interface Level<T> extends Updatable<T> {
    *
    * @param world World.
    */
-  activate(world: T): void;
+  activate(world: World): void;
 
   /**
    * Deactivate level.
    *
    * @param world
    */
-  deactivate(world: T): void;
+  deactivate(world: World): void;
 
   /**
    * Level is activated.
@@ -53,7 +53,7 @@ export interface Level<T> extends Updatable<T> {
    * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(world: T): boolean;
+  shouldRemoveSelfFromWorld(world: World): boolean;
 
   /**
    * Update level.
@@ -61,5 +61,5 @@ export interface Level<T> extends Updatable<T> {
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void;
+  update(world: World, deltaSec: number): void;
 }

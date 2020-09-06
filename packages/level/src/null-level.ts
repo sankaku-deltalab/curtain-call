@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Asset } from "@curtain-call/asset";
 import { Level } from "./level";
 
-export class NullLevel<T> implements Level<T> {
+export class NullLevel implements Level {
   private isLoadedInternal = false;
   private isActiveInternal = false;
 
@@ -35,19 +34,15 @@ export class NullLevel<T> implements Level<T> {
 
   /**
    * Activate level.
-   *
-   * @param _world World.
    */
-  activate(_world: T): void {
+  activate(): void {
     this.isActiveInternal = true;
   }
 
   /**
    * Deactivate level.
-   *
-   * @param _world
    */
-  deactivate(_world: T): void {
+  deactivate(): void {
     this.isActiveInternal = false;
   }
 
@@ -71,9 +66,7 @@ export class NullLevel<T> implements Level<T> {
 
   /**
    * Update level.
-   *
-   * @param _world World.
-   * @param _deltaSec Delta seconds.
    */
-  update(_world: T, _deltaSec: number): void {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  update(): void {}
 }

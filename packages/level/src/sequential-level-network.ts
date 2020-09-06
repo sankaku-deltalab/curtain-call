@@ -9,12 +9,12 @@ import { LevelNetwork } from "./networked-levels";
  * @param levels
  * @returns Network.
  */
-export function sequentialLevelNetwork<T>(
+export function sequentialLevelNetwork(
   activateDistance: number,
   loadDistance: number,
-  levels: ReadonlyArray<Level<T>>
-): LevelNetwork<T> {
-  const edges: [Level<T>, Level<T>][] = [];
+  levels: ReadonlyArray<Level>
+): LevelNetwork {
+  const edges: [Level, Level][] = [];
   levels.reduce((prev, curr) => {
     edges.push([prev, curr]);
     return curr;

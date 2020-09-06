@@ -1,10 +1,10 @@
 import { sequentialLevelNetwork } from "../src";
-import { levelMock } from "./mocks";
+import { levelMockClass } from "./mocks";
 
 describe("@curtain-call/level.sequentialLevelNetwork", () => {
   it("create network", async () => {
     const levelNum = 3;
-    const levels = new Array(levelNum).fill(0).map(() => levelMock());
+    const levels = new Array(levelNum).fill(0).map(() => new levelMockClass());
 
     const activateDistance = 0;
     const loadDistance = 1;

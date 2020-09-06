@@ -1,16 +1,16 @@
 import { NetworkedLevels, Level } from "../src";
-import { levelMock, assetMock } from "./mocks";
+import { levelMockClass, assetMock, worldMockClass } from "./mocks";
 
-const createNetworkedLevels = <T>(
+const createNetworkedLevels = (
   activateDistance = 0,
   loadDistance = 1,
   levelNum = 10
 ): {
-  networkedLevel: NetworkedLevels<T>;
-  levels: Level<T>[];
+  networkedLevel: NetworkedLevels;
+  levels: Level[];
 } => {
-  const levels = new Array(levelNum).fill(0).map(() => levelMock<T>());
-  const edges: [Level<T>, Level<T>][] = [];
+  const levels = new Array(levelNum).fill(0).map(() => new levelMockClass());
+  const edges: [Level, Level][] = [];
   levels.reduce((prev, curr) => {
     edges.push([prev, curr]);
     return curr;
@@ -53,7 +53,7 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can activate", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(1, 2, 4);
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     await networkedLevel.load();
     networkedLevel.activate(world);
 
@@ -66,7 +66,7 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can deactivate", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(1, 2, 4);
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     await networkedLevel.load();
     networkedLevel.activate(world);
     networkedLevel.deactivate(world);
@@ -80,7 +80,7 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can move level", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(0, 1, 4);
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     await networkedLevel.load();
     networkedLevel.activate(world);
 
@@ -108,7 +108,7 @@ describe("@curtain-call/level.NetworkedLevel", () => {
   it("can update with children", async () => {
     const { networkedLevel, levels } = createNetworkedLevels(0, 1, 4);
 
-    const world = jest.fn();
+    const world = new worldMockClass();
     const deltaSec = 0.125;
     networkedLevel.update(world, deltaSec);
 

@@ -1,11 +1,12 @@
 import { Graph, alg, Path } from "graphlib";
+import { World } from "@curtain-call/actor";
 import { Asset } from "@curtain-call/asset";
 import { Level } from "./level";
 
-export interface LevelNetwork<T> {
-  readonly initialLevel: Level<T>;
-  readonly levels: ReadonlyArray<Level<T>>;
-  readonly edges: ReadonlyArray<readonly [Level<T>, Level<T>]>;
+export interface LevelNetwork {
+  readonly initialLevel: Level;
+  readonly levels: ReadonlyArray<Level>;
+  readonly edges: ReadonlyArray<readonly [Level, Level]>;
   readonly activateDistance: number;
   readonly loadDistance: number;
 }
@@ -37,17 +38,17 @@ export interface LevelNetwork<T> {
  * level.moveTo(level2)
  * // ...
  */
-export class NetworkedLevels<T> implements Level<T> {
+export class NetworkedLevels implements Level {
   private readonly graph: Graph;
-  private readonly levelNames: ReadonlyMap<Level<T>, string>;
+  private readonly levelNames: ReadonlyMap<Level, string>;
   private readonly distanceInfo: { [source: string]: { [node: string]: Path } };
-  private readonly levelSet: ReadonlySet<Level<T>>;
-  private currentLevel: Level<T>;
+  private readonly levelSet: ReadonlySet<Level>;
+  private currentLevel: Level;
 
   /**
    * @param network Level network.
    */
-  constructor(private readonly network: LevelNetwork<T>) {
+  constructor(private readonly network: LevelNetwork) {
     if (network.activateDistance < 0) throw new Error();
     if (network.loadDistance < 1) throw new Error();
     if (network.activateDistance > network.loadDistance) throw new Error();
@@ -96,7 +97,7 @@ export class NetworkedLevels<T> implements Level<T> {
    *
    * @param world World.
    */
-  activate(world: T): void {
+  activate(world: World): void {
     this.updateActivatingFor(world, this.currentLevel);
   }
 
@@ -105,7 +106,7 @@ export class NetworkedLevels<T> implements Level<T> {
    *
    * @param world
    */
-  deactivate(world: T): void {
+  deactivate(world: World): void {
     this.network.levels.forEach((level) => level.deactivate(world));
   }
 
@@ -127,7 +128,7 @@ export class NetworkedLevels<T> implements Level<T> {
    * @param _world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(_world: T): boolean {
+  shouldRemoveSelfFromWorld(_world: World): boolean {
     return false;
   }
 
@@ -137,7 +138,7 @@ export class NetworkedLevels<T> implements Level<T> {
    * @param world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     this.network.levels.forEach((level) => level.update(world, deltaSec));
   }
 
@@ -147,7 +148,7 @@ export class NetworkedLevels<T> implements Level<T> {
    * @param level Destination.
    * @returns Can move to level.
    */
-  canMoveTo(level: Level<T>): boolean {
+  canMoveTo(level: Level): boolean {
     if (!this.levelSet.has(level)) throw new Error();
     return level.isLoaded() && this.distance(this.currentLevel, level) === 1;
   }
@@ -158,26 +159,26 @@ export class NetworkedLevels<T> implements Level<T> {
    * @param world World.
    * @param level Destination.
    */
-  moveTo(world: T, level: Level<T>): void {
+  moveTo(world: World, level: Level): void {
     if (!this.levelSet.has(level)) throw new Error();
     this.currentLevel = level;
     this.updateLoadingFor(level);
     this.updateActivatingFor(world, level);
   }
 
-  private getNearLevels(src: Level<T>, distance: number): Level<T>[] {
+  private getNearLevels(src: Level, distance: number): Level[] {
     return this.network.levels.filter(
       (dest) => this.distance(src, dest) <= distance
     );
   }
 
-  private getFarLevels(src: Level<T>, distance: number): Level<T>[] {
+  private getFarLevels(src: Level, distance: number): Level[] {
     return this.network.levels.filter(
       (dest) => this.distance(src, dest) > distance
     );
   }
 
-  private distance(src: Level<T>, dest: Level<T>): number {
+  private distance(src: Level, dest: Level): number {
     const srcName = this.levelNames.get(src);
     const destName = this.levelNames.get(dest);
     if (!srcName || !destName) throw new Error();
@@ -185,7 +186,7 @@ export class NetworkedLevels<T> implements Level<T> {
     return this.distanceInfo[srcName][destName].distance;
   }
 
-  private async updateLoadingFor(level: Level<T>): Promise<void> {
+  private async updateLoadingFor(level: Level): Promise<void> {
     const distance = this.network.loadDistance;
     this.getFarLevels(level, distance).forEach((lv) => lv.unload());
     const loadings = this.getNearLevels(level, distance).map((lv) => lv.load());
@@ -193,17 +194,17 @@ export class NetworkedLevels<T> implements Level<T> {
     await Promise.all(loadings);
   }
 
-  private updateActivatingFor(world: T, level: Level<T>): void {
+  private updateActivatingFor(world: World, level: Level): void {
     const distance = this.network.activateDistance;
     this.getFarLevels(level, distance).forEach((lv) => lv.deactivate(world));
     this.getNearLevels(level, distance).map((lv) => lv.activate(world));
   }
 
   private createGraph(
-    network: LevelNetwork<T>
+    network: LevelNetwork
   ): {
     graph: Graph;
-    levelNames: ReadonlyMap<Level<T>, string>;
+    levelNames: ReadonlyMap<Level, string>;
     distanceInfo: { [source: string]: { [node: string]: Path } };
   } {
     const graph = new Graph();
