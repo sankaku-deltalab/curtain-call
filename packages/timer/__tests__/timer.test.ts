@@ -9,6 +9,7 @@ const worldMockClass = jest.fn<World, []>(() => ({
   }>(),
   pixiHead: new PIXI.Container(),
   pixiTail: new PIXI.Container(),
+  getCamera: jest.fn(),
   setDrawAreaUpdater: jest.fn(),
   update: jest.fn(),
   addActor: jest.fn(),

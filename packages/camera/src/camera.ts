@@ -1,8 +1,12 @@
 import * as PIXI from "pixi.js";
 import { VectorLike, Matrix, Vector } from "trans-vector2d";
 import { inject, autoInjectable, container as diContainer } from "tsyringe";
-import { Camera as ICamera, RectArea } from "@curtain-call/world";
-import { PositionInAreaStatus, Transformation } from "@curtain-call/actor";
+import { RectArea } from "@curtain-call/world";
+import {
+  Camera as ICamera,
+  PositionInAreaStatus,
+  Transformation,
+} from "@curtain-call/actor";
 
 export { diContainer };
 

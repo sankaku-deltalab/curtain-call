@@ -92,6 +92,7 @@ export const worldMockClass = jest.fn<World, []>(() => ({
   }>(),
   pixiHead: containerMock(),
   pixiTail: containerMock(),
+  getCamera: jest.fn(),
   setDrawAreaUpdater: jest.fn(),
   update: jest.fn(),
   addActor: jest.fn(),
