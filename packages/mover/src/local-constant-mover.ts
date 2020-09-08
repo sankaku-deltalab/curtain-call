@@ -1,11 +1,12 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { Mover, World } from "@curtain-call/actor";
+import { World } from "@curtain-call/actor";
+import { LocalConstantMover as ILocalConstantMover } from "@curtain-call/weapon";
 
-export class RelativeMover implements Mover {
-  private delta = Matrix.identity;
+export class LocalConstantMover implements ILocalConstantMover {
+  private velocity = Matrix.identity;
 
-  setDelta(delta: Matrix): this {
-    this.delta = delta;
+  setVelocity(velocity: Matrix): this {
+    this.velocity = velocity;
     return this;
   }
 
@@ -22,7 +23,7 @@ export class RelativeMover implements Mover {
     deltaSec: number,
     currentTrans: Matrix
   ): { done: boolean; newTrans: Matrix } {
-    const { translation, rotation, scale } = this.delta.decompose();
+    const { translation, rotation, scale } = this.velocity.decompose();
     const delta = Matrix.from({
       translation: translation.mlt(deltaSec),
       rotation: rotation * deltaSec,

@@ -36,6 +36,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/actor": "^0.10.0",
+    "@curtain-call/weapon": "^0.10.0",
     "bezier-easing": "^2.1.0",
     "reflect-metadata": "^0.1.13",
     "trans-vector2d": "^2.0.0",
