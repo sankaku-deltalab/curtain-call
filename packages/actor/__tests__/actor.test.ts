@@ -111,7 +111,8 @@ describe("@curtain-call/actor.Actor", () => {
     it("can express removing self from world", () => {
       const actor = createActor().actor.reserveRemovingSelfFromWorld();
 
-      expect(actor.shouldRemoveSelfFromWorld()).toBe(true);
+      const world = new worldMock();
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(true);
     });
 
     it("can revoke removing self expressing", () => {
@@ -119,7 +120,8 @@ describe("@curtain-call/actor.Actor", () => {
         .actor.reserveRemovingSelfFromWorld()
         .cancelRemovingSelfFromWorld();
 
-      expect(actor.shouldRemoveSelfFromWorld()).toBe(false);
+      const world = new worldMock();
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
     });
 
     it("emit updated event", () => {
@@ -136,16 +138,16 @@ describe("@curtain-call/actor.Actor", () => {
 
     it("can set life time", () => {
       const actor = createActor().actor;
+      const world = new worldMock();
 
       const lifeTime = 123;
       actor.setLifeTime(lifeTime);
-      expect(actor.shouldRemoveSelfFromWorld()).toBe(false);
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(false);
 
-      const world = new worldMock();
       actor.update(world, lifeTime / 2);
       actor.update(world, lifeTime / 2);
 
-      expect(actor.shouldRemoveSelfFromWorld()).toBe(true);
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(true);
     });
   });
 

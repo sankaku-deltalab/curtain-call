@@ -33,10 +33,11 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/health": "^0.10.0",
-    "@curtain-call/util": "^0.10.0",
+    "@curtain-call/actor": "^0.10.0",
     "guntree": "^0.9.1",
     "pixi.js": "^5.3.3",
-    "trans-vector2d": "^2.0.0"
+    "reflect-metadata": "^0.1.13",
+    "trans-vector2d": "^2.0.0",
+    "tsyringe": "^4.3.0"
   }
 }

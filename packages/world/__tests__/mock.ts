@@ -10,14 +10,9 @@ import {
   CollisionShape,
   FiniteResource,
   Collision,
-} from "@curtain-call/actor";
-import {
-  World,
   Camera,
-  DisplayObjectManager,
-  RectArea,
-  OverlapChecker,
-} from "../src";
+} from "@curtain-call/actor";
+import { World, DisplayObjectManager, RectArea, OverlapChecker } from "../src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();

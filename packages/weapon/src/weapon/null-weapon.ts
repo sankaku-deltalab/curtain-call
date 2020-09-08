@@ -1,16 +1,13 @@
-import { BasicDamageDealer } from "@curtain-call/health";
 import { Weapon } from "./weapon";
 
 /**
  * Weapon do nothing.
  */
-export class NullWeapon<T, A> implements Weapon<T, A> {
-  constructor(public readonly damageDealer = new BasicDamageDealer<T, A>()) {}
-
+export class NullWeapon extends Weapon {
   /**
    * Start firing.
    */
-  start(): void {
+  startFire(): void {
     // do nothing
   }
 
@@ -26,14 +23,14 @@ export class NullWeapon<T, A> implements Weapon<T, A> {
   /**
    * Request stop firing.
    */
-  stop(): void {
+  stopFire(): void {
     // do nothing
   }
 
   /**
    * Stop firing process immediately.
    */
-  forceStop(): void {
+  forceStopFire(): void {
     // do nothing
   }
 

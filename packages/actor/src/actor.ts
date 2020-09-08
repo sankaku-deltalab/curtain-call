@@ -33,7 +33,7 @@ export enum ActorRole {
   misc = "misc",
 }
 
-type ActorEvent = IEventEmitter<{
+export type ActorEvent = IEventEmitter<{
   // world
   addedToWorld: [World];
   removedFromWorld: [World];
@@ -284,10 +284,10 @@ export class Actor implements Updatable {
   /**
    * If remove self from world, this function must be true.
    *
-   * @param world World.
+   * @param _world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean {
+  shouldRemoveSelfFromWorld(_world: World): boolean {
     const lifeTimeIsOver =
       this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
     return this.shouldRemoveSelf || lifeTimeIsOver;

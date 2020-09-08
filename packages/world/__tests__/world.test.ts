@@ -34,8 +34,8 @@ describe("@curtain-call/world.World", () => {
     const gameHeight = 400;
     const gameWidth = 300;
     const gameUnitPerPixel = 1 / 2;
-    const world = createWorld().world;
-    jest.spyOn(world.camera, "setCameraResolution");
+    const { world, camera } = createWorld();
+    jest.spyOn(camera, "setCameraResolution");
 
     world.setDrawAreaUpdater((canvasSize) => ({
       drawCenterInCanvas: canvasSize.div(2),
@@ -57,7 +57,7 @@ describe("@curtain-call/world.World", () => {
     const canvasPos = obj.getGlobalPosition();
     expect(canvasPos.x).toBeCloseTo(300 + 2 / gameUnitPerPixel);
     expect(canvasPos.y).toBeCloseTo(500 + 3 / gameUnitPerPixel);
-    expect(world.camera.setCameraResolution).toBeCalledWith({
+    expect(camera.setCameraResolution).toBeCalledWith({
       x: gameWidth,
       y: gameHeight,
     });
@@ -272,12 +272,12 @@ describe("@curtain-call/world.World", () => {
   });
 
   it("update camera", () => {
-    const { world } = createWorld();
-    jest.spyOn(world.camera, "update");
+    const { world, camera } = createWorld();
+    jest.spyOn(camera, "update");
 
     world.update(new engineMockClass(), 1);
 
-    expect(world.camera.update).toBeCalled();
+    expect(camera.update).toBeCalled();
   });
 
   it("can update added actors", () => {

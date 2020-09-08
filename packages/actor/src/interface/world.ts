@@ -1,9 +1,10 @@
-import EventEmitter from "eventemitter3";
 import { VectorLike, Vector } from "trans-vector2d";
 import * as PIXI from "pixi.js";
 import { Engine } from "./engine";
+import { Camera } from "./camera";
 import { Actor } from "../actor";
 import { Updatable } from "./updatable";
+import { EventEmitter } from "./event-emitter";
 import { PointerInputReceiver } from "./pointer-input-receiver";
 
 export enum PositionInAreaStatus {
@@ -51,6 +52,11 @@ export interface World {
       gameUnitPerPixel: number;
     }
   ): this;
+
+  /**
+   * Get world camera.
+   */
+  getCamera(): Camera;
 
   /**
    * Update this and contained Updatable object.

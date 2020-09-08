@@ -1,5 +1,6 @@
 import { VectorLike } from "trans-vector2d";
-import { PositionInAreaStatus, Transformation } from "@curtain-call/actor";
+import { Transformation } from "./transformation";
+import { PositionInAreaStatus } from "./world";
 
 export interface Camera {
   readonly trans: Transformation;

@@ -1,17 +1,16 @@
-import EventEmitter from "eventemitter3";
 import * as gt from "guntree";
-import { Transformation } from "@curtain-call/util";
-import { BasicDamageDealer } from "@curtain-call/health";
+import { Transformation, World } from "@curtain-call/actor";
 import { Matrix } from "trans-vector2d";
-import { BulletGenerator } from "./bullet-generator";
-import { TargetProvider, NonTargetProvider } from "./target-provider";
+import { BulletGenerator } from "../bullet-generator";
+import { TargetProvider } from "../target-provider";
+import { NullTargetProvider } from "../target-provider/null-target-provider";
 import { Weapon } from "./weapon";
 
-class GuntreeOwner<T> implements gt.Owner {
+class GuntreeOwner implements gt.Owner {
   constructor(
-    private readonly world: T,
+    private readonly world: World,
     private readonly muzzles: Map<string, Transformation>,
-    private readonly targetProvider: TargetProvider<T>
+    private readonly targetProvider: TargetProvider
   ) {}
 
   getMuzzleTransform(name: string): Matrix {
@@ -23,47 +22,32 @@ class GuntreeOwner<T> implements gt.Owner {
 
   getEnemyTransform(name: string): Matrix {
     if (!this.world || !this.targetProvider) throw new Error();
-    const targetPos = this.targetProvider.getTargetPosition(this.world);
-    if (!targetPos)
-      return this.getMuzzleTransform(name).globalize(
-        Matrix.translation({ x: 1, y: 0 })
-      );
+    const targetTrans = this.targetProvider
+      .getTarget(this.world)
+      ?.getTransformation()
+      .getGlobal();
+    if (targetTrans) return targetTrans;
 
-    return Matrix.from({ translation: targetPos });
+    return this.getMuzzleTransform(name).globalize(
+      Matrix.translation({ x: 1, y: 0 })
+    );
   }
 }
 
 /**
  * Fire bullets with Guntree.
  */
-export class GuntreeWeapon<T, A> implements Weapon<T, A> {
-  /** Events. */
-  public readonly event = new EventEmitter<{
-    fired: [T, A];
-    finished: [T];
-  }>();
-
+export class GuntreeWeapon extends Weapon {
   private readonly player = new gt.Player();
-  private world?: T;
+  private world?: World;
   private guntree: gt.Gun = gt.nop();
   private muzzles = new Map<string, Transformation>();
-  private bulletGenerator?: BulletGenerator<T, A>;
-  private targetProvider: TargetProvider<T> = new NonTargetProvider<T>();
+  private bulletGenerator?: BulletGenerator;
+  private targetProvider: TargetProvider = new NullTargetProvider();
 
-  /**
-   * @param damageDealer Damage dealer would be emitted when bullet dealt damage.
-   */
-  constructor(public readonly damageDealer = new BasicDamageDealer<T, A>()) {
-    this.player.events.on("fired", (data, bullet) => {
-      if (!this.world || !this.bulletGenerator) throw new Error();
-      const bulletActor = this.generateBullet(data, bullet);
-      if (!bulletActor) return;
-      this.event.emit("fired", this.world, bulletActor);
-    });
-    this.player.events.on("finished", () => {
-      if (!this.world) throw new Error();
-      this.event.emit("finished", this.world);
-    });
+  constructor() {
+    super();
+    this.player.events.on("fired", (data) => this.fireBullet(data));
   }
 
   /**
@@ -78,8 +62,8 @@ export class GuntreeWeapon<T, A> implements Weapon<T, A> {
   init(args: {
     guntree: gt.Gun;
     muzzles: Map<string, Transformation>;
-    bulletGenerator: BulletGenerator<T, A>;
-    targetProvider: TargetProvider<T>;
+    bulletGenerator: BulletGenerator;
+    targetProvider: TargetProvider;
   }): this {
     this.guntree = args.guntree;
     this.muzzles = args.muzzles;
@@ -94,12 +78,12 @@ export class GuntreeWeapon<T, A> implements Weapon<T, A> {
    *
    * @param world World.
    */
-  start(world: T): void {
+  startFire(world: World): void {
     if (this.player.isRunning()) return;
 
     this.world = world;
 
-    const owner = new GuntreeOwner<T>(world, this.muzzles, this.targetProvider);
+    const owner = new GuntreeOwner(world, this.muzzles, this.targetProvider);
     this.player.start(true, owner, this.guntree);
   }
 
@@ -115,14 +99,14 @@ export class GuntreeWeapon<T, A> implements Weapon<T, A> {
   /**
    * Request stop firing.
    */
-  stop(): void {
+  stopFire(): void {
     this.player.requestStop();
   }
 
   /**
    * Stop firing process immediately.
    */
-  forceStop(): void {
+  forceStopFire(): void {
     this.player.forceStop();
   }
 
@@ -132,14 +116,14 @@ export class GuntreeWeapon<T, A> implements Weapon<T, A> {
    * @param _world World.
    * @param deltaSec Delta seconds.
    */
-  update(world: T, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     this.world = world;
     this.player.update(deltaSec);
   }
 
-  private generateBullet(data: gt.FireData, _bullet: gt.Bullet): A | undefined {
+  protected fireBullet(data: gt.FireData): void {
     if (!this.world || !this.bulletGenerator) throw new Error();
-    return this.bulletGenerator.generate(
+    this.bulletGenerator.generate(
       this.world,
       this,
       Matrix.from(data.transform),

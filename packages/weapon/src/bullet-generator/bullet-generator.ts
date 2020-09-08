@@ -1,5 +1,6 @@
 import { VectorLike, Matrix } from "trans-vector2d";
-import { GuntreeWeapon } from "./guntree-weapon";
+import { Actor, World } from "@curtain-call/actor";
+import { Weapon } from "../weapon";
 
 export interface BulletStyle {
   spriteSize: VectorLike;
@@ -7,13 +8,13 @@ export interface BulletStyle {
   texture: PIXI.Texture;
 }
 
-export interface BulletGenerator<T, A> {
+export interface BulletGenerator {
   generate(
-    world: T,
-    weapon: GuntreeWeapon<T, A>,
+    world: World,
+    weapon: Weapon,
     trans: Matrix,
     elapsedSec: number,
     params: Map<string, number>,
     texts: Map<string, string>
-  ): A | undefined;
+  ): Actor | undefined;
 }

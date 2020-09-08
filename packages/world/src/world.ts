@@ -12,13 +12,9 @@ import {
   Collision,
   DisplayObject,
   Transformation,
-} from "@curtain-call/actor";
-import {
   Camera,
-  DisplayObjectManager,
-  OverlapChecker,
-  RectArea,
-} from "./interface";
+} from "@curtain-call/actor";
+import { DisplayObjectManager, OverlapChecker, RectArea } from "./interface";
 import { pixiMatrixToMatrix2d } from "./matrix-convert";
 
 export { diContainer };
@@ -36,9 +32,9 @@ export class World implements IWorld {
   public readonly backgroundTrans: Transformation;
   public readonly pixiHead: PIXI.Container;
   public readonly pixiTail: PIXI.Container;
-  public readonly camera: Camera;
   public readonly pointerInput: PointerInputReceiver;
 
+  private readonly camera: Camera;
   private readonly displayObjectManager: DisplayObjectManager;
   private readonly actors = new Set<Actor>();
   private readonly updatable = new Set<Updatable>();
@@ -99,6 +95,15 @@ export class World implements IWorld {
     this.pointerInput.setModifier((canvasPos) =>
       this.canvasPosToGamePos(canvasPos)
     );
+  }
+
+  /**
+   * Get camera.
+   *
+   * @returns Camera.
+   */
+  getCamera(): Camera {
+    return this.camera;
   }
 
   /**
