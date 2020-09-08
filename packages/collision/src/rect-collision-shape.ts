@@ -1,13 +1,13 @@
 import { Vector, VectorLike } from "trans-vector2d";
 import { Transformation } from "@curtain-call/util";
-import { CollisionShape } from "./collision-shape";
+import { RectCollisionShape as IRectCollisionShape } from "@curtain-call/weapon";
 import { Box2d } from "./common";
 
 /**
  * RectCollisionShape deal single rectangle collision.
  * Collision center was set by `trans` and size was set by `setSize` and `trans` scale.
  */
-export class RectCollisionShape implements CollisionShape {
+export class RectCollisionShape implements IRectCollisionShape {
   private size = Vector.zero;
 
   /**
