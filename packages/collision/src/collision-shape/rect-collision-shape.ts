@@ -1,19 +1,29 @@
 import { Vector, VectorLike } from "trans-vector2d";
-import { Transformation } from "@curtain-call/util";
+import { inject, autoInjectable, container as diContainer } from "tsyringe";
+import { Transformation, Box2d } from "@curtain-call/actor";
 import { RectCollisionShape as IRectCollisionShape } from "@curtain-call/weapon";
-import { Box2d } from "./common";
+
+export { diContainer };
 
 /**
  * RectCollisionShape deal single rectangle collision.
  * Collision center was set by `trans` and size was set by `setSize` and `trans` scale.
+ *
+ * @example
+ * const shape = new RectCollisionShape().setSize({ x: 2, y: 2 });
  */
+@autoInjectable()
 export class RectCollisionShape implements IRectCollisionShape {
+  public readonly trans: Transformation;
   private size = Vector.zero;
 
   /**
    * @param trans Transformation.
    */
-  constructor(public readonly trans = new Transformation()) {}
+  constructor(@inject("Transformation") trans?: Transformation) {
+    if (!trans) throw new Error("DI failed");
+    this.trans = trans;
+  }
 
   /**
    * Get collision boxes for overlap checking.

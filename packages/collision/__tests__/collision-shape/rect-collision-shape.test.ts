@@ -1,7 +1,16 @@
 import { Vector, Matrix } from "trans-vector2d";
-import { RectCollisionShape } from "../src";
+import { transMockClass } from "../mocks";
+import { RectCollisionShape, diContainer } from "../../src";
 
 describe("@curtain-call/collision.RectCollisionShape", () => {
+  beforeAll(() => {
+    diContainer.register("Transformation", { useClass: transMockClass });
+  });
+
+  afterAll(() => {
+    diContainer.clearInstances();
+  });
+
   it("can set size", () => {
     const shape = new RectCollisionShape();
 
@@ -11,9 +20,11 @@ describe("@curtain-call/collision.RectCollisionShape", () => {
   it("deal one box", () => {
     const shape = new RectCollisionShape();
     shape.setSize({ x: 1, y: 2 });
-    shape.trans.setLocal(
-      Matrix.scaling({ x: 5, y: 6 }).translated({ x: 3, y: 4 })
-    );
+    jest
+      .spyOn(shape.trans, "getGlobal")
+      .mockReturnValue(
+        Matrix.from({ translation: { x: 3, y: 4 }, scale: { x: 5, y: 6 } })
+      );
 
     const expectedNW: [number, number] = [3 - (1 * 5) / 2, 4 - (2 * 6) / 2];
     const expectedSE: [number, number] = [3 + (1 * 5) / 2, 4 + (2 * 6) / 2];

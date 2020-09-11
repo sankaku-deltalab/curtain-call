@@ -1,88 +1,83 @@
-import { Collision, CollisionShape, Box2d } from "../src";
-import { Transformation } from "@curtain-call/util";
+import { Transformation } from "@curtain-call/actor";
+import { collisionShapeMockClass, transMockClass } from "./mocks";
+import { Collision, Box2d } from "../src";
 
-const shapeMock = (boxes: Box2d[] = []): CollisionShape => {
-  const shapeClass = jest.fn(() => ({
-    trans: new Transformation(),
-    getBox2Ds: jest.fn().mockReturnValue(boxes),
-  }));
-  return new shapeClass();
+const createCollision = (): {
+  trans: Transformation;
+  collision: Collision;
+} => {
+  const trans = new transMockClass();
+  const collision = new Collision(trans);
+  return { trans, collision };
 };
 
 describe("@curtain-call/collision.Collision", () => {
   describe("can add shape", () => {
     it("by function", () => {
-      const shape = shapeMock();
-      const collision = new Collision();
+      const shape = new collisionShapeMockClass();
+      const collision = createCollision().collision;
 
-      expect(() => collision.add(shape));
+      expect(() => collision.addShape(shape));
     });
 
     it("and attach shape trans to self trans", () => {
-      const shape = shapeMock();
-      jest.spyOn(shape.trans, "attachTo");
-      const collision = new Collision();
+      const shape = new collisionShapeMockClass();
+      const { trans, collision } = createCollision();
+      jest.spyOn(trans, "attachChild");
 
-      collision.add(shape);
+      collision.addShape(shape);
 
-      expect(shape.trans.attachTo).toBeCalledWith(collision.trans);
+      expect(trans.attachChild).toBeCalledWith(shape.trans, false);
     });
   });
 
   describe("can remove shape", () => {
     it("by function", () => {
-      const shape = shapeMock();
-      const collision = new Collision();
-      collision.add(shape);
+      const shape = new collisionShapeMockClass();
+      const collision = createCollision().collision;
+      collision.addShape(shape);
 
-      expect(() => collision.remove(shape));
+      expect(() => collision.removeShape(shape));
     });
 
     it("and detach shape trans", () => {
-      const shape = shapeMock();
-      jest.spyOn(shape.trans, "detachFromParent");
-      const collision = new Collision();
+      const shape = new collisionShapeMockClass();
+      const { trans, collision } = createCollision();
+      jest.spyOn(trans, "detachChild");
 
-      collision.add(shape);
-      collision.remove(shape);
+      collision.addShape(shape);
+      collision.removeShape(shape);
 
-      expect(shape.trans.detachFromParent).toBeCalled();
+      expect(trans.detachChild).toBeCalledWith(shape.trans, false);
     });
   });
 
   it("can deal boxes from shapes", () => {
     const box1: Box2d = [0, 1, 2, 3];
-    const shape1 = shapeMock([box1]);
     const box2: Box2d = [4, 5, 6, 7];
-    const shape2 = shapeMock([box2]);
+    const shape1 = new collisionShapeMockClass();
+    const shape2 = new collisionShapeMockClass();
+    jest.spyOn(shape1, "getBox2Ds").mockReturnValue([box1]);
+    jest.spyOn(shape2, "getBox2Ds").mockReturnValue([box2]);
 
-    const collision = new Collision();
-    collision.add(shape1);
-    collision.add(shape2);
+    const collision = createCollision().collision;
+    collision.addShape(shape1);
+    collision.addShape(shape2);
 
     expect(collision.getBox2Ds()).toEqual([box1, box2]);
   });
 
   describe("can set is-huge-number", () => {
     it("and not huge-number at default", () => {
-      const collision = new Collision();
+      const collision = createCollision().collision;
 
       expect(collision.isHugeNumber()).toBe(false);
     });
 
     it("and can change by function", () => {
-      const collision = new Collision().setIsHugeNumber(true);
+      const collision = createCollision().collision.setIsHugeNumber(true);
 
       expect(collision.isHugeNumber()).toBe(true);
     });
-  });
-
-  it("can attach to other", () => {
-    const parent = new Transformation();
-    const trans = new Transformation();
-    jest.spyOn(trans, "attachTo");
-    const collision = new Collision(trans).attachTo(parent);
-
-    expect(collision.trans.attachTo).toBeCalledWith(parent);
   });
 });

@@ -1,6 +1,5 @@
 import boxIntersect from "box-intersect";
-import { Box2d } from "./common";
-import { Collision } from "./collision";
+import { Collision, Box2d } from "@curtain-call/actor";
 
 export class OverlapChecker {
   checkOverlap(collisions: Collision[]): Map<Collision, Set<Collision>> {

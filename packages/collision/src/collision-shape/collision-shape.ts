@@ -1,5 +1,5 @@
-import { Transformation } from "@curtain-call/util";
-import { Box2d } from "./common";
+import { Transformation } from "@curtain-call/actor";
+import { Box2d } from "../common";
 
 /**
  * CollisionShape deal collision boxes for overlap checking.

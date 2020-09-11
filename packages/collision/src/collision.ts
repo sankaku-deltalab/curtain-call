@@ -1,12 +1,20 @@
-import { Transformation } from "@curtain-call/util";
-import { CollisionShape } from "./collision-shape";
-import { CollisionGroup, CollisionGroupPresets } from "./collision-group";
+import { inject, autoInjectable } from "tsyringe";
+import {
+  Collision as ICollision,
+  CollisionShape,
+  CollisionGroup,
+  Transformation,
+} from "@curtain-call/actor";
+import { CollisionGroupPresets } from "./collision-group";
 import { Box2d } from "./common";
 
 /**
  * Collision.
  */
-export class Collision {
+@autoInjectable()
+export class Collision implements ICollision {
+  public readonly trans: Transformation;
+
   private isHugeNumberInternal = false;
   private readonly shapes = new Set<CollisionShape>();
   private collisionGroup = CollisionGroupPresets.all;
@@ -15,17 +23,9 @@ export class Collision {
   /**
    * @param trans Transformation
    */
-  constructor(public readonly trans = new Transformation()) {}
-
-  /**
-   * Attach self Transformation to other.
-   *
-   * @param parent Parent Transformation.
-   * @returns this.
-   */
-  attachTo(parent: Transformation): this {
-    this.trans.attachTo(parent);
-    return this;
+  constructor(@inject("Transformation") trans: Transformation) {
+    if (!trans) throw new Error("DI failed");
+    this.trans = trans;
   }
 
   /**
@@ -34,10 +34,10 @@ export class Collision {
    * @param shape Adding collision shape.
    * @returns this.
    */
-  add(shape: CollisionShape): this {
+  addShape(shape: CollisionShape): this {
     if (this.shapes.has(shape)) throw new Error("Shape was already added");
     this.shapes.add(shape);
-    shape.trans.attachTo(this.trans);
+    this.trans.attachChild(shape.trans, false);
     return this;
   }
 
@@ -47,10 +47,10 @@ export class Collision {
    * @param shape Removing collision shape.
    * @returns this.
    */
-  remove(shape: CollisionShape): this {
+  removeShape(shape: CollisionShape): this {
     if (!this.shapes.has(shape)) throw new Error("Shape is not added");
     this.shapes.delete(shape);
-    shape.trans.detachFromParent();
+    this.trans.detachChild(shape.trans, false);
     return this;
   }
 
@@ -94,7 +94,7 @@ export class Collision {
    *
    * @returns Group of this.
    */
-  group(): CollisionGroup {
+  getGroup(): CollisionGroup {
     return this.collisionGroup;
   }
 
@@ -117,8 +117,8 @@ export class Collision {
    * @param other Other collision.
    * @return This can collide with other.
    */
-  canCollideWith(other: Collision): boolean {
-    return (this.group().mask & other.group().category) !== 0;
+  canCollideWith(other: ICollision): boolean {
+    return (this.getGroup().mask & other.getGroup().category) !== 0;
   }
 
   /**

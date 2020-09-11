@@ -34,10 +34,12 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/util": "^0.10.0",
+    "@curtain-call/actor": "^0.10.0",
     "@curtain-call/weapon": "^0.10.0",
     "box-intersect": "^1.0.2",
     "eventemitter3": "^4.0.7",
-    "trans-vector2d": "^2.0.0"
+    "reflect-metadata": "^0.1.13",
+    "trans-vector2d": "^2.0.0",
+    "tsyringe": "^4.3.0"
   }
 }
