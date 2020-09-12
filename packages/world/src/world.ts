@@ -54,14 +54,14 @@ export class World implements IWorld {
   });
 
   constructor(
-    @inject("pixiHead") pixiHead?: PIXI.Container,
-    @inject("pixiTail") pixiTail?: PIXI.Container,
-    @inject("camera") camera?: Camera,
-    @inject("displayObjectManager") displayObjectManager?: DisplayObjectManager,
-    @inject("pointerInput") pointerInput?: PointerInputReceiver,
-    @inject("coreArea") coreArea?: RectArea,
-    @inject("overlapChecker") overlapChecker?: OverlapChecker,
-    @inject("backgroundTrans") backgroundTrans?: Transformation
+    @inject("PIXI.Container") pixiHead?: PIXI.Container,
+    @inject("PIXI.Container") pixiTail?: PIXI.Container,
+    @inject("Camera") camera?: Camera,
+    @inject("DisplayObjectManager") displayObjectManager?: DisplayObjectManager,
+    @inject("PointerInputReceiver") pointerInput?: PointerInputReceiver,
+    @inject("RectArea") coreArea?: RectArea,
+    @inject("OverlapChecker") overlapChecker?: OverlapChecker,
+    @inject("Transformation") backgroundTrans?: Transformation
   ) {
     if (
       !(
