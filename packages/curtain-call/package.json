@@ -45,6 +45,9 @@
     "@curtain-call/timer": "^0.10.0",
     "@curtain-call/util": "^0.10.0",
     "@curtain-call/weapon": "^0.10.0",
-    "@curtain-call/world": "^0.10.0"
+    "@curtain-call/world": "^0.10.0",
+    "eventemitter3": "^4.0.7",
+    "pixi.js": "^5.3.3",
+    "reflect-metadata": "^0.1.13"
   }
 }
