@@ -47,6 +47,26 @@ describe("@curtain-call/actor.Actor", () => {
       expect(trans.setLocal).toBeCalledWith(newTrans);
     });
 
+    it("can swap local transform with function", () => {
+      const oldTrans = Matrix.from({
+        translation: { x: 4, y: 5 },
+        rotation: 6,
+      });
+      const { actor, trans } = createActor();
+      jest.spyOn(trans, "getLocal").mockReturnValue(oldTrans);
+
+      const newTrans = Matrix.from({
+        translation: { x: 1, y: 2 },
+        rotation: 3,
+      });
+      const swapper = jest.fn().mockReturnValue(newTrans);
+      const r = actor.swapLocalTransform(swapper);
+
+      expect(r).toBe(actor);
+      expect(trans.setLocal).toBeCalledWith(newTrans);
+      expect(swapper).toBeCalledWith(oldTrans);
+    });
+
     it("can attach other actor", () => {
       const parent = createActor();
       const child = createActor();

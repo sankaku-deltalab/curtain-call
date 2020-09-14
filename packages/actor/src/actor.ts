@@ -144,6 +144,17 @@ export class Actor implements Updatable {
   }
 
   /**
+   * Swap local transform.
+   *
+   * @param swapper Function given current transform and return new transform.
+   * @returns this.
+   */
+  swapLocalTransform(swapper: (current: Matrix) => Matrix): this {
+    this.trans.setLocal(swapper(this.trans.getLocal()));
+    return this;
+  }
+
+  /**
    * Get Transformation of self.
    *
    * @returns Transformation of self.
