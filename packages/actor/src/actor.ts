@@ -335,6 +335,8 @@ export class Actor implements Updatable {
       this.updateMovement(world, deltaSec, this.trans.getLocal()).newTrans
     );
 
+    this.objects.forEach((d) => d.update(world, deltaSec));
+
     if (this.lifeTimeSec !== undefined) this.lifeTimeSec -= deltaSec;
 
     this.event.emit("updated", world, deltaSec);

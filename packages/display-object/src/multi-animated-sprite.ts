@@ -92,7 +92,7 @@ export class MultiAnimatedSprite<
    *
    * @param deltaSec Delta seconds.
    */
-  notifyPreDraw(world: World, deltaSec: number): void {
+  update(world: World, deltaSec: number): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

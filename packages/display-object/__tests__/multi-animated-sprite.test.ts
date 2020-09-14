@@ -47,7 +47,7 @@ describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
     jest
       .spyOn(trans, "getGlobal")
       .mockReturnValue(Matrix.translation({ x: 1, y: 2 }));
-    sprite.notifyPreDraw(new worldMockClass(), 1);
+    sprite.update(new worldMockClass(), 1);
 
     expect(sprite.pixiObj.position.x).toBeCloseTo(1);
     expect(sprite.pixiObj.position.y).toBeCloseTo(2);
@@ -83,7 +83,7 @@ describe("@curtain-call/display-object.MultiAnimatedSprite", () => {
 
     const deltaSec = 123;
     const deltaMS = 123 * 1000;
-    sprite.notifyPreDraw(new worldMockClass(), deltaSec);
+    sprite.update(new worldMockClass(), deltaSec);
 
     expect(s1.visible).toBe(true);
     [s1, s2, a1, a2].forEach((as) => {

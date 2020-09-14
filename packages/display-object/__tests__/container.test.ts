@@ -22,7 +22,7 @@ describe("@curtain-call/display-object.Container", () => {
     jest
       .spyOn(trans, "getGlobal")
       .mockReturnValue(Matrix.translation({ x: 1, y: 2 }));
-    container.notifyPreDraw();
+    container.update();
 
     expect(pixiObj.position.x).toBeCloseTo(1);
     expect(pixiObj.position.y).toBeCloseTo(2);

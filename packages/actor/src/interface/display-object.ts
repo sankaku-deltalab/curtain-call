@@ -5,5 +5,12 @@ import { World } from "./world";
 export interface DisplayObject {
   readonly pixiObj: PIXI.DisplayObject;
   readonly trans: Transformation;
-  notifyPreDraw(world: World, deltaSec: number): void;
+
+  /**
+   * Update drawing something.
+   *
+   * @param world
+   * @param deltaSec
+   */
+  update(world: World, deltaSec: number): void;
 }

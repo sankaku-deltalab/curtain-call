@@ -127,5 +127,5 @@ export const worldMock = jest.fn<World, []>(() => ({
 export const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
   pixiObj: new PIXI.Container(),
   trans: new transMockClass(),
-  notifyPreDraw: jest.fn(),
+  update: jest.fn(),
 }));

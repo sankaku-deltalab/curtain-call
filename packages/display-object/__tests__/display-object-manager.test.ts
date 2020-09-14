@@ -5,7 +5,7 @@ import { DisplayObjectManager } from "../src";
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
   pixiObj: containerMock(),
   trans: new transMockClass(),
-  notifyPreDraw: jest.fn(),
+  update: jest.fn(),
 }));
 
 describe("@curtain-call/display-object.DisplayObjectManager", () => {
@@ -50,9 +50,9 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
     const manager = new DisplayObjectManager(pixiContainer);
 
     const sprite = new displayObjectMockClass();
-    jest.spyOn(sprite, "notifyPreDraw");
+    jest.spyOn(sprite, "update");
     manager.updatePixiObjects([sprite]);
 
-    expect(sprite.notifyPreDraw).not.toBeCalled();
+    expect(sprite.update).not.toBeCalled();
   });
 });

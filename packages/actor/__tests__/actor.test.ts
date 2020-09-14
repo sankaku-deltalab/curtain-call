@@ -303,7 +303,7 @@ describe("@curtain-call/actor.Actor", () => {
       expect(trans.attachChild).toBeCalledWith(sprite.trans, false);
     });
 
-    it("do not update display objects in actor update", () => {
+    it("update display objects in actor update", () => {
       const sprite = new displayObjectMock();
       const actor = createActor().actor.addDisplayObject(sprite);
 
@@ -311,7 +311,20 @@ describe("@curtain-call/actor.Actor", () => {
       const deltaSec = 125;
       actor.update(world, deltaSec);
 
-      expect(sprite.notifyPreDraw).not.toBeCalled();
+      expect(sprite.update).toBeCalledWith(world, deltaSec);
+    });
+
+    it("can iterate display objects", () => {
+      const sprite1 = new displayObjectMock();
+      const sprite2 = new displayObjectMock();
+      const actor = createActor()
+        .actor.addDisplayObject(sprite1)
+        .addDisplayObject(sprite2);
+
+      const objects: DisplayObject[] = [];
+      actor.iterateDisplayObject((d) => objects.push(d));
+
+      expect(objects).toEqual([sprite1, sprite2]);
     });
   });
 

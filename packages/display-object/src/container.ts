@@ -33,7 +33,7 @@ export class Container implements DisplayObject {
   /**
    * Update pixi sprite transformation.
    */
-  notifyPreDraw(): void {
+  update(): void {
     this.pixiObj.transform.setFromMatrix(
       matrix2dToPixiMatrix(this.trans.getGlobal())
     );

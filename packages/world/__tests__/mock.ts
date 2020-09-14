@@ -157,7 +157,7 @@ export const updatableMockClass = jest.fn<Updatable, []>(() => ({
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
   pixiObj: containerMock(),
   trans: new transMockClass(),
-  notifyPreDraw: jest.fn(),
+  update: jest.fn(),
 }));
 
 export const collisionShapeMock = jest.fn<CollisionShape, []>(() => ({
