@@ -31,15 +31,15 @@ const setupSpawner = (
 ): {
   actors: Actor[];
   spawning: jest.Mock;
-  schedule: [Matrix, number][];
+  schedule: [number, Matrix][];
 } => {
   const actors = [actorMock(), actorMock(), actorMock(), actorMock()];
   const spawning = jest.fn().mockImplementation((i) => actors[i]);
-  const schedule: [Matrix, number][] = [
-    [Matrix.identity, 0],
-    [Matrix.translation({ x: 1, y: 2 }), 0.5],
-    [Matrix.translation({ x: 3, y: 4 }), 0.5],
-    [Matrix.translation({ x: 5, y: 6 }), 1.2],
+  const schedule: [number, Matrix][] = [
+    [0, Matrix.identity],
+    [0.5, Matrix.translation({ x: 1, y: 2 })],
+    [0.5, Matrix.translation({ x: 3, y: 4 })],
+    [1.2, Matrix.translation({ x: 5, y: 6 })],
   ];
   spawner.setSpawningFunction(spawning).setSchedule(schedule);
 
@@ -76,7 +76,7 @@ describe("@curtain-call/actors-spawner", () => {
     expect(spawning).toBeCalledWith(0, 4);
     expect(spawning).toBeCalledTimes(1);
     expect(world.addActor).toBeCalledWith(actors[0]);
-    expect(actors[0].setLocalTransform).toBeCalledWith(schedule[0][0]);
+    expect(actors[0].setLocalTransform).toBeCalledWith(schedule[0][1]);
 
     spawner.update(world, 0.3);
     expect(spawning).toBeCalledTimes(1);
@@ -87,15 +87,15 @@ describe("@curtain-call/actors-spawner", () => {
     expect(spawning).toBeCalledTimes(3);
     expect(world.addActor).toBeCalledWith(actors[1]);
     expect(world.addActor).toBeCalledWith(actors[2]);
-    expect(actors[1].setLocalTransform).toBeCalledWith(schedule[1][0]);
-    expect(actors[2].setLocalTransform).toBeCalledWith(schedule[2][0]);
+    expect(actors[1].setLocalTransform).toBeCalledWith(schedule[1][1]);
+    expect(actors[2].setLocalTransform).toBeCalledWith(schedule[2][1]);
 
     spawner.update(world, 0.7);
     spawner.update(world, 0.7);
     expect(spawning).toBeCalledWith(3, 4);
     expect(spawning).toBeCalledTimes(4);
     expect(world.addActor).toBeCalledWith(actors[3]);
-    expect(actors[3].setLocalTransform).toBeCalledWith(schedule[3][0]);
+    expect(actors[3].setLocalTransform).toBeCalledWith(schedule[3][1]);
   });
 
   it("do not spawn before start", () => {

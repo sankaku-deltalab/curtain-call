@@ -77,7 +77,7 @@ export class ActorsSpawner extends Actor {
     spawnedCount: number,
     spawnNum: number
   ) => Actor = (): Actor => new Actor();
-  private schedule: readonly [Matrix, number][] = [];
+  private schedule: readonly [number, Matrix][] = [];
   private isActive = false;
   private spawnedCount = 0;
   private elapsedSec = 0;
@@ -112,7 +112,7 @@ export class ActorsSpawner extends Actor {
    * @param schedule Spawning schedule.
    * @returns this.
    */
-  setSchedule(schedule: readonly [Matrix, number][]): this {
+  setSchedule(schedule: readonly [number, Matrix][]): this {
     this.schedule = schedule;
     return this;
   }
@@ -142,10 +142,10 @@ export class ActorsSpawner extends Actor {
     this.elapsedSec += deltaSec;
     while (
       this.spawnedCount < this.schedule.length &&
-      this.elapsedSec >= this.schedule[this.spawnedCount][1]
+      this.elapsedSec >= this.schedule[this.spawnedCount][0]
     ) {
       const actor = this.spawnActor(this.spawnedCount, this.schedule.length);
-      actor.setLocalTransform(this.schedule[this.spawnedCount][0]);
+      actor.setLocalTransform(this.schedule[this.spawnedCount][1]);
       this.spawnedCount += 1;
       world.addActor(actor);
     }
