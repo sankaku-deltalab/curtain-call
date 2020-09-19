@@ -120,7 +120,7 @@ describe("@curtain-call/actors-spawner", () => {
 
     const deadActors = [2, 1, 0, 3].map((i) => actors[i]);
     deadActors.forEach((ac) =>
-      ac.kill(world, actorMock(), { name: "testDamage" })
+      ac.killSelf(world, actorMock(), { name: "testDamage" })
     );
 
     expect(deadEvent).toBeCalledWith(world, deadActors);

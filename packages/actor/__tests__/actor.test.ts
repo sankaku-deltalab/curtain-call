@@ -342,68 +342,67 @@ describe("@curtain-call/actor.Actor", () => {
       expect(health.init).toBeCalledWith(1, 2);
     });
 
-    it("can take damage and emit event and notify it to DamageDealer", () => {
-      const { actor, health } = createActor();
-      const ev = jest.fn();
-      actor.event.on("takenDamage", ev);
+    it("can deal damage to other actor and emit event", () => {
+      const actor = createActor().actor;
+      const dealEvent = jest.fn();
+      actor.event.on("dealDamage", dealEvent);
 
-      const world = new worldMock();
       const damage = 125;
-      const dealer = createActor().actor;
-      jest.spyOn(dealer, "notifyDealtDamage");
-      const damageType = { name: "test" };
+      const { actor: taker, health } = createActor();
+      taker.initHealth(500, 1000);
       jest
         .spyOn(health, "sub")
         .mockReturnValue({ variation: -damage, zeroed: false });
+      const takeEvent = jest.fn();
+      taker.event.on("takenDamage", takeEvent);
 
-      const r = actor.takeDamage(world, damage, dealer, damageType);
+      const world = new worldMock();
+      const damageType = { name: "test" };
+      const r = actor.dealDamage(world, damage, taker, damageType);
 
       expect(r.actualDamage).toBe(damage);
-      expect(r.died).toBe(false);
-      expect(dealer.notifyDealtDamage).toBeCalledWith(
+      expect(r.killed).toBe(false);
+      expect(health.sub).toBeCalledWith(damage);
+      expect(takeEvent).toBeCalledWith(
         world,
         r.actualDamage,
         actor,
         damageType
       );
-      expect(ev).toBeCalledWith(world, r.actualDamage, dealer, damageType);
+      expect(dealEvent).toBeCalledWith(
+        world,
+        r.actualDamage,
+        taker,
+        damageType
+      );
     });
 
-    it("can kill and emit event and notify it to DamageDealer", () => {
-      const healthMax = 3;
-      const { actor, health } = createActor();
-      jest.spyOn(health, "max").mockReturnValue(healthMax);
-      jest.spyOn(health, "value").mockReturnValue(1);
-      const ev = jest.fn();
-      actor.event.on("dead", ev);
+    it("can kill other actor and emit event", () => {
+      const actor = createActor().actor;
+      const killedEvent = jest.fn();
+      actor.event.on("killed", killedEvent);
+
+      const { actor: taker, health } = createActor();
+      taker.initHealth(500, 1000);
+      const deadEvent = jest.fn();
+      taker.event.on("dead", deadEvent);
+      jest.spyOn(health, "value").mockReturnValue(500);
 
       const world = new worldMock();
-      const dealer = createActor().actor;
-      jest.spyOn(dealer, "notifyKilled");
       const damageType = { name: "test" };
-      actor.kill(world, dealer, damageType);
-      jest.spyOn(health, "value").mockReturnValue(0);
+      const r = actor.killOther(world, taker, damageType);
 
-      expect(health.init).lastCalledWith(0, healthMax);
-      expect(actor.isDead()).toBe(true);
-      expect(dealer.notifyKilled).toBeCalledWith(world, actor, damageType);
-      expect(ev).toBeCalledWith(world, dealer, damageType);
+      expect(r.killed).toBe(true);
+      expect(killedEvent).toBeCalledWith(world, taker, damageType);
+      expect(deadEvent).toBeCalledWith(world, actor, damageType);
     });
 
-    it("remove self from world when died", () => {
-      const { actor, health } = createActor();
-      jest.spyOn(actor, "reserveRemovingSelfFromWorld");
+    it("remove self from world while dead", () => {
+      const { actor } = createActor();
+      jest.spyOn(actor, "isDead").mockReturnValue(true);
 
       const world = new worldMock();
-      const damage = 1;
-      const dealer = createActor().actor;
-      const damageType = { name: "test" };
-      jest
-        .spyOn(health, "sub")
-        .mockReturnValue({ variation: -damage, zeroed: true });
-      actor.takeDamage(world, damage, dealer, damageType);
-
-      expect(actor.reserveRemovingSelfFromWorld).toBeCalled();
+      expect(actor.shouldRemoveSelfFromWorld(world)).toBe(true);
     });
 
     it("can heal", () => {

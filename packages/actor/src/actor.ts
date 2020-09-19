@@ -301,7 +301,8 @@ export class Actor implements Updatable {
   shouldRemoveSelfFromWorld(_world: World): boolean {
     const lifeTimeIsOver =
       this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
-    return this.shouldRemoveSelf || lifeTimeIsOver;
+    const isDead = this.isDead();
+    return this.shouldRemoveSelf || lifeTimeIsOver || isDead;
   }
 
   /**
@@ -526,29 +527,26 @@ export class Actor implements Updatable {
     const actualDamage = -r.variation;
     const died = r.zeroed;
 
-    dealer.notifyDealtDamage(world, actualDamage, this, type);
     this.event.emit("takenDamage", world, actualDamage, dealer, type);
     if (died) {
-      this.reserveRemovingSelfFromWorld();
-      dealer.notifyKilled(world, this, type);
       this.event.emit("dead", world, dealer, type);
     }
     return { actualDamage, died };
   }
 
   /**
-   * Kill this.
+   * Kill self.
    *
    * @param world World.
-   * @param dealer Damage dealer killing this directly.
+   * @param dealer Death dealer.
    * @param type Damage type.
    */
-  kill(world: World, dealer: Actor, type: DamageType): void {
-    if (this.healthComponent.value() === 0) return;
+  killSelf(world: World, dealer: Actor, type: DamageType): { died: boolean } {
+    if (this.healthComponent.value() === 0) return { died: false };
 
     this.healthComponent.init(0, this.healthComponent.max());
-    dealer.notifyKilled(world, this, type);
     this.event.emit("dead", world, dealer, type);
+    return { died: true };
   }
 
   /**
@@ -564,6 +562,44 @@ export class Actor implements Updatable {
   }
 
   // about damage dealer
+
+  /**
+   * Deal damage to other actor.
+   *
+   * @param world Our world.
+   * @param damage Dealing damage.
+   * @param taker Damaged actor.
+   * @param type Damage type.
+   */
+  dealDamage(
+    world: World,
+    damage: number,
+    taker: Actor,
+    type: DamageType
+  ): { actualDamage: number; killed: boolean } {
+    const r = taker.takeDamage(world, damage, this, type);
+    this.notifyDealtDamage(world, r.actualDamage, taker, type);
+    if (r.died) this.notifyKilled(world, taker, type);
+    return {
+      actualDamage: r.actualDamage,
+      killed: r.died,
+    };
+  }
+
+  /**
+   * Kill other actor.
+   *
+   * @param world Our world.
+   * @param taker Damaged actor.
+   * @param type Damage type.
+   */
+  killOther(world: World, taker: Actor, type: DamageType): { killed: boolean } {
+    const r = taker.killSelf(world, this, type);
+    if (r.died) this.notifyKilled(world, taker, type);
+    return {
+      killed: r.died,
+    };
+  }
 
   /**
    * Notify this dealt damage to other.
