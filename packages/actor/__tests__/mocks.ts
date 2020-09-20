@@ -11,6 +11,7 @@ import {
   World,
   DamageType,
   Mover,
+  IActor,
 } from "../src";
 
 export const moverMockClass = jest.fn<Mover, [boolean, Vector]>(
@@ -129,3 +130,74 @@ export const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
   trans: new transMockClass(),
   update: jest.fn(),
 }));
+
+export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
+  const event = new EventEmitter<{
+    // world
+    addedToWorld: [World];
+    removedFromWorld: [World];
+    updated: [World, number];
+    // collision
+    overlapped: [World, Set<Actor>];
+    // health
+    takenDamage: [World, number, Actor, DamageType];
+    dead: [World, Actor, DamageType];
+    beHealed: [World, number];
+    // damage dealer
+    dealDamage: [World, number, Actor, DamageType];
+    killed: [World, Actor, DamageType];
+  }>();
+  return {
+    event,
+    getController: jest.fn(),
+    notifyControlledBy: jest.fn().mockReturnThis(),
+    moveTo: jest.fn().mockReturnThis(),
+    rotateTo: jest.fn().mockReturnThis(),
+    setLocalTransform: jest.fn().mockReturnThis(),
+    swapLocalTransform: jest.fn().mockReturnThis(),
+    getTransformation: jest.fn(),
+    attachActor: jest.fn().mockReturnThis(),
+    attachTransformation: jest.fn().mockReturnThis(),
+    detachActor: jest.fn().mockReturnThis(),
+    detachTransformation: jest.fn().mockReturnThis(),
+    addMover: jest.fn().mockReturnThis(),
+    removeMover: jest.fn().mockReturnThis(),
+    reserveRemovingSelfFromWorld: jest.fn().mockReturnThis(),
+    cancelRemovingSelfFromWorld: jest.fn().mockReturnThis(),
+    shouldRemoveSelfFromWorld: jest.fn(),
+    notifyAddedToWorld: jest.fn(),
+    notifyRemovedFromWorld: jest.fn(),
+    update: jest.fn(),
+    setLifeTime: jest.fn().mockReturnThis(),
+    addCollisionShape: jest.fn().mockReturnThis(),
+    removeCollisionShape: jest.fn().mockReturnThis(),
+    setCollisionAsHugeNumber: jest.fn().mockReturnThis(),
+    setCollisionGroup: jest.fn().mockReturnThis(),
+    setCollisionEnable: jest.fn().mockReturnThis(),
+    getCollision: jest.fn(),
+    notifyOverlappedWith: jest.fn(),
+    addDisplayObject: jest.fn().mockReturnThis(),
+    removeDisplayObject: jest.fn().mockReturnThis(),
+    iterateDisplayObject: jest.fn(),
+    initHealth: jest.fn().mockReturnThis(),
+    health: jest.fn(),
+    healthMax: jest.fn(),
+    isDead: jest.fn(),
+    takeDamage: jest.fn(),
+    killSelf: jest.fn(),
+    heal: jest.fn(),
+    dealDamage: jest.fn(),
+    killOther: jest.fn(),
+    notifyDealtDamage: jest.fn(),
+    notifyKilled: jest.fn(),
+    setTeam: jest.fn().mockReturnThis(),
+    getTeam: jest.fn(),
+    setRole: jest.fn().mockReturnThis(),
+    getRole: jest.fn(),
+    addSubActor: jest.fn().mockReturnThis(),
+    removeSubActor: jest.fn().mockReturnThis(),
+    hasSubActor: jest.fn(),
+    getOwnerActor: jest.fn(),
+    getSubActors: jest.fn(),
+  };
+});
