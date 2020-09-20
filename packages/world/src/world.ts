@@ -3,6 +3,7 @@ import * as PIXI from "pixi.js";
 import { VectorLike, Vector } from "trans-vector2d";
 import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
+  IActor,
   Actor,
   World as IWorld,
   Updatable,
@@ -36,7 +37,7 @@ export class World implements IWorld {
 
   private readonly camera: Camera;
   private readonly displayObjectManager: DisplayObjectManager;
-  private readonly actors = new Set<Actor>();
+  private readonly actors = new Set<IActor>();
   private readonly updatable = new Set<Updatable>();
   private readonly overlapChecker: OverlapChecker;
   private readonly mask = new PIXI.Graphics();
@@ -195,7 +196,7 @@ export class World implements IWorld {
    * @param actor Adding actor.
    * @returns this.
    */
-  addActor(actor: Actor): this {
+  addActor(actor: IActor): this {
     if (this.hasActor(actor)) throw new Error("Actor was already added");
 
     this.actors.add(actor);
@@ -215,7 +216,7 @@ export class World implements IWorld {
    * @param actor Removing actor.
    * @returns this.
    */
-  removeActor(actor: Actor): this {
+  removeActor(actor: IActor): this {
     const removing = [actor, ...actor.getSubActors()];
 
     if (removing.some((ac) => !this.hasActor(ac)))
@@ -236,7 +237,7 @@ export class World implements IWorld {
    * @param actor Checking actor.
    * @returns This has given actor.
    */
-  hasActor(actor: Actor): boolean {
+  hasActor(actor: IActor): boolean {
     return this.actors.has(actor);
   }
 
@@ -245,7 +246,7 @@ export class World implements IWorld {
    *
    * @returns Added actors iterator.
    */
-  iterateActors(): IterableIterator<Actor> {
+  iterateActors(): IterableIterator<IActor> {
     return this.actors.values();
   }
 
@@ -407,7 +408,7 @@ export class World implements IWorld {
     const collisionToActor = new Map(
       Array.from(this.actors).map((ac) => [ac.getCollision(), ac])
     );
-    const getActor = (col: Collision): Actor => {
+    const getActor = (col: Collision): IActor => {
       const ac = collisionToActor.get(col);
       if (!ac) throw new Error();
       return ac;

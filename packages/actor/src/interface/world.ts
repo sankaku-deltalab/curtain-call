@@ -2,7 +2,7 @@ import { VectorLike, Vector } from "trans-vector2d";
 import * as PIXI from "pixi.js";
 import { Engine } from "./engine";
 import { Camera } from "./camera";
-import { Actor } from "../actor";
+import { Actor as IActor } from "../actor-interface";
 import { Updatable } from "./updatable";
 import { EventEmitter } from "./event-emitter";
 import { PointerInputReceiver } from "./pointer-input-receiver";
@@ -72,7 +72,7 @@ export interface World {
    * @param actor Adding actor.
    * @returns this.
    */
-  addActor(actor: Actor): this;
+  addActor(actor: IActor): this;
 
   /**
    * Remove added actor from this.
@@ -80,7 +80,7 @@ export interface World {
    * @param actor Removing actor.
    * @returns this.
    */
-  removeActor(actor: Actor): this;
+  removeActor(actor: IActor): this;
 
   /**
    * Return this has given actor.
@@ -88,14 +88,14 @@ export interface World {
    * @param actor Checking actor.
    * @returns This has given actor.
    */
-  hasActor(actor: Actor): boolean;
+  hasActor(actor: IActor): boolean;
 
   /**
    * Iterate added actors.
    *
    * @returns Added actors iterator.
    */
-  iterateActors(): IterableIterator<Actor>;
+  iterateActors(): IterableIterator<IActor>;
 
   /**
    * Add Updatable object.

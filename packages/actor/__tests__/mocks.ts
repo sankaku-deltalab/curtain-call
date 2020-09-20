@@ -62,7 +62,7 @@ export const collisionMockClass = jest.fn<Collision, [Transformation]>(
 );
 
 export const createActor = (): {
-  actor: Actor;
+  actor: IActor;
   trans: Transformation;
   health: FiniteResource;
   collisionTrans: Transformation;
@@ -74,14 +74,14 @@ export const createActor = (): {
     removedFromWorld: [World];
     updated: [World, number];
     // collision
-    overlapped: [World, Set<Actor>];
+    overlapped: [World, Set<IActor>];
     // health
-    takenDamage: [World, number, Actor, DamageType];
-    dead: [World, Actor, DamageType];
+    takenDamage: [World, number, IActor, DamageType];
+    dead: [World, IActor, DamageType];
     beHealed: [World, number];
     // damage dealer
-    dealDamage: [World, number, Actor, DamageType];
-    killed: [World, Actor, DamageType];
+    dealDamage: [World, number, IActor, DamageType];
+    killed: [World, IActor, DamageType];
   }>();
   const trans = new transMockClass();
   const health = new healthMockClass();

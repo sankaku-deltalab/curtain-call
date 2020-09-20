@@ -10,65 +10,43 @@ import {
   CollisionGroup,
   ActorController,
   Transformation,
-  Updatable,
-  EventEmitter as IEventEmitter,
 } from "./interface";
+import {
+  Actor as IActor,
+  DamageType,
+  ActorRole,
+  Team,
+  ActorEvent,
+} from "./actor-interface";
+import {
+  ActorWithCollision,
+  ActorWithController,
+  ActorWithDamaging,
+  ActorWithDisplayObject,
+  ActorWithInfo,
+  ActorWithSubActors,
+  ActorWithTransformation,
+  ActorWithWorld,
+} from "./actor-subsystem";
 
 export { diContainer };
-
-export interface DamageType {
-  name: string;
-}
-
-export enum Team {
-  playerSide = "player",
-  enemySide = "enemy",
-  noSide = "noSide",
-}
-
-export enum ActorRole {
-  character = "character",
-  bullet = "bullet",
-  visual = "visual",
-  misc = "misc",
-}
-
-export type ActorEvent = IEventEmitter<{
-  // world
-  addedToWorld: [World];
-  removedFromWorld: [World];
-  updated: [World, number];
-  // collision
-  overlapped: [World, Set<Actor>];
-  // health
-  takenDamage: [World, number, Actor, DamageType];
-  dead: [World, Actor, DamageType];
-  beHealed: [World, number];
-  // damage dealer
-  dealDamage: [World, number, Actor, DamageType];
-  killed: [World, Actor, DamageType];
-}>;
 
 /**
  * Actor is individual in world.
  */
 @autoInjectable()
-export class Actor implements Updatable {
+export class Actor implements IActor {
   /** Event. */
   public readonly event: ActorEvent;
 
-  private readonly trans: Transformation;
-  private readonly healthComponent: FiniteResource;
-  private readonly collision: Collision;
-  private readonly objects = new Set<DisplayObject>();
-  private readonly movers = new Set<Mover>();
-  private controller: ActorController | undefined;
-  private team = Team.noSide;
-  private role = ActorRole.misc;
-  private ownerActor?: Actor;
-  private subActors = new Set<Actor>();
-  private lifeTimeSec?: number;
-  private shouldRemoveSelf = false;
+  private readonly actorCollision: ActorWithCollision;
+  private readonly actorController: ActorWithController;
+  private readonly actorDamaging: ActorWithDamaging;
+  private readonly actorDisplay: ActorWithDisplayObject;
+  private readonly actorInfo: ActorWithInfo;
+  private readonly actorSubActors: ActorWithSubActors;
+  private readonly actorTransform: ActorWithTransformation;
+  private readonly actorWithWorld: ActorWithWorld;
 
   constructor(
     @inject("EventEmitter") event?: ActorEvent,
@@ -79,10 +57,14 @@ export class Actor implements Updatable {
     if (!(event && trans && health && collision))
       throw new Error("DI object is not exist");
     this.event = event;
-    this.trans = trans;
-    this.healthComponent = health.init(0, 0);
-    this.collision = collision;
-    this.attachTransformation(collision.trans, false);
+    this.actorCollision = new ActorWithCollision(event, collision, trans);
+    this.actorController = new ActorWithController();
+    this.actorDamaging = new ActorWithDamaging(event, health);
+    this.actorDisplay = new ActorWithDisplayObject(trans);
+    this.actorInfo = new ActorWithInfo();
+    this.actorSubActors = new ActorWithSubActors(trans);
+    this.actorTransform = new ActorWithTransformation(trans);
+    this.actorWithWorld = new ActorWithWorld(event);
   }
 
   /**
@@ -92,7 +74,7 @@ export class Actor implements Updatable {
    * @returns Controller.
    */
   getController(): ActorController | undefined {
-    return this.controller;
+    return this.actorController.getController();
   }
 
   /**
@@ -101,8 +83,8 @@ export class Actor implements Updatable {
    * @param controller Controller.
    * @returns this.
    */
-  notifyControlledBy(controller: ActorController): this {
-    this.controller = controller;
+  setController(controller: ActorController): this {
+    this.actorController.setController(controller);
     return this;
   }
 
@@ -115,8 +97,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   moveTo(pos: VectorLike): this {
-    const { rotation, scale } = this.trans.getLocal().decompose();
-    this.trans.setLocal(Matrix.from({ translation: pos, rotation, scale }));
+    this.actorTransform.moveTo(pos);
     return this;
   }
 
@@ -127,8 +108,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   rotateTo(angle: number): this {
-    const { translation, scale } = this.trans.getLocal().decompose();
-    this.trans.setLocal(Matrix.from({ translation, rotation: angle, scale }));
+    this.actorTransform.rotateTo(angle);
     return this;
   }
 
@@ -139,7 +119,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setLocalTransform(newLocalTrans: Matrix): this {
-    this.trans.setLocal(newLocalTrans);
+    this.actorTransform.setLocalTransform(newLocalTrans);
     return this;
   }
 
@@ -150,7 +130,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   swapLocalTransform(swapper: (current: Matrix) => Matrix): this {
-    this.trans.setLocal(swapper(this.trans.getLocal()));
+    this.actorTransform.swapLocalTransform(swapper);
     return this;
   }
 
@@ -160,7 +140,7 @@ export class Actor implements Updatable {
    * @returns Transformation of self.
    */
   getTransformation(): Transformation {
-    return this.trans;
+    return this.actorTransform.getTransformation();
   }
 
   /**
@@ -170,8 +150,9 @@ export class Actor implements Updatable {
    * @param keepWorldTransform When attached, keep world transform of child.
    * @returns this.
    */
-  attachActor(child: Actor, keepWorldTransform: boolean): this {
-    return this.attachTransformation(child.trans, keepWorldTransform);
+  attachActor(child: IActor, keepWorldTransform: boolean): this {
+    this.actorTransform.attachActor(child, keepWorldTransform);
+    return this;
   }
 
   /**
@@ -185,7 +166,7 @@ export class Actor implements Updatable {
     child: Transformation,
     keepWorldTransform: boolean
   ): this {
-    this.trans.attachChild(child, keepWorldTransform);
+    this.actorTransform.attachTransformation(child, keepWorldTransform);
     return this;
   }
 
@@ -196,11 +177,9 @@ export class Actor implements Updatable {
    * @param keepWorldTransform When detached, keep world transform of child.
    * @return this.
    */
-  detachActor(child: Actor, keepWorldTransform: boolean): this {
-    return this.detachTransformation(
-      child.getTransformation(),
-      keepWorldTransform
-    );
+  detachActor(child: IActor, keepWorldTransform: boolean): this {
+    this.actorTransform.detachActor(child, keepWorldTransform);
+    return this;
   }
 
   /**
@@ -214,7 +193,7 @@ export class Actor implements Updatable {
     child: Transformation,
     keepWorldTransform: boolean
   ): this {
-    this.trans.detachChild(child, keepWorldTransform);
+    this.actorTransform.detachTransformation(child, keepWorldTransform);
     return this;
   }
 
@@ -225,7 +204,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   addMover(mover: Mover): this {
-    this.movers.add(mover);
+    this.actorTransform.addMover(mover);
     return this;
   }
 
@@ -236,38 +215,8 @@ export class Actor implements Updatable {
    * @returns this.
    */
   removeMover(mover: Mover): this {
-    this.movers.delete(mover);
+    this.actorTransform.removeMover(mover);
     return this;
-  }
-
-  /**
-   * Update movement and return transformation delta
-   *
-   * @param world World.
-   * @param deltaSec Delta seconds.
-   * @param currentTrans Current transform.
-   * @returns New transformation and movement was done.
-   */
-  protected updateMovement(
-    world: World,
-    deltaSec: number,
-    currentTrans: Matrix
-  ): {
-    done: boolean;
-    newTrans: Matrix;
-  } {
-    const movers = Array.from(this.movers);
-    const result = movers.reduce(
-      (prev, mov) => {
-        const r = mov.update(world, deltaSec, prev.newTrans);
-        return {
-          done: prev.done && r.done,
-          newTrans: r.newTrans,
-        };
-      },
-      { done: true, newTrans: currentTrans }
-    );
-    return result;
   }
 
   // about world
@@ -278,7 +227,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   reserveRemovingSelfFromWorld(): this {
-    this.shouldRemoveSelf = true;
+    this.actorWithWorld.reserveRemovingSelfFromWorld();
     return this;
   }
 
@@ -288,21 +237,21 @@ export class Actor implements Updatable {
    * @returns this.
    */
   cancelRemovingSelfFromWorld(): this {
-    this.shouldRemoveSelf = false;
+    this.actorWithWorld.cancelRemovingSelfFromWorld();
     return this;
   }
 
   /**
    * If remove self from world, this function must be true.
    *
-   * @param _world World.
+   * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(_world: World): boolean {
-    const lifeTimeIsOver =
-      this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
-    const isDead = this.isDead();
-    return this.shouldRemoveSelf || lifeTimeIsOver || isDead;
+  shouldRemoveSelfFromWorld(world: World): boolean {
+    return (
+      this.actorWithWorld.shouldRemoveSelfFromWorld(world) ||
+      this.actorDamaging.shouldRemoveSelfFromWorld()
+    );
   }
 
   /**
@@ -312,7 +261,7 @@ export class Actor implements Updatable {
    * @param world Added World.
    */
   notifyAddedToWorld(world: World): void {
-    this.event.emit("addedToWorld", world);
+    this.actorWithWorld.notifyAddedToWorld(world);
   }
 
   /**
@@ -322,7 +271,7 @@ export class Actor implements Updatable {
    * @param world Removed World.
    */
   notifyRemovedFromWorld(world: World): void {
-    this.event.emit("removedFromWorld", world);
+    this.actorWithWorld.notifyRemovedFromWorld(world);
   }
 
   /**
@@ -332,13 +281,10 @@ export class Actor implements Updatable {
    * @param deltaSec Delta seconds.
    */
   update(world: World, deltaSec: number): void {
-    this.trans.setLocal(
-      this.updateMovement(world, deltaSec, this.trans.getLocal()).newTrans
-    );
-
-    this.objects.forEach((d) => d.update(world, deltaSec));
-
-    if (this.lifeTimeSec !== undefined) this.lifeTimeSec -= deltaSec;
+    this.actorController.update(world, deltaSec);
+    this.actorTransform.update(world, deltaSec);
+    this.actorWithWorld.update(world, deltaSec);
+    this.actorDisplay.update(world, deltaSec);
 
     this.event.emit("updated", world, deltaSec);
   }
@@ -351,7 +297,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setLifeTime(lifeTimeSec: number): this {
-    this.lifeTimeSec = lifeTimeSec;
+    this.actorWithWorld.setLifeTime(lifeTimeSec);
     return this;
   }
 
@@ -364,7 +310,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   addCollisionShape(shape: CollisionShape): this {
-    this.collision.addShape(shape);
+    this.actorCollision.addCollisionShape(shape);
     return this;
   }
 
@@ -375,7 +321,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   removeCollisionShape(shape: CollisionShape): this {
-    this.collision.removeShape(shape);
+    this.actorCollision.removeCollisionShape(shape);
     return this;
   }
 
@@ -388,7 +334,7 @@ export class Actor implements Updatable {
    * @return this.
    */
   setCollisionAsHugeNumber(isHuge: boolean): this {
-    this.collision.setIsHugeNumber(isHuge);
+    this.actorCollision.setCollisionAsHugeNumber(isHuge);
     return this;
   }
 
@@ -399,7 +345,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setCollisionGroup(newGroup: CollisionGroup): this {
-    this.collision.setGroup(newGroup);
+    this.actorCollision.setCollisionGroup(newGroup);
     return this;
   }
 
@@ -410,7 +356,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setCollisionEnable(newEnable: boolean): this {
-    this.collision.setEnable(newEnable);
+    this.actorCollision.setCollisionEnable(newEnable);
     return this;
   }
 
@@ -420,7 +366,7 @@ export class Actor implements Updatable {
    * @returns This collision.
    */
   getCollision(): Collision {
-    return this.collision;
+    return this.actorCollision.getCollision();
   }
 
   /**
@@ -429,8 +375,8 @@ export class Actor implements Updatable {
    * @param world Our world.
    * @param others Collided Other actors.
    */
-  notifyOverlappedWith(world: World, others: Set<Actor>): void {
-    this.event.emit("overlapped", world, others);
+  notifyOverlappedWith(world: World, others: Set<IActor>): void {
+    this.actorCollision.notifyOverlappedWith(world, others);
   }
 
   // about display-object
@@ -442,8 +388,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   addDisplayObject(obj: DisplayObject): this {
-    this.objects.add(obj);
-    this.attachTransformation(obj.trans, false);
+    this.actorDisplay.addDisplayObject(obj);
     return this;
   }
 
@@ -454,7 +399,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   removeDisplayObject(obj: DisplayObject): this {
-    this.objects.delete(obj);
+    this.actorDisplay.removeDisplayObject(obj);
     return this;
   }
 
@@ -464,7 +409,7 @@ export class Actor implements Updatable {
    * @param callback
    */
   iterateDisplayObject(callback: (obj: DisplayObject) => void): void {
-    this.objects.forEach((o) => callback(o));
+    this.actorDisplay.iterateDisplayObject(callback);
   }
 
   // about health
@@ -477,7 +422,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   initHealth(health: number, healthMax: number): this {
-    this.healthComponent.init(health, healthMax);
+    this.actorDamaging.initHealth(health, healthMax);
     return this;
   }
 
@@ -487,7 +432,7 @@ export class Actor implements Updatable {
    * @returns Current health.
    */
   health(): number {
-    return this.healthComponent.value();
+    return this.actorDamaging.health();
   }
 
   /**
@@ -496,7 +441,7 @@ export class Actor implements Updatable {
    * @returns Max health.
    */
   healthMax(): number {
-    return this.healthComponent.max();
+    return this.actorDamaging.healthMax();
   }
 
   /**
@@ -505,7 +450,7 @@ export class Actor implements Updatable {
    * @returns Self is dead.
    */
   isDead(): boolean {
-    return this.healthComponent.value() === 0;
+    return this.actorDamaging.isDead();
   }
 
   /**
@@ -520,18 +465,10 @@ export class Actor implements Updatable {
   takeDamage(
     world: World,
     damage: number,
-    dealer: Actor,
+    dealer: IActor,
     type: DamageType
   ): { actualDamage: number; died: boolean } {
-    const r = this.healthComponent.sub(damage);
-    const actualDamage = -r.variation;
-    const died = r.zeroed;
-
-    this.event.emit("takenDamage", world, actualDamage, dealer, type);
-    if (died) {
-      this.event.emit("dead", world, dealer, type);
-    }
-    return { actualDamage, died };
+    return this.actorDamaging.takeDamage(world, damage, dealer, type);
   }
 
   /**
@@ -541,12 +478,8 @@ export class Actor implements Updatable {
    * @param dealer Death dealer.
    * @param type Damage type.
    */
-  killSelf(world: World, dealer: Actor, type: DamageType): { died: boolean } {
-    if (this.healthComponent.value() === 0) return { died: false };
-
-    this.healthComponent.init(0, this.healthComponent.max());
-    this.event.emit("dead", world, dealer, type);
-    return { died: true };
+  killSelf(world: World, dealer: IActor, type: DamageType): { died: boolean } {
+    return this.actorDamaging.killSelf(world, dealer, type);
   }
 
   /**
@@ -556,9 +489,7 @@ export class Actor implements Updatable {
    * @param amount Healing amount.
    */
   heal(world: World, amount: number): { actualHealed: number } {
-    const r = this.healthComponent.add(amount);
-    this.event.emit("beHealed", world, r.variation);
-    return { actualHealed: r.variation };
+    return this.actorDamaging.heal(world, amount);
   }
 
   // about damage dealer
@@ -574,16 +505,10 @@ export class Actor implements Updatable {
   dealDamage(
     world: World,
     damage: number,
-    taker: Actor,
+    taker: IActor,
     type: DamageType
   ): { actualDamage: number; killed: boolean } {
-    const r = taker.takeDamage(world, damage, this, type);
-    this.notifyDealtDamage(world, r.actualDamage, taker, type);
-    if (r.died) this.notifyKilled(world, taker, type);
-    return {
-      actualDamage: r.actualDamage,
-      killed: r.died,
-    };
+    return this.actorDamaging.dealDamage(world, damage, this, taker, type);
   }
 
   /**
@@ -593,12 +518,12 @@ export class Actor implements Updatable {
    * @param taker Damaged actor.
    * @param type Damage type.
    */
-  killOther(world: World, taker: Actor, type: DamageType): { killed: boolean } {
-    const r = taker.killSelf(world, this, type);
-    if (r.died) this.notifyKilled(world, taker, type);
-    return {
-      killed: r.died,
-    };
+  killOther(
+    world: World,
+    taker: IActor,
+    type: DamageType
+  ): { killed: boolean } {
+    return this.actorDamaging.killOther(world, this, taker, type);
   }
 
   /**
@@ -612,10 +537,10 @@ export class Actor implements Updatable {
   notifyDealtDamage(
     world: World,
     damage: number,
-    taker: Actor,
+    taker: IActor,
     type: DamageType
   ): void {
-    this.event.emit("dealDamage", world, damage, taker, type);
+    this.actorDamaging.notifyDealtDamage(world, damage, taker, type);
   }
 
   /**
@@ -625,8 +550,8 @@ export class Actor implements Updatable {
    * @param taker Damaged Actor.
    * @param type Damage type.
    */
-  notifyKilled(world: World, taker: Actor, type: DamageType): void {
-    this.event.emit("killed", world, taker, type);
+  notifyKilled(world: World, taker: IActor, type: DamageType): void {
+    this.actorDamaging.notifyKilled(world, taker, type);
   }
 
   // about team
@@ -638,7 +563,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setTeam(team: Team): this {
-    this.team = team;
+    this.actorInfo.setTeam(team);
     return this;
   }
 
@@ -648,7 +573,7 @@ export class Actor implements Updatable {
    * @returns Team.
    */
   getTeam(): Team {
-    return this.team;
+    return this.actorInfo.getTeam();
   }
 
   /**
@@ -658,7 +583,7 @@ export class Actor implements Updatable {
    * @returns this.
    */
   setRole(role: ActorRole): this {
-    this.role = role;
+    this.actorInfo.setRole(role);
     return this;
   }
 
@@ -668,7 +593,7 @@ export class Actor implements Updatable {
    * @returns ActorRole of self.
    */
   getRole(): ActorRole {
-    return this.role;
+    return this.actorInfo.getRole();
   }
 
   /**
@@ -678,19 +603,8 @@ export class Actor implements Updatable {
    * @param addingSubActor Adding actors.
    * @returns this.
    */
-  addSubActor(...addingSubActor: Actor[]): this {
-    const someSubActorsWasAlreadySubActor = addingSubActor.some(
-      (sub) => sub.getOwnerActor() !== undefined
-    );
-    if (someSubActorsWasAlreadySubActor)
-      throw new Error("Actor was already sub actor");
-
-    addingSubActor.forEach((sub) => {
-      this.subActors.add(sub);
-      this.attachActor(sub, false);
-      sub.ownerActor = this;
-    });
-
+  addSubActor(...addingSubActor: IActor[]): this {
+    this.actorSubActors.addSubActor(...addingSubActor);
     return this;
   }
 
@@ -701,46 +615,15 @@ export class Actor implements Updatable {
    * @param removingSubActor Removing actors.
    * @returns this.
    */
-  removeSubActor(...removingSubActor: Actor[]): this {
-    const someActorIsNotOwnedByThis = removingSubActor.some(
-      (sub) => sub.getOwnerActor() !== this
-    );
-    if (someActorIsNotOwnedByThis)
-      throw new Error("Actor is not this sub actor");
-
-    removingSubActor.forEach((sub) => {
-      this.subActors.delete(sub);
-      this.detachActor(sub, true);
-      sub.ownerActor = undefined;
-    });
-
+  removeSubActor(...removingSubActor: IActor[]): this {
+    this.actorSubActors.removeSubActor(...removingSubActor);
     return this;
-  }
-
-  /**
-   * Check this has given actor as sub actor.
-   *
-   * @param subActor
-   * @returns this.
-   */
-  hasSubActor(subActor: Actor): boolean {
-    return this.subActors.has(subActor);
-  }
-
-  /**
-   * Get parent actor if this is sub-actor.
-   * If this is not sub-actor, return undefined.
-   *
-   * @returns Owner actor or undefined.
-   */
-  getOwnerActor(): Actor | undefined {
-    return this.ownerActor;
   }
 
   /**
    * Get sub-actors.
    */
-  getSubActors(): Actor[] {
-    return Array.from(this.subActors);
+  getSubActors(): IActor[] {
+    return this.actorSubActors.getSubActors();
   }
 }

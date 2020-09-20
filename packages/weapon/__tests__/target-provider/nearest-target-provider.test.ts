@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import { Vector } from "trans-vector2d";
 import {
+  IActor,
   Actor,
   World,
   Team,
@@ -23,7 +24,7 @@ const targetableActor = (): Actor => {
     .initHealth(1, 1);
 };
 
-const addActorsToWorld = (world: World, actors: readonly Actor[]): void => {
+const addActorsToWorld = (world: World, actors: readonly IActor[]): void => {
   jest
     .spyOn(world, "iterateActors")
     .mockImplementation(() => new Set(actors).values());

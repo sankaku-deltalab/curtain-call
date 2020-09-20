@@ -1,6 +1,7 @@
 import { inject, autoInjectable } from "tsyringe";
 import { Matrix, Vector, VectorLike } from "trans-vector2d";
 import {
+  IActor,
   Actor,
   ActorEvent,
   Transformation,
@@ -109,7 +110,7 @@ export class SimpleBullet extends Actor {
     this.cancelRemovingSelfFromWorld();
   }
 
-  private processHit(world: World, other: Actor): boolean {
+  private processHit(world: World, other: IActor): boolean {
     if (this.shouldRemoveSelfFromWorld(world)) return false;
     other.takeDamage(world, this.damage, this, {
       name: this.damageName,

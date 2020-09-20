@@ -1,4 +1,4 @@
-import { Actor, Team, World, ActorRole } from "@curtain-call/actor";
+import { IActor, Team, World, ActorRole } from "@curtain-call/actor";
 import { TargetProvider } from "./target-provider";
 
 /**
@@ -12,9 +12,9 @@ import { TargetProvider } from "./target-provider";
  *   .setUser(user);
  */
 export class NearestTargetProvider implements TargetProvider {
-  private user?: Actor;
+  private user?: IActor;
   private targeTeam?: Team;
-  private currentTarget?: Actor;
+  private currentTarget?: IActor;
 
   /**
    * Set user of self.
@@ -22,7 +22,7 @@ export class NearestTargetProvider implements TargetProvider {
    * @param user
    * @returns this.
    */
-  setUser(user: Actor): this {
+  setUser(user: IActor): this {
     this.user = user;
     return this;
   }
@@ -44,7 +44,7 @@ export class NearestTargetProvider implements TargetProvider {
    * @param world Our world.
    * @returns Target transformation.
    */
-  getTarget(world: World): Actor | undefined {
+  getTarget(world: World): IActor | undefined {
     if (
       !this.user ||
       !this.currentTarget ||
@@ -56,7 +56,7 @@ export class NearestTargetProvider implements TargetProvider {
     return this.currentTarget;
   }
 
-  private targetIsTargetable(world: World, target: Actor): boolean {
+  private targetIsTargetable(world: World, target: IActor): boolean {
     return (
       world.hasActor(target) &&
       !target.shouldRemoveSelfFromWorld(world) &&
@@ -66,7 +66,7 @@ export class NearestTargetProvider implements TargetProvider {
     );
   }
 
-  private searchTarget(world: World): Actor | undefined {
+  private searchTarget(world: World): IActor | undefined {
     if (!this.user) return undefined;
 
     const {
@@ -76,7 +76,7 @@ export class NearestTargetProvider implements TargetProvider {
       this.targetIsTargetable(world, ac)
     );
 
-    const actorsWithDistance = actors.map<{ distance: number; actor?: Actor }>(
+    const actorsWithDistance = actors.map<{ distance: number; actor?: IActor }>(
       (ac) => {
         const targetPos = ac.getTransformation().getGlobal().decompose()
           .translation;

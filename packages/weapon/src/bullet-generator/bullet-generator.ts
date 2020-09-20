@@ -1,5 +1,5 @@
 import { VectorLike, Matrix } from "trans-vector2d";
-import { Actor, World } from "@curtain-call/actor";
+import { IActor, World } from "@curtain-call/actor";
 import { Weapon } from "../weapon";
 
 export interface BulletStyle {
@@ -16,5 +16,5 @@ export interface BulletGenerator {
     elapsedSec: number,
     params: Map<string, number>,
     texts: Map<string, string>
-  ): Actor | undefined;
+  ): IActor | undefined;
 }
