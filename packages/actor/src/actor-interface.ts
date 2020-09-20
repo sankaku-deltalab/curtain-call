@@ -65,7 +65,7 @@ export interface Actor extends Updatable {
    * @param controller Controller.
    * @returns this.
    */
-  notifyControlledBy(controller: ActorController): this;
+  setController(controller: ActorController): this;
 
   /**
    * Move to specified position.

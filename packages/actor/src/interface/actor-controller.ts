@@ -1,4 +1,5 @@
 import { Actor } from "../actor";
+import { World } from "./world";
 
 export interface ActorController {
   /**
@@ -12,5 +13,13 @@ export interface ActorController {
    * @param actor Actor.
    * @returns this.
    */
-  ownActor(actor: Actor): this;
+  notifyUsedBy(actor: Actor): this;
+
+  /**
+   * Update self.
+   *
+   * @param world World.
+   * @param deltaSec Delta seconds.
+   */
+  update(world: World, deltaSec: number): void;
 }

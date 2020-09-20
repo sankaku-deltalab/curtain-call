@@ -12,6 +12,7 @@ import {
   DamageType,
   Mover,
   IActor,
+  ActorController,
 } from "../src";
 
 export const moverMockClass = jest.fn<Mover, [boolean, Vector]>(
@@ -131,6 +132,12 @@ export const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
   update: jest.fn(),
 }));
 
+export const controllerMockClass = jest.fn<ActorController, []>(() => ({
+  getActor: jest.fn(),
+  notifyUsedBy: jest.fn(),
+  update: jest.fn(),
+}));
+
 export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
   const event = new EventEmitter<{
     // world
@@ -138,19 +145,19 @@ export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
     removedFromWorld: [World];
     updated: [World, number];
     // collision
-    overlapped: [World, Set<Actor>];
+    overlapped: [World, Set<IActor>];
     // health
-    takenDamage: [World, number, Actor, DamageType];
-    dead: [World, Actor, DamageType];
+    takenDamage: [World, number, IActor, DamageType];
+    dead: [World, IActor, DamageType];
     beHealed: [World, number];
     // damage dealer
-    dealDamage: [World, number, Actor, DamageType];
-    killed: [World, Actor, DamageType];
+    dealDamage: [World, number, IActor, DamageType];
+    killed: [World, IActor, DamageType];
   }>();
   return {
     event,
     getController: jest.fn(),
-    notifyControlledBy: jest.fn().mockReturnThis(),
+    setController: jest.fn().mockReturnThis(),
     moveTo: jest.fn().mockReturnThis(),
     rotateTo: jest.fn().mockReturnThis(),
     setLocalTransform: jest.fn().mockReturnThis(),
