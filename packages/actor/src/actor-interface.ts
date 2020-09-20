@@ -459,22 +459,6 @@ export interface Actor extends Updatable {
   removeSubActor(...removingSubActor: Actor[]): this;
 
   /**
-   * Check this has given actor as sub actor.
-   *
-   * @param subActor
-   * @returns this.
-   */
-  hasSubActor(subActor: Actor): boolean;
-
-  /**
-   * Get parent actor if this is sub-actor.
-   * If this is not sub-actor, return undefined.
-   *
-   * @returns Owner actor or undefined.
-   */
-  getOwnerActor(): Actor | undefined;
-
-  /**
    * Get sub-actors.
    */
   getSubActors(): Actor[];
