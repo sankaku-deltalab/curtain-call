@@ -330,7 +330,7 @@ export class World implements IWorld {
 
   private removeActorsShouldRemove(): void {
     const removing = new Array(...this.actors).filter((ac) =>
-      ac.shouldRemoveSelfFromWorld(this)
+      ac.shouldBeRemovedFromWorld(this)
     );
     removing.forEach((ac) => {
       this.removeActor(ac);

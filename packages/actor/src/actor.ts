@@ -275,11 +275,11 @@ export class Actor implements IActor {
    * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(world: World): boolean {
+  shouldBeRemovedFromWorld(world: World): boolean {
     return (
-      this.actorController.shouldRemoveSelfFromWorld(world) ||
-      this.actorWithWorld.shouldRemoveSelfFromWorld(world) ||
-      this.actorDamaging.shouldRemoveSelfFromWorld()
+      this.actorController.shouldBeRemovedFromWorld(world) ||
+      this.actorWithWorld.shouldBeRemovedFromWorld(world) ||
+      this.actorDamaging.shouldBeRemovedFromWorld()
     );
   }
 

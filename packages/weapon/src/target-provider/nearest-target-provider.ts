@@ -59,7 +59,7 @@ export class NearestTargetProvider implements TargetProvider {
   private targetIsTargetable(world: World, target: IActor): boolean {
     return (
       world.hasActor(target) &&
-      !target.shouldRemoveSelfFromWorld(world) &&
+      !target.shouldBeRemovedFromWorld(world) &&
       !target.isDead() &&
       target.getRole() === ActorRole.character &&
       target.getTeam() === this.targeTeam

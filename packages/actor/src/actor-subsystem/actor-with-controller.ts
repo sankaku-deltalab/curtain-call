@@ -40,8 +40,8 @@ export class ActorWithController {
    * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(world: World): boolean {
+  shouldBeRemovedFromWorld(world: World): boolean {
     if (!this.controller) return false;
-    return this.controller.shouldRemoveSelfFromWorld(world);
+    return this.controller.shouldBeRemovedFromWorld(world);
   }
 }

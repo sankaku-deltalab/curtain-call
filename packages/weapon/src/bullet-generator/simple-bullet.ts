@@ -63,12 +63,12 @@ export class SimpleBullet extends Actor {
    * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(world: World): boolean {
+  shouldBeRemovedFromWorld(world: World): boolean {
     const { translation } = this.getTransformation().getGlobal().decompose();
     const isNotVisible =
       world.getCamera().calcVisibilityStatus(translation, this.visualRadius) ===
       PositionInAreaStatus.outOfArea;
-    return isNotVisible || super.shouldRemoveSelfFromWorld(world);
+    return isNotVisible || super.shouldBeRemovedFromWorld(world);
   }
 
   /**
@@ -97,7 +97,7 @@ export class SimpleBullet extends Actor {
 
     this.event.on("overlapped", (world, others) => {
       others.forEach((other) => {
-        if (this.shouldRemoveSelfFromWorld(world)) return;
+        if (this.shouldBeRemovedFromWorld(world)) return;
         this.processHit(world, other);
       });
     });
@@ -111,7 +111,7 @@ export class SimpleBullet extends Actor {
   }
 
   private processHit(world: World, other: IActor): boolean {
-    if (this.shouldRemoveSelfFromWorld(world)) return false;
+    if (this.shouldBeRemovedFromWorld(world)) return false;
     other.takeDamage(world, this.damage, this, {
       name: this.damageName,
     });

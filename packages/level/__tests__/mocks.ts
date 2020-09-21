@@ -11,7 +11,7 @@ export const levelMockClass = jest.fn<Level, []>(() => ({
   activate: jest.fn(),
   deactivate: jest.fn(),
   isActive: jest.fn(),
-  shouldRemoveSelfFromWorld: jest.fn().mockReturnValue(false),
+  shouldBeRemovedFromWorld: jest.fn().mockReturnValue(false),
   update: jest.fn(),
 }));
 

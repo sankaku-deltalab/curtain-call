@@ -128,7 +128,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
 
     const { bullet } = createBullet();
 
-    expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
+    expect(bullet.shouldBeRemovedFromWorld(world)).toBe(true);
   });
 
   it("deal damage when hit to enemy", () => {
@@ -160,7 +160,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
       .mockReturnValue({ actualDamage: 1, died: false });
     bullet.notifyOverlappedWith(world, new Set([victim]));
 
-    expect(bullet.shouldRemoveSelfFromWorld(world)).toBe(true);
+    expect(bullet.shouldBeRemovedFromWorld(world)).toBe(true);
   });
 
   it("can clear for reuse self", () => {

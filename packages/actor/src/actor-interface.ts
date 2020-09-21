@@ -200,7 +200,7 @@ export interface Actor {
    * @param world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(world: World): boolean;
+  shouldBeRemovedFromWorld(world: World): boolean;
 
   /**
    * Notify added to world.

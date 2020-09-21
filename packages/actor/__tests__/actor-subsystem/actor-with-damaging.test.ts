@@ -171,7 +171,7 @@ describe("@curtain-call/actor.ActorWithDamaging", () => {
     const { actor } = createActorWithDamaging();
     jest.spyOn(actor, "isDead").mockReturnValue(true);
 
-    expect(actor.shouldRemoveSelfFromWorld()).toBe(true);
+    expect(actor.shouldBeRemovedFromWorld()).toBe(true);
   });
 
   it("can heal", () => {

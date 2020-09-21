@@ -67,6 +67,6 @@ describe("@curtain-call/timer", () => {
     const timer = new Timer(false, 30, callback).deactivate();
 
     expect(timer.isActive()).toBe(false);
-    expect(timer.shouldRemoveSelfFromWorld()).toBe(true);
+    expect(timer.shouldBeRemovedFromWorld()).toBe(true);
   });
 });

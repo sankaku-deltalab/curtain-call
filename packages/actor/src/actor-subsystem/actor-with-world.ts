@@ -37,7 +37,7 @@ export class ActorWithWorld {
    * @param _world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(_world: World): boolean {
+  shouldBeRemovedFromWorld(_world: World): boolean {
     const lifeTimeIsOver =
       this.lifeTimeSec !== undefined && this.lifeTimeSec <= 0;
     return this.shouldRemoveSelf || lifeTimeIsOver;

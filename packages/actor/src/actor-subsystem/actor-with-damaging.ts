@@ -26,7 +26,7 @@ export class ActorWithDamaging {
    *
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean {
+  shouldBeRemovedFromWorld(): boolean {
     return this.isDead();
   }
 

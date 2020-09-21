@@ -154,12 +154,12 @@ describe("@curtain-call/actors-spawner", () => {
     spawner.start(world);
     spawner.update(world, 10);
 
-    expect(spawner.shouldRemoveSelfFromWorld(world)).toBe(false);
+    expect(spawner.shouldBeRemovedFromWorld(world)).toBe(false);
 
     const removedActors = [2, 1, 0, 3].map((i) => actors[i]);
     removedActors.forEach((ac) => ac.notifyRemovedFromWorld(world));
 
     spawner.update(world, 10);
-    expect(spawner.shouldRemoveSelfFromWorld(world)).toBe(true);
+    expect(spawner.shouldBeRemovedFromWorld(world)).toBe(true);
   });
 });

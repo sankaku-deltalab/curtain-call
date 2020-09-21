@@ -44,7 +44,7 @@ export class Timer implements ITimer {
    *
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean {
+  shouldBeRemovedFromWorld(): boolean {
     return !this.active;
   }
 

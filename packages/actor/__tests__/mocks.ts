@@ -134,7 +134,7 @@ export const controllerMockClass = jest.fn<ActorController, []>(() => ({
   getActor: jest.fn(),
   notifyUsedBy: jest.fn(),
   update: jest.fn(),
-  shouldRemoveSelfFromWorld: jest.fn(),
+  shouldBeRemovedFromWorld: jest.fn(),
 }));
 
 export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
@@ -172,7 +172,7 @@ export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
     removeMover: jest.fn().mockReturnThis(),
     reserveRemovingSelfFromWorld: jest.fn().mockReturnThis(),
     cancelRemovingSelfFromWorld: jest.fn().mockReturnThis(),
-    shouldRemoveSelfFromWorld: jest.fn(),
+    shouldBeRemovedFromWorld: jest.fn(),
     notifyAddedToWorld: jest.fn(),
     notifyRemovedFromWorld: jest.fn(),
     update: jest.fn(),

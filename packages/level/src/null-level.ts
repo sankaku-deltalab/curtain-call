@@ -60,7 +60,7 @@ export class NullLevel implements Level {
    *
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(): boolean {
+  shouldBeRemovedFromWorld(): boolean {
     return false;
   }
 

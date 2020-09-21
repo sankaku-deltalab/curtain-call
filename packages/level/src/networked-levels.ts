@@ -128,7 +128,7 @@ export class NetworkedLevels implements Level {
    * @param _world World.
    * @returns Self must remove from world.
    */
-  shouldRemoveSelfFromWorld(_world: World): boolean {
+  shouldBeRemovedFromWorld(_world: World): boolean {
     return false;
   }
 
