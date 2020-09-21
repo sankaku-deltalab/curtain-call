@@ -1,4 +1,8 @@
-import { controllerMockClass, worldMock } from "../mocks";
+import {
+  controllerMockClass,
+  actorInterfaceMockClass,
+  worldMock,
+} from "../mocks";
 import { ActorWithController } from "../../src";
 
 describe("@curtain-call/actor.ActorWithController", () => {
@@ -17,10 +21,11 @@ describe("@curtain-call/actor.ActorWithController", () => {
     actor.setController(controller);
 
     const world = new worldMock();
+    const parent = new actorInterfaceMockClass();
     const deltaSec = 0.125;
-    actor.update(world, deltaSec);
+    actor.update(world, parent, deltaSec);
 
-    expect(controller.update).toBeCalledWith(world, deltaSec);
+    expect(controller.update).toBeCalledWith(world, parent, deltaSec);
   });
 
   it("should be remove if controller should be removed", () => {
@@ -30,11 +35,12 @@ describe("@curtain-call/actor.ActorWithController", () => {
     actor.setController(controller);
 
     const world = new worldMock();
+    const parent = new actorInterfaceMockClass();
     const deltaSec = 0.125;
-    actor.update(world, deltaSec);
+    actor.update(world, parent, deltaSec);
 
-    const shouldRemoveActor = actor.shouldBeRemovedFromWorld(world);
+    const shouldRemoveActor = actor.shouldBeRemovedFromWorld(world, parent);
     expect(shouldRemoveActor).toBe(true);
-    expect(controller.shouldBeRemovedFromWorld).toBeCalledWith(world);
+    expect(controller.shouldBeRemovedFromWorld).toBeCalledWith(world, parent);
   });
 });

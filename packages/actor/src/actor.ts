@@ -277,7 +277,7 @@ export class Actor implements IActor {
    */
   shouldBeRemovedFromWorld(world: World): boolean {
     return (
-      this.actorController.shouldBeRemovedFromWorld(world) ||
+      this.actorController.shouldBeRemovedFromWorld(world, this) ||
       this.actorWithWorld.shouldBeRemovedFromWorld(world) ||
       this.actorDamaging.shouldBeRemovedFromWorld()
     );
@@ -311,7 +311,7 @@ export class Actor implements IActor {
    */
   update(world: World, deltaSec: number): void {
     this.actorTimer.update(world, deltaSec);
-    this.actorController.update(world, deltaSec);
+    this.actorController.update(world, this, deltaSec);
     this.actorTransform.update(world, deltaSec);
     this.actorWithWorld.update(world, deltaSec);
     this.actorDisplay.update(world, deltaSec);
