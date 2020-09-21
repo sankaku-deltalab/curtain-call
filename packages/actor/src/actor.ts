@@ -9,6 +9,7 @@ import {
   CollisionShape,
   CollisionGroup,
   ActorController,
+  Timer,
   Transformation,
 } from "./interface";
 import {
@@ -25,6 +26,7 @@ import {
   ActorWithDisplayObject,
   ActorWithInfo,
   ActorWithSubActors,
+  ActorWithTimer,
   ActorWithTransformation,
   ActorWithWorld,
 } from "./actor-subsystem";
@@ -45,6 +47,7 @@ export class Actor implements IActor {
   private readonly actorDisplay: ActorWithDisplayObject;
   private readonly actorInfo: ActorWithInfo;
   private readonly actorSubActors: ActorWithSubActors;
+  private readonly actorTimer: ActorWithTimer;
   private readonly actorTransform: ActorWithTransformation;
   private readonly actorWithWorld: ActorWithWorld;
 
@@ -63,6 +66,7 @@ export class Actor implements IActor {
     this.actorDisplay = new ActorWithDisplayObject(trans);
     this.actorInfo = new ActorWithInfo();
     this.actorSubActors = new ActorWithSubActors(trans);
+    this.actorTimer = new ActorWithTimer();
     this.actorTransform = new ActorWithTransformation(trans);
     this.actorWithWorld = new ActorWithWorld(event);
   }
@@ -85,6 +89,30 @@ export class Actor implements IActor {
    */
   setController(controller: ActorController): this {
     this.actorController.setController(controller);
+    return this;
+  }
+
+  // about timer
+
+  /**
+   * Add timer.
+   *
+   * @param timer
+   * @returns this.
+   */
+  addTimer(timer: Timer): this {
+    this.actorTimer.addTimer(timer);
+    return this;
+  }
+
+  /**
+   * Remove timer.
+   *
+   * @param timer
+   * @returns this.
+   */
+  removeTimer(timer: Timer): this {
+    this.actorTimer.removeTimer(timer);
     return this;
   }
 
@@ -281,6 +309,7 @@ export class Actor implements IActor {
    * @param deltaSec Delta seconds.
    */
   update(world: World, deltaSec: number): void {
+    this.actorTimer.update(world, deltaSec);
     this.actorController.update(world, deltaSec);
     this.actorTransform.update(world, deltaSec);
     this.actorWithWorld.update(world, deltaSec);

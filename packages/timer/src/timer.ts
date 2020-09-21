@@ -1,4 +1,4 @@
-import { World } from "@curtain-call/actor";
+import { World, Timer as ITimer } from "@curtain-call/actor";
 
 /**
  * Timer.
@@ -10,7 +10,7 @@ import { World } from "@curtain-call/actor";
  *
  * actor.addTimer(timer);
  */
-export class Timer {
+export class Timer implements ITimer {
   private elapsedSec = 0;
   private active = true;
 

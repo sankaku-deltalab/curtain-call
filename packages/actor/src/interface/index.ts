@@ -8,5 +8,6 @@ export * from "./finite-resource";
 export * from "./mover";
 export * from "./pointer-input";
 export * from "./pointer-input-receiver";
+export * from "./timer";
 export * from "./transformation";
 export * from "./world";

@@ -11,6 +11,7 @@ import {
   CollisionGroup,
   ActorController,
   Transformation,
+  Timer,
   EventEmitter as IEventEmitter,
 } from "./interface";
 
@@ -65,6 +66,22 @@ export interface Actor {
    * @returns this.
    */
   setController(controller: ActorController): this;
+
+  /**
+   * Add timer.
+   *
+   * @param timer
+   * @returns this.
+   */
+  addTimer(timer: Timer): this;
+
+  /**
+   * Remove timer.
+   *
+   * @param timer
+   * @returns this.
+   */
+  removeTimer(timer: Timer): this;
 
   /**
    * Move to specified position.
