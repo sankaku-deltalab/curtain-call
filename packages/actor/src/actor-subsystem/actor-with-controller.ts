@@ -33,4 +33,15 @@ export class ActorWithController {
   update(world: World, deltaSec: number): void {
     if (this.controller) this.controller.update(world, deltaSec);
   }
+
+  /**
+   * If remove self from world, this function must be true.
+   *
+   * @param world World.
+   * @returns Self must remove from world.
+   */
+  shouldRemoveSelfFromWorld(world: World): boolean {
+    if (!this.controller) return false;
+    return this.controller.shouldRemoveSelfFromWorld(world);
+  }
 }

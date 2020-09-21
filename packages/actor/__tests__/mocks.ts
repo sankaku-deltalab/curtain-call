@@ -134,6 +134,7 @@ export const controllerMockClass = jest.fn<ActorController, []>(() => ({
   getActor: jest.fn(),
   notifyUsedBy: jest.fn(),
   update: jest.fn(),
+  shouldRemoveSelfFromWorld: jest.fn(),
 }));
 
 export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {

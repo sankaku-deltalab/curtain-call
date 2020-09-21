@@ -22,4 +22,19 @@ describe("@curtain-call/actor.ActorWithController", () => {
 
     expect(controller.update).toBeCalledWith(world, deltaSec);
   });
+
+  it("should be remove if controller should be removed", () => {
+    const controller = new controllerMockClass();
+    jest.spyOn(controller, "shouldRemoveSelfFromWorld").mockReturnValue(true);
+    const actor = new ActorWithController();
+    actor.setController(controller);
+
+    const world = new worldMock();
+    const deltaSec = 0.125;
+    actor.update(world, deltaSec);
+
+    const shouldRemoveActor = actor.shouldRemoveSelfFromWorld(world);
+    expect(shouldRemoveActor).toBe(true);
+    expect(controller.shouldRemoveSelfFromWorld).toBeCalledWith(world);
+  });
 });
