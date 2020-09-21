@@ -9,7 +9,6 @@ import {
 import {
   createWorld,
   engineMockClass,
-  updatableMockClass,
   displayObjectMockClass,
   pointerInputReceiverMockClass,
   transMockClass,
@@ -363,42 +362,6 @@ describe("@curtain-call/world.World", () => {
       const downPos = downPosMod(canvasDownPos);
       expect(downPos).toBe(convertedGamePos);
     });
-  });
-
-  it("can add Updatable objects", () => {
-    const { world } = createWorld();
-    const updatable = new updatableMockClass();
-
-    const deltaSec = 123;
-    world.addUpdatable(updatable);
-    world.update(new engineMockClass(), deltaSec);
-
-    expect(updatable.update).toBeCalledWith(world, deltaSec);
-  });
-
-  it("can remove Updatable objects", () => {
-    const { world } = createWorld();
-    const updatable = new updatableMockClass();
-
-    const deltaSec = 123;
-    world.addUpdatable(updatable).removeUpdatable(updatable);
-    world.update(new engineMockClass(), deltaSec);
-
-    expect(updatable.update).not.toBeCalled();
-  });
-
-  it("can remove Updatable objects should remove", () => {
-    const { world } = createWorld();
-    const updatable1 = new updatableMockClass();
-    const updatable2 = new updatableMockClass();
-    jest.spyOn(updatable2, "shouldRemoveSelfFromWorld").mockReturnValue(true);
-
-    const deltaSec = 123;
-    world.addUpdatable(updatable1).addUpdatable(updatable2);
-    world.update(new engineMockClass(), deltaSec);
-
-    expect(updatable1.update).toBeCalled();
-    expect(updatable2.update).not.toBeCalled();
   });
 
   it("check overlapping when updated", () => {

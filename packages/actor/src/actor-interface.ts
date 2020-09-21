@@ -11,7 +11,6 @@ import {
   CollisionGroup,
   ActorController,
   Transformation,
-  Updatable,
   EventEmitter as IEventEmitter,
 } from "./interface";
 
@@ -47,7 +46,7 @@ export type ActorEvent = IEventEmitter<{
 /**
  * Actor is individual in world.
  */
-export interface Actor extends Updatable {
+export interface Actor {
   /** Event. */
   readonly event: ActorEvent;
 

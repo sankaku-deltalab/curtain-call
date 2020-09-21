@@ -1,11 +1,11 @@
-import { World, Updatable, EventEmitter as IEventEmitter } from "../interface";
+import { World, EventEmitter as IEventEmitter } from "../interface";
 
 export type ActorWithWorldEvent = IEventEmitter<{
   addedToWorld: [World];
   removedFromWorld: [World];
 }>;
 
-export class ActorWithWorld implements Updatable {
+export class ActorWithWorld {
   private lifeTimeSec?: number;
   private shouldRemoveSelf = false;
 

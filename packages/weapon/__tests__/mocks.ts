@@ -71,8 +71,6 @@ export const worldMockClass = jest.fn<World, []>(() => {
     removeActor: jest.fn().mockReturnThis(),
     hasActor: jest.fn(),
     iterateActors: jest.fn(),
-    addUpdatable: jest.fn(),
-    removeUpdatable: jest.fn(),
     addPointerInputReceiver: jest.fn(),
     removePointerInputReceiver: jest.fn(),
     getPointerInputReceiver: jest.fn(),

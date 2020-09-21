@@ -5,7 +5,6 @@ import {
   Transformation,
   PointerInputReceiver,
   Engine,
-  Updatable,
   DisplayObject,
   CollisionShape,
   FiniteResource,
@@ -147,11 +146,6 @@ export const engineMockClass = jest.fn<Engine, []>(() => ({
   addWorld: jest.fn().mockReturnThis(),
   removeWorld: jest.fn().mockReturnThis(),
   destroy: jest.fn(),
-}));
-
-export const updatableMockClass = jest.fn<Updatable, []>(() => ({
-  shouldRemoveSelfFromWorld: jest.fn().mockReturnValue(false),
-  update: jest.fn(),
 }));
 
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({

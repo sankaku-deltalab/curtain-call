@@ -4,9 +4,7 @@ import { VectorLike, Vector } from "trans-vector2d";
 import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
   IActor,
-  Actor,
   World as IWorld,
-  Updatable,
   Engine,
   PositionInAreaStatus,
   PointerInputReceiver,
@@ -38,7 +36,6 @@ export class World implements IWorld {
   private readonly camera: Camera;
   private readonly displayObjectManager: DisplayObjectManager;
   private readonly actors = new Set<IActor>();
-  private readonly updatable = new Set<Updatable>();
   private readonly overlapChecker: OverlapChecker;
   private readonly mask = new PIXI.Graphics();
   private readonly coreArea: RectArea;
@@ -171,18 +168,18 @@ export class World implements IWorld {
   }
 
   /**
-   * Update this and contained Updatable object.
+   * Update this and contained actors.
    *
    * @param deltaSec Update delta seconds.
    */
   update(engine: Engine, deltaSec: number): void {
-    this.removeDeadUpdatable();
+    this.removeActorsShouldRemove();
 
     this.updateDrawArea(engine.canvasSize());
 
     this.addSubActorsIfNotAdded();
 
-    this.updatable.forEach((up) => up.update(this, deltaSec));
+    this.actors.forEach((up) => up.update(this, deltaSec));
     this.checkCollision();
     this.updatePixiDisplayObject();
     this.camera.update(deltaSec);
@@ -200,7 +197,6 @@ export class World implements IWorld {
     if (this.hasActor(actor)) throw new Error("Actor was already added");
 
     this.actors.add(actor);
-    this.addUpdatableInternal(actor);
     actor.notifyAddedToWorld(this);
 
     actor.getSubActors().forEach((sub) => {
@@ -217,15 +213,12 @@ export class World implements IWorld {
    * @returns this.
    */
   removeActor(actor: IActor): this {
-    const removing = [actor, ...actor.getSubActors()];
+    if (!this.hasActor(actor)) throw new Error("Actor was not added");
+    this.actors.delete(actor);
+    actor.notifyRemovedFromWorld(this);
 
-    if (removing.some((ac) => !this.hasActor(ac)))
-      throw new Error("Actor was not added");
-
-    removing.forEach((ac) => {
-      this.actors.delete(ac);
-      this.removeUpdatableInternal(ac);
-      ac.notifyRemovedFromWorld(this);
+    actor.getSubActors().forEach((sub) => {
+      this.removeActor(sub);
     });
 
     return this;
@@ -248,34 +241,6 @@ export class World implements IWorld {
    */
   iterateActors(): IterableIterator<IActor> {
     return this.actors.values();
-  }
-
-  /**
-   * Add Updatable object.
-   *
-   * @warn Do not add `Actor`. Use `addActor` instead.
-   * @param updatable Adding Updatable object.
-   * @returns this.
-   */
-  addUpdatable(updatable: Updatable): this {
-    if (updatable instanceof Actor)
-      throw new Error("Do not add Actor as Updatable");
-    this.updatable.add(updatable);
-    return this;
-  }
-
-  /**
-   * Remove Updatable object.
-   *
-   * @warn Do not remove `Actor`. Use `removeActor` instead.
-   * @param updatable Removing Updatable object.
-   * @returns this.
-   */
-  removeUpdatable(updatable: Updatable): this {
-    if (updatable instanceof Actor)
-      throw new Error("Do not remove Actor as Updatable");
-    this.updatable.delete(updatable);
-    return this;
   }
 
   /**
@@ -363,14 +328,12 @@ export class World implements IWorld {
     return this.coreArea.calcPositionStatus(globalPos, radius);
   }
 
-  private removeDeadUpdatable(): void {
-    this.updatable.forEach((up) => {
-      if (!up.shouldRemoveSelfFromWorld(this)) return;
-      if (up instanceof Actor) {
-        this.removeActor(up);
-      } else {
-        this.removeUpdatable(up);
-      }
+  private removeActorsShouldRemove(): void {
+    const removing = new Array(...this.actors).filter((ac) =>
+      ac.shouldRemoveSelfFromWorld(this)
+    );
+    removing.forEach((ac) => {
+      this.removeActor(ac);
     });
   }
 
@@ -381,16 +344,6 @@ export class World implements IWorld {
         this.addActor(sub);
       });
     });
-  }
-
-  private addUpdatableInternal(updatable: Updatable): this {
-    this.updatable.add(updatable);
-    return this;
-  }
-
-  private removeUpdatableInternal(updatable: Updatable): this {
-    this.updatable.delete(updatable);
-    return this;
   }
 
   private updatePixiDisplayObject(): void {

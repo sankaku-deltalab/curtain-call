@@ -3,7 +3,6 @@ import * as PIXI from "pixi.js";
 import { Engine } from "./engine";
 import { Camera } from "./camera";
 import { Actor as IActor } from "../actor-interface";
-import { Updatable } from "./updatable";
 import { EventEmitter } from "./event-emitter";
 import { PointerInputReceiver } from "./pointer-input-receiver";
 
@@ -59,7 +58,7 @@ export interface World {
   getCamera(): Camera;
 
   /**
-   * Update this and contained Updatable object.
+   * Update this and contained actors.
    *
    * @param engine Engine owning self.
    * @param deltaSec Update delta seconds.
@@ -96,24 +95,6 @@ export interface World {
    * @returns Added actors iterator.
    */
   iterateActors(): IterableIterator<IActor>;
-
-  /**
-   * Add Updatable object.
-   *
-   * @warn Do not add `Actor`. Use `addActor` instead.
-   * @param updatable Adding Updatable object.
-   * @returns this.
-   */
-  addUpdatable(updatable: Updatable): this;
-
-  /**
-   * Remove Updatable object.
-   *
-   * @warn Do not remove `Actor`. Use `removeActor` instead.
-   * @param updatable Removing Updatable object.
-   * @returns this.
-   */
-  removeUpdatable(updatable: Updatable): this;
 
   /**
    * Add pointer input receiver.

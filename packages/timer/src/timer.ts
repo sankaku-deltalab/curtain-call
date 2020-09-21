@@ -1,4 +1,4 @@
-import { Updatable, World } from "@curtain-call/actor";
+import { World } from "@curtain-call/actor";
 
 /**
  * Timer.
@@ -8,9 +8,9 @@ import { Updatable, World } from "@curtain-call/actor";
  *   // do something.
  * });
  *
- * world.addUpdatable(timer);
+ * actor.addTimer(timer);
  */
-export class Timer implements Updatable {
+export class Timer {
   private elapsedSec = 0;
   private active = true;
 

@@ -1,10 +1,10 @@
 import { Asset } from "@curtain-call/asset";
-import { Updatable, World } from "@curtain-call/actor";
+import { World } from "@curtain-call/actor";
 
 /**
  * Level manage asset loading.
  */
-export interface Level extends Updatable {
+export interface Level {
   /**
    * Load assets.
    *
