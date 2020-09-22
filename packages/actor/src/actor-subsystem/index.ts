@@ -1,5 +1,5 @@
 export * from "./actor-with-collision";
-export * from "./actor-with-controller";
+export * from "./actor-with-extension";
 export * from "./actor-with-damaging";
 export * from "./actor-with-display-object";
 export * from "./actor-with-info";

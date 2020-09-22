@@ -9,7 +9,7 @@ import {
   Mover,
   CollisionShape,
   CollisionGroup,
-  ActorController,
+  ActorExtension,
   Transformation,
   Timer,
   EventEmitter as IEventEmitter,
@@ -52,20 +52,19 @@ export interface Actor {
   readonly event: ActorEvent;
 
   /**
-   * Get controller.
-   * If self is not controlled by ActorController, return undefined.
+   * Get extensions.
    *
-   * @returns Controller.
+   * @returns Extensions.
    */
-  getController(): ActorController | undefined;
+  getExtensions(): readonly ActorExtension[];
 
   /**
-   * Set controller.
+   * Add extension.
    *
-   * @param controller Controller.
+   * @param extension: Adding extension.
    * @returns this.
    */
-  setController(controller: ActorController): this;
+  addExtension(extension: ActorExtension): this;
 
   /**
    * Add timer.

@@ -1,7 +1,14 @@
 import { Actor } from "../actor-interface";
 import { World } from "./world";
 
-export interface ActorController {
+export interface ActorExtension {
+  /**
+   * Notify added to actor.
+   *
+   * @param actor Actor using this.
+   */
+  notifyAddedToActor(actor: Actor): void;
+
   /**
    * Update self.
    *

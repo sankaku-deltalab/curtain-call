@@ -1,4 +1,4 @@
-export * from "./actor-controller";
+export * from "./actor-extension";
 export * from "./camera";
 export * from "./collision";
 export * from "./display-object";

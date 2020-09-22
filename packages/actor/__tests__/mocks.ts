@@ -12,7 +12,7 @@ import {
   DamageType,
   Mover,
   IActor,
-  ActorController,
+  ActorExtension,
 } from "../src";
 
 export const moverMockClass = jest.fn<Mover, [boolean, Vector]>(
@@ -130,9 +130,8 @@ export const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
   update: jest.fn(),
 }));
 
-export const controllerMockClass = jest.fn<ActorController, []>(() => ({
-  getActor: jest.fn(),
-  notifyUsedBy: jest.fn(),
+export const extensionMockClass = jest.fn<ActorExtension, []>(() => ({
+  notifyAddedToActor: jest.fn(),
   update: jest.fn(),
   shouldBeRemovedFromWorld: jest.fn(),
 }));
@@ -155,8 +154,8 @@ export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
   }>();
   return {
     event,
-    getController: jest.fn(),
-    setController: jest.fn().mockReturnThis(),
+    getExtensions: jest.fn(),
+    addExtension: jest.fn().mockReturnThis(),
     addTimer: jest.fn().mockReturnThis(),
     removeTimer: jest.fn().mockReturnThis(),
     moveTo: jest.fn().mockReturnThis(),

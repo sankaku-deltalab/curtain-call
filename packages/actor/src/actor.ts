@@ -8,7 +8,7 @@ import {
   Mover,
   CollisionShape,
   CollisionGroup,
-  ActorController,
+  ActorExtension,
   Timer,
   Transformation,
 } from "./interface";
@@ -21,7 +21,7 @@ import {
 } from "./actor-interface";
 import {
   ActorWithCollision,
-  ActorWithController,
+  ActorWithExtension,
   ActorWithDamaging,
   ActorWithDisplayObject,
   ActorWithInfo,
@@ -42,7 +42,7 @@ export class Actor implements IActor {
   public readonly event: ActorEvent;
 
   private readonly actorCollision: ActorWithCollision;
-  private readonly actorController: ActorWithController;
+  private readonly actorExtension: ActorWithExtension;
   private readonly actorDamaging: ActorWithDamaging;
   private readonly actorDisplay: ActorWithDisplayObject;
   private readonly actorInfo: ActorWithInfo;
@@ -61,7 +61,7 @@ export class Actor implements IActor {
       throw new Error("DI object is not exist");
     this.event = event;
     this.actorCollision = new ActorWithCollision(event, collision, trans);
-    this.actorController = new ActorWithController();
+    this.actorExtension = new ActorWithExtension();
     this.actorDamaging = new ActorWithDamaging(event, health);
     this.actorDisplay = new ActorWithDisplayObject(trans);
     this.actorInfo = new ActorWithInfo();
@@ -72,23 +72,22 @@ export class Actor implements IActor {
   }
 
   /**
-   * Get controller.
-   * If self is not controlled by ActorController, return undefined.
+   * Get extensions.
    *
-   * @returns Controller.
+   * @returns Extensions.
    */
-  getController(): ActorController | undefined {
-    return this.actorController.getController();
+  getExtensions(): ActorExtension[] {
+    return this.actorExtension.getExtensions();
   }
 
   /**
-   * Set controller.
+   * Add extension.
    *
-   * @param controller Controller.
+   * @param extension: Adding extension.
    * @returns this.
    */
-  setController(controller: ActorController): this {
-    this.actorController.setController(controller);
+  addExtension(extension: ActorExtension): this {
+    this.actorExtension.addExtension(extension, this);
     return this;
   }
 
@@ -277,7 +276,7 @@ export class Actor implements IActor {
    */
   shouldBeRemovedFromWorld(world: World): boolean {
     return (
-      this.actorController.shouldBeRemovedFromWorld(world, this) ||
+      this.actorExtension.shouldBeRemovedFromWorld(world, this) ||
       this.actorWithWorld.shouldBeRemovedFromWorld(world) ||
       this.actorDamaging.shouldBeRemovedFromWorld()
     );
@@ -311,7 +310,7 @@ export class Actor implements IActor {
    */
   update(world: World, deltaSec: number): void {
     this.actorTimer.update(world, deltaSec);
-    this.actorController.update(world, this, deltaSec);
+    this.actorExtension.update(world, this, deltaSec);
     this.actorTransform.update(world, deltaSec);
     this.actorWithWorld.update(world, deltaSec);
     this.actorDisplay.update(world, deltaSec);
