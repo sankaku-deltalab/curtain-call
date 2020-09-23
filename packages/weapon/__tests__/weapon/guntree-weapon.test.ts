@@ -9,6 +9,7 @@ import {
   worldMockClass,
   healthMockClass,
   collisionMockClass,
+  actorInterfaceMockClass,
 } from "../mocks";
 import { GuntreeWeapon, BulletGenerator, TargetProvider } from "../../src";
 
@@ -75,7 +76,6 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
-      jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -88,7 +88,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
-      jest.spyOn(weapon.event, "emit");
+      const parent = new actorInterfaceMockClass();
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -98,7 +98,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
 
       weapon.stopFire();
 
-      weapon.update(world, 60);
+      weapon.update(world, parent, 60);
       expect(weapon.isFiring()).toBe(false);
     });
 
@@ -106,7 +106,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
-      jest.spyOn(weapon.event, "emit");
+      const parent = new actorInterfaceMockClass();
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -114,7 +114,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       weapon.init(args).startFire(world);
       weapon.stopFire();
 
-      weapon.update(world, 60);
+      weapon.update(world, parent, 60);
       expect(weapon.isFiring()).toBe(false);
     });
 
@@ -122,7 +122,6 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
-      jest.spyOn(weapon.event, "emit");
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);

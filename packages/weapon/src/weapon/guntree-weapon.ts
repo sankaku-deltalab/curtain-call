@@ -1,6 +1,6 @@
 import * as gt from "guntree";
-import { Transformation, World } from "@curtain-call/actor";
 import { Matrix } from "trans-vector2d";
+import { IActor, Transformation, World } from "@curtain-call/actor";
 import { BulletGenerator } from "../bullet-generator";
 import { TargetProvider } from "../target-provider";
 import { NullTargetProvider } from "../target-provider/null-target-provider";
@@ -37,7 +37,7 @@ class GuntreeOwner implements gt.Owner {
 /**
  * Fire bullets with Guntree.
  */
-export class GuntreeWeapon extends Weapon {
+export class GuntreeWeapon implements Weapon {
   private readonly player = new gt.Player();
   private world?: World;
   private guntree: gt.Gun = gt.nop();
@@ -46,8 +46,36 @@ export class GuntreeWeapon extends Weapon {
   private targetProvider: TargetProvider = new NullTargetProvider();
 
   constructor() {
-    super();
     this.player.events.on("fired", (data) => this.fireBullet(data));
+  }
+  /**
+   * Notify added to actor.
+   *
+   * @param actor Actor using this.
+   */
+  notifyAddedToActor(): void {
+    // do nothing
+  }
+
+  /**
+   * Update self.
+   *
+   * @param world World.
+   * @param actor Actor using this.
+   * @param deltaSec Delta seconds.
+   */
+  update(world: World, actor: IActor, deltaSec: number): void {
+    this.world = world;
+    this.player.update(deltaSec);
+  }
+
+  /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldBeRemovedFromWorld(): boolean {
+    return false;
   }
 
   /**
@@ -108,17 +136,6 @@ export class GuntreeWeapon extends Weapon {
    */
   forceStopFire(): void {
     this.player.forceStop();
-  }
-
-  /**
-   * Update firing process.
-   *
-   * @param _world World.
-   * @param deltaSec Delta seconds.
-   */
-  update(world: World, deltaSec: number): void {
-    this.world = world;
-    this.player.update(deltaSec);
   }
 
   protected fireBullet(data: gt.FireData): void {

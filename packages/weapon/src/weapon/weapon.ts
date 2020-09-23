@@ -1,27 +1,27 @@
-import { Actor, World } from "@curtain-call/actor";
+import { ActorExtension, World } from "@curtain-call/actor";
 
-export abstract class Weapon extends Actor {
+export interface Weapon extends ActorExtension {
   /**
    * Start firing.
    *
    * @param world World.
    */
-  abstract startFire(world: World): void;
+  startFire(world: World): void;
 
   /**
    * Is firing now.
    *
    * @returns Is firing.
    */
-  abstract isFiring(): boolean;
+  isFiring(): boolean;
 
   /**
    * Request stop firing.
    */
-  abstract stopFire(): void;
+  stopFire(): void;
 
   /**
    * Stop firing process immediately.
    */
-  abstract forceStopFire(): void;
+  forceStopFire(): void;
 }

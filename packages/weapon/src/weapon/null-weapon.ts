@@ -3,7 +3,30 @@ import { Weapon } from "./weapon";
 /**
  * Weapon do nothing.
  */
-export class NullWeapon extends Weapon {
+export class NullWeapon implements Weapon {
+  /**
+   * Notify added to actor.
+   */
+  notifyAddedToActor(): void {
+    // do nothing
+  }
+
+  /**
+   * Update self.
+   */
+  update(): void {
+    // do nothing
+  }
+
+  /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldBeRemovedFromWorld(): boolean {
+    return false;
+  }
+
   /**
    * Start firing.
    */
@@ -31,13 +54,6 @@ export class NullWeapon extends Weapon {
    * Stop firing process immediately.
    */
   forceStopFire(): void {
-    // do nothing
-  }
-
-  /**
-   * Update firing process.
-   */
-  update(): void {
     // do nothing
   }
 }

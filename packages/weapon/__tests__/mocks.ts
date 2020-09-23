@@ -2,12 +2,14 @@ import EventEmitter from "eventemitter3";
 import { Matrix } from "trans-vector2d";
 import * as PIXI from "pixi.js";
 import {
+  IActor,
   Transformation,
   FiniteResource,
   Collision,
   World,
   Camera,
   PositionInAreaStatus,
+  DamageType,
 } from "@curtain-call/actor";
 import { LocalConstantMover, RectCollisionShape, Weapon } from "../src";
 
@@ -83,6 +85,79 @@ export const worldMockClass = jest.fn<World, []>(() => {
   };
 });
 
+export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
+  const event = new EventEmitter<{
+    // world
+    addedToWorld: [World];
+    removedFromWorld: [World];
+    updated: [World, number];
+    // collision
+    overlapped: [World, Set<IActor>];
+    // health
+    takenDamage: [World, number, IActor, DamageType];
+    dead: [World, IActor, DamageType];
+    beHealed: [World, number];
+    // damage dealer
+    dealDamage: [World, number, IActor, DamageType];
+    killed: [World, IActor, DamageType];
+  }>();
+  return {
+    event,
+    getExtensions: jest.fn(),
+    addExtension: jest.fn().mockReturnThis(),
+    addTimer: jest.fn().mockReturnThis(),
+    removeTimer: jest.fn().mockReturnThis(),
+    moveTo: jest.fn().mockReturnThis(),
+    rotateTo: jest.fn().mockReturnThis(),
+    setLocalTransform: jest.fn().mockReturnThis(),
+    swapLocalTransform: jest.fn().mockReturnThis(),
+    getTransformation: jest.fn(),
+    attachActor: jest.fn().mockReturnThis(),
+    attachTransformation: jest.fn().mockReturnThis(),
+    detachActor: jest.fn().mockReturnThis(),
+    detachTransformation: jest.fn().mockReturnThis(),
+    addMover: jest.fn().mockReturnThis(),
+    removeMover: jest.fn().mockReturnThis(),
+    reserveRemovingSelfFromWorld: jest.fn().mockReturnThis(),
+    cancelRemovingSelfFromWorld: jest.fn().mockReturnThis(),
+    shouldBeRemovedFromWorld: jest.fn(),
+    notifyAddedToWorld: jest.fn(),
+    notifyRemovedFromWorld: jest.fn(),
+    update: jest.fn(),
+    setLifeTime: jest.fn().mockReturnThis(),
+    addCollisionShape: jest.fn().mockReturnThis(),
+    removeCollisionShape: jest.fn().mockReturnThis(),
+    setCollisionAsHugeNumber: jest.fn().mockReturnThis(),
+    setCollisionGroup: jest.fn().mockReturnThis(),
+    setCollisionEnable: jest.fn().mockReturnThis(),
+    getCollision: jest.fn(),
+    notifyOverlappedWith: jest.fn(),
+    addDisplayObject: jest.fn().mockReturnThis(),
+    removeDisplayObject: jest.fn().mockReturnThis(),
+    iterateDisplayObject: jest.fn(),
+    initHealth: jest.fn().mockReturnThis(),
+    health: jest.fn(),
+    healthMax: jest.fn(),
+    isDead: jest.fn(),
+    takeDamage: jest.fn(),
+    killSelf: jest.fn(),
+    heal: jest.fn(),
+    dealDamage: jest.fn(),
+    killOther: jest.fn(),
+    notifyDealtDamage: jest.fn(),
+    notifyKilled: jest.fn(),
+    setTeam: jest.fn().mockReturnThis(),
+    getTeam: jest.fn(),
+    setRole: jest.fn().mockReturnThis(),
+    getRole: jest.fn(),
+    addSubActor: jest.fn().mockReturnThis(),
+    removeSubActor: jest.fn().mockReturnThis(),
+    hasSubActor: jest.fn(),
+    getOwnerActor: jest.fn(),
+    getSubActors: jest.fn(),
+  };
+});
+
 export const localConstantMoverMockClass = jest.fn<LocalConstantMover, []>(
   () => ({
     update: jest.fn().mockReturnValue({
@@ -101,46 +176,16 @@ export const rectCollisionShapeMockClass = jest.fn<RectCollisionShape, []>(
   })
 );
 
-export class WeaponMock extends Weapon {
-  /**
-   * Start firing.
-   *
-   * @param world World.
-   */
-  startFire(_world: World): void {
-    // do nothing
-  }
+export const weaponMockClass = jest.fn<Weapon, []>(() => ({
+  notifyAddedToActor: jest.fn(),
+  update: jest.fn(),
+  shouldBeRemovedFromWorld: jest.fn(),
+  startFire: jest.fn(),
+  isFiring: jest.fn(),
+  stopFire: jest.fn(),
+  forceStopFire: jest.fn(),
+}));
 
-  /**
-   * Is firing now.
-   *
-   * @returns Is firing.
-   */
-  isFiring(): boolean {
-    return false;
-  }
-
-  /**
-   * Request stop firing.
-   */
-  stopFire(): void {
-    // do nothing
-  }
-
-  /**
-   * Stop firing process immediately.
-   */
-  forceStopFire(): void {
-    // do nothing
-  }
-}
-
-export const weaponMock = (): WeaponMock => {
-  const weapon = new WeaponMock();
-  jest.spyOn(weapon, "startFire");
-  jest.spyOn(weapon, "isFiring");
-  jest.spyOn(weapon, "stopFire");
-  jest.spyOn(weapon, "forceStopFire");
-  jest.spyOn(weapon, "update");
-  return weapon;
+export const weaponMock = (): Weapon => {
+  return new weaponMockClass();
 };
