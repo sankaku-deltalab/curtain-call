@@ -1,10 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { Matrix } from "trans-vector2d";
-import {
-  Actor,
-  diContainer as actorDiContainer,
-  Transformation,
-} from "@curtain-call/actor";
+import { Actor, diContainer as actorDiContainer } from "@curtain-call/actor";
 import {
   worldMockClass,
   transMockClass,
@@ -21,17 +17,13 @@ const actorMock = (): Actor => {
   return actor;
 };
 
-const createSpawner = (): { trans: Transformation; spawner: ActorsSpawner } => {
-  const spawner = new ActorsSpawner();
-  return { trans: spawner.getTransformation(), spawner };
-};
-
 const setupSpawner = (
   spawner: ActorsSpawner
 ): {
   actors: Actor[];
   spawning: jest.Mock;
   schedule: [number, Matrix][];
+  parent: Actor;
 } => {
   const actors = [actorMock(), actorMock(), actorMock(), actorMock()];
   const spawning = jest.fn().mockImplementation((i) => actors[i]);
@@ -42,8 +34,9 @@ const setupSpawner = (
     [1.2, Matrix.translation({ x: 5, y: 6 })],
   ];
   spawner.setSpawningFunction(spawning).setSchedule(schedule);
+  const parent = actorMock().addExtension(spawner);
 
-  return { actors, spawning, schedule };
+  return { actors, spawning, schedule, parent };
 };
 
 describe("@curtain-call/actors-spawner", () => {
@@ -62,14 +55,9 @@ describe("@curtain-call/actors-spawner", () => {
     });
   });
 
-  it("is sub-class of Actor", () => {
-    const spawner = createSpawner().spawner;
-    expect(spawner).toBeInstanceOf(Actor);
-  });
-
   it("spawn actors with given transformation and times", () => {
-    const spawner = createSpawner().spawner;
-    const { actors, spawning, schedule } = setupSpawner(spawner);
+    const spawner = new ActorsSpawner();
+    const { actors, spawning, schedule, parent } = setupSpawner(spawner);
 
     const world = new worldMockClass();
     spawner.start(world);
@@ -78,10 +66,10 @@ describe("@curtain-call/actors-spawner", () => {
     expect(world.addActor).toBeCalledWith(actors[0]);
     expect(actors[0].setLocalTransform).toBeCalledWith(schedule[0][1]);
 
-    spawner.update(world, 0.3);
+    spawner.update(world, parent, 0.3);
     expect(spawning).toBeCalledTimes(1);
 
-    spawner.update(world, 0.3);
+    spawner.update(world, parent, 0.3);
     expect(spawning).toBeCalledWith(1, 4);
     expect(spawning).toBeCalledWith(2, 4);
     expect(spawning).toBeCalledTimes(3);
@@ -90,8 +78,8 @@ describe("@curtain-call/actors-spawner", () => {
     expect(actors[1].setLocalTransform).toBeCalledWith(schedule[1][1]);
     expect(actors[2].setLocalTransform).toBeCalledWith(schedule[2][1]);
 
-    spawner.update(world, 0.7);
-    spawner.update(world, 0.7);
+    spawner.update(world, parent, 0.7);
+    spawner.update(world, parent, 0.7);
     expect(spawning).toBeCalledWith(3, 4);
     expect(spawning).toBeCalledTimes(4);
     expect(world.addActor).toBeCalledWith(actors[3]);
@@ -99,24 +87,24 @@ describe("@curtain-call/actors-spawner", () => {
   });
 
   it("do not spawn before start", () => {
-    const spawner = createSpawner().spawner;
-    const { spawning } = setupSpawner(spawner);
+    const spawner = new ActorsSpawner();
+    const { spawning, parent } = setupSpawner(spawner);
 
     const world = new worldMockClass();
-    spawner.update(world, 10);
+    spawner.update(world, parent, 10);
     expect(spawning).not.toBeCalled();
   });
 
   it("emit event when all spawned actors were dead", () => {
-    const spawner = createSpawner().spawner;
-    const { actors } = setupSpawner(spawner);
+    const spawner = new ActorsSpawner();
+    const { actors, parent } = setupSpawner(spawner);
 
     const deadEvent = jest.fn();
     spawner.event.on("allActorsWereDead", deadEvent);
 
     const world = new worldMockClass();
     spawner.start(world);
-    spawner.update(world, 10);
+    spawner.update(world, parent, 10);
 
     const deadActors = [2, 1, 0, 3].map((i) => actors[i]);
     deadActors.forEach((ac) =>
@@ -127,15 +115,15 @@ describe("@curtain-call/actors-spawner", () => {
   });
 
   it("emit event when all spawned actors were removed from world", () => {
-    const spawner = createSpawner().spawner;
-    const { actors } = setupSpawner(spawner);
+    const spawner = new ActorsSpawner();
+    const { actors, parent } = setupSpawner(spawner);
 
     const removedEvent = jest.fn();
     spawner.event.on("allActorsWereRemoved", removedEvent);
 
     const world = new worldMockClass();
     spawner.start(world);
-    spawner.update(world, 10);
+    spawner.update(world, parent, 10);
 
     const removedActors = [2, 1, 0, 3].map((i) => actors[i]);
     removedActors.forEach((ac) => ac.notifyRemovedFromWorld(world));
@@ -144,22 +132,22 @@ describe("@curtain-call/actors-spawner", () => {
   });
 
   it("reserve removing self when all spawned actors were removed from world", () => {
-    const spawner = createSpawner().spawner;
-    const { actors } = setupSpawner(spawner);
+    const spawner = new ActorsSpawner();
+    const { actors, parent } = setupSpawner(spawner);
 
     const removedEvent = jest.fn();
     spawner.event.on("allActorsWereRemoved", removedEvent);
 
     const world = new worldMockClass();
     spawner.start(world);
-    spawner.update(world, 10);
+    spawner.update(world, parent, 10);
 
-    expect(spawner.shouldBeRemovedFromWorld(world)).toBe(false);
+    expect(spawner.shouldBeRemovedFromWorld()).toBe(false);
 
     const removedActors = [2, 1, 0, 3].map((i) => actors[i]);
     removedActors.forEach((ac) => ac.notifyRemovedFromWorld(world));
 
-    spawner.update(world, 10);
-    expect(spawner.shouldBeRemovedFromWorld(world)).toBe(true);
+    spawner.update(world, parent, 10);
+    expect(spawner.shouldBeRemovedFromWorld()).toBe(true);
   });
 });

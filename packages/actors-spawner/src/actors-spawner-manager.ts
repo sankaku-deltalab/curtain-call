@@ -1,55 +1,35 @@
-import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
+  IActor,
   Actor,
   World,
-  Transformation,
   EventEmitter as IEventEmitter,
-  DamageType,
-  FiniteResource,
-  Collision,
+  ActorExtension,
 } from "@curtain-call/actor";
 import EventEmitter from "eventemitter3";
 import { ActorsSpawner } from "./actors-spawner";
 
-export { diContainer };
-
 type ActorsSpawnerManagerEvent = IEventEmitter<{
-  // world
-  addedToWorld: [World];
-  removedFromWorld: [World];
-  updated: [World, number];
-  // collision
-  overlapped: [World, Set<Actor>];
-  // health
-  takenDamage: [World, number, Actor, DamageType];
-  dead: [World, Actor, DamageType];
-  beHealed: [World, number];
-  // damage dealer
-  dealDamage: [World, number, Actor, DamageType];
-  killed: [World, Actor, DamageType];
-  // spawner
   allSpawnersWereFinished: [World];
   pauseCompleted: [World];
 }>;
 
-@autoInjectable()
-export class ActorsSpawnerManager extends Actor {
+/**
+ * ActorsSpawnerManager start ActorsSpawner as parallel.
+ *
+ * @example
+ * const asm = new ActorsSpawnerManager()
+ *   .setActiveSpawnersLimit(2)
+ *   .setSpawnDelay(0.2)
+ *   .setSpawnIntervalMin(1)
+ *   .setActorGenerator((spawner, index) => new Actor()) // optional
+ *   .setSpawners(spawners)
+ *   .start(world);
+ * const actor = new Actor().addExtension(asm);
+ * world.addActor(actor);
+ */
+export class ActorsSpawnerManager implements ActorExtension {
   /** Events. */
   public readonly event: ActorsSpawnerManagerEvent = new EventEmitter<{
-    // world
-    addedToWorld: [World];
-    removedFromWorld: [World];
-    updated: [World, number];
-    // collision
-    overlapped: [World, Set<Actor>];
-    // health
-    takenDamage: [World, number, Actor, DamageType];
-    dead: [World, Actor, DamageType];
-    beHealed: [World, number];
-    // damage dealer
-    dealDamage: [World, number, Actor, DamageType];
-    killed: [World, Actor, DamageType];
-    // spawner
     allSpawnersWereFinished: [World];
     pauseCompleted: [World];
   }>();
@@ -65,16 +45,26 @@ export class ActorsSpawnerManager extends Actor {
   private isStarted = false;
   private isPaused = false;
   private startedCount = 0;
+  private allSpawnersWereFinished = false;
+  private actorGenerator: (
+    spawner: ActorsSpawner,
+    index: number
+  ) => IActor = () => new Actor();
 
-  constructor(
-    @inject("EventEmitter") event?: ActorsSpawnerManagerEvent,
-    @inject("Transformation") trans?: Transformation,
-    @inject("FiniteResource") health?: FiniteResource,
-    @inject("Collision") collision?: Collision
-  ) {
-    super(event, trans, health, collision);
-    if (!event) throw new Error("DI failed");
-    this.event = event;
+  /**
+   * Notify added to actor.
+   */
+  notifyAddedToActor(): void {
+    // do nothing
+  }
+
+  /**
+   * If remove self from world, this function must be true.
+   *
+   * @returns Self must remove from world.
+   */
+  shouldBeRemovedFromWorld(): boolean {
+    return this.allSpawnersWereFinished;
   }
 
   setActiveSpawnersLimit(limit: number): this {
@@ -94,6 +84,13 @@ export class ActorsSpawnerManager extends Actor {
 
   setSpawners(spawners: readonly ActorsSpawner[]): this {
     this.spawners = spawners;
+    return this;
+  }
+
+  setActorGenerator(
+    generator: (spawner: ActorsSpawner, index: number) => IActor
+  ): this {
+    this.actorGenerator = generator;
     return this;
   }
 
@@ -126,9 +123,10 @@ export class ActorsSpawnerManager extends Actor {
    * Update self.
    *
    * @param world World.
+   * @param actor Actor.
    * @param deltaSec Delta seconds.
    */
-  update(world: World, deltaSec: number): void {
+  update(world: World, actor: IActor, deltaSec: number): void {
     if (this.isActive()) this.progress(world, deltaSec);
   }
 
@@ -151,8 +149,12 @@ export class ActorsSpawnerManager extends Actor {
       this.elapsedSec >= this.lastSpawnedTimeSec + this.spawnIntervalMin
     ) {
       const spawner = this.spawners[this.startedCount];
+      const actor = this.actorGenerator(
+        spawner,
+        this.startedCount
+      ).addExtension(spawner);
       this.setupSpawner(spawner);
-      world.addActor(spawner);
+      world.addActor(actor);
       spawner.start(world);
 
       this.startedCount += 1;
@@ -175,6 +177,7 @@ export class ActorsSpawnerManager extends Actor {
         this.activeSpawners.size === 0
       ) {
         this.event.emit("allSpawnersWereFinished", world);
+        this.allSpawnersWereFinished = true;
       }
     });
   }
