@@ -55,13 +55,15 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
     it("can start firing", () => {
       const world = new worldMockClass();
       const weapon = new GuntreeWeapon();
+      const parent = actorInterfaceMockClass();
+      weapon.notifyAddedToActor(parent);
 
       const args = initArgsMock();
       weapon.init(args).startFire(world);
 
       expect(args.bulletGenerator.generate).toBeCalledWith(
         world,
-        weapon,
+        parent,
         args.muzzles.get("center")?.getGlobal(),
         0,
         new Map([
@@ -76,6 +78,8 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
+      const parent = actorInterfaceMockClass();
+      weapon.notifyAddedToActor(parent);
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -89,6 +93,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const bullet = {};
       const weapon = new GuntreeWeapon();
       const parent = new actorInterfaceMockClass();
+      weapon.notifyAddedToActor(parent);
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -107,6 +112,7 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const bullet = {};
       const weapon = new GuntreeWeapon();
       const parent = new actorInterfaceMockClass();
+      weapon.notifyAddedToActor(parent);
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);
@@ -122,6 +128,8 @@ describe("@curtain-call/weapon.GuntreeWeapon", () => {
       const world = new worldMockClass();
       const bullet = {};
       const weapon = new GuntreeWeapon();
+      const parent = new actorInterfaceMockClass();
+      weapon.notifyAddedToActor(parent);
 
       const args = initArgsMock();
       args.bulletGenerator.generate = jest.fn().mockReturnValue(bullet);

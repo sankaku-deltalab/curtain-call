@@ -1,6 +1,5 @@
 import { VectorLike, Matrix } from "trans-vector2d";
 import { IActor, World } from "@curtain-call/actor";
-import { Weapon } from "../weapon";
 
 export interface BulletStyle {
   spriteSize: VectorLike;
@@ -9,9 +8,20 @@ export interface BulletStyle {
 }
 
 export interface BulletGenerator {
+  /**
+   * Generate bullet.
+   *
+   * @param world World.
+   * @param damageParent Damage dealer using bullet.
+   * @param trans Bullet spawning transform.
+   * @param elapsedSec Elapsed time from fired.
+   * @param params Real parameters.
+   * @param texts String parameters.
+   * @returns Bullet.
+   */
   generate(
     world: World,
-    weapon: Weapon,
+    damageParent: IActor,
     trans: Matrix,
     elapsedSec: number,
     params: Map<string, number>,

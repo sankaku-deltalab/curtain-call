@@ -44,6 +44,7 @@ export class GuntreeWeapon implements Weapon {
   private muzzles = new Map<string, Transformation>();
   private bulletGenerator?: BulletGenerator;
   private targetProvider: TargetProvider = new NullTargetProvider();
+  private owner?: IActor;
 
   constructor() {
     this.player.events.on("fired", (data) => this.fireBullet(data));
@@ -53,8 +54,8 @@ export class GuntreeWeapon implements Weapon {
    *
    * @param actor Actor using this.
    */
-  notifyAddedToActor(): void {
-    // do nothing
+  notifyAddedToActor(actor: IActor): void {
+    this.owner = actor;
   }
 
   /**
@@ -139,10 +140,13 @@ export class GuntreeWeapon implements Weapon {
   }
 
   protected fireBullet(data: gt.FireData): void {
-    if (!this.world || !this.bulletGenerator) throw new Error();
+    if (!this.world || !this.bulletGenerator)
+      throw new Error("GuntreeWeapon is not initialized");
+    if (!this.owner) throw new Error("GuntreeWeapon is not added to actor");
+
     this.bulletGenerator.generate(
       this.world,
-      this,
+      this.owner,
       Matrix.from(data.transform),
       data.elapsedSec,
       data.parameters,

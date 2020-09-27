@@ -5,6 +5,7 @@ import {
   Team,
   diContainer as actorDiContainer,
   PositionInAreaStatus,
+  IActor,
 } from "@curtain-call/actor";
 import {
   transMockClass,
@@ -33,21 +34,17 @@ const createBullet = (): {
   bullet: SimpleBullet;
   mover: LocalConstantMover;
   collisionShape: RectCollisionShape;
+  actor: IActor;
 } => {
   const mover = new localConstantMoverMockClass();
   const collisionShape = new rectCollisionShapeMockClass();
-  const bullet = new SimpleBullet(
-    new EventEmitter<{}>(),
-    new transMockClass(),
-    new healthMockClass(),
-    new collisionMockClass(),
-    mover,
-    collisionShape
-  );
+  const bullet = new SimpleBullet(mover, collisionShape);
+  const actor = new Actor().addExtension(bullet);
   return {
     bullet,
     mover,
     collisionShape,
+    actor,
   };
 };
 
@@ -85,39 +82,33 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     });
   });
   it("could be initialized", () => {
-    const { collisionShape, bullet } = createBullet();
+    const { collisionShape, bullet, actor } = createBullet();
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
-    expect(bullet.getTransformation().setLocal).toBeCalledWith(initArgs.trans);
+    expect(actor.getTransformation().setLocal).toBeCalledWith(initArgs.trans);
     expect(collisionShape.setSize).toBeCalledWith({ x: 64, y: 64 });
   });
 
   it("move with local constant mover", () => {
-    const initArgs = createInitArgs();
-    const { bullet, mover } = createBullet();
-    bullet.init(initArgs);
-    jest.spyOn(mover, "update").mockReturnValue({
-      done: false,
-      newTrans: Matrix.translation({ x: 1, y: 2 }),
-    });
+    const mover = new localConstantMoverMockClass();
+    const collisionShape = new rectCollisionShapeMockClass();
+    const bullet = new SimpleBullet(mover, collisionShape);
+    const actor = new Actor();
+    jest.spyOn(actor, "addMover");
+    actor.addExtension(bullet);
 
-    const world = new worldMockClass();
-    bullet.update(world, 0.5);
-
-    expect(bullet.getTransformation().setLocal).toBeCalledWith(
-      Matrix.translation({ x: 1, y: 2 })
-    );
+    expect(actor.addMover).toBeCalledWith(mover);
   });
 
   it("would be set lifetime when initialized", () => {
-    const { bullet } = createBullet();
-    jest.spyOn(bullet, "setLifeTime");
+    const { bullet, actor } = createBullet();
+    jest.spyOn(actor, "setLifeTime");
 
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
-    expect(bullet.setLifeTime).toBeCalledWith(initArgs.lifeTimeSec);
+    expect(actor.setLifeTime).toBeCalledWith(initArgs.lifeTimeSec);
   });
 
   it("remove self if bullet is not in visible area", () => {
@@ -126,13 +117,13 @@ describe("@curtain-call/contents.SimpleBullet", () => {
       .spyOn(world.getCamera(), "calcVisibilityStatus")
       .mockReturnValue(PositionInAreaStatus.outOfArea);
 
-    const { bullet } = createBullet();
+    const { bullet, actor } = createBullet();
 
-    expect(bullet.shouldBeRemovedFromWorld(world)).toBe(true);
+    expect(bullet.shouldBeRemovedFromWorld(world, actor)).toBe(true);
   });
 
   it("deal damage when hit to enemy", () => {
-    const { bullet } = createBullet();
+    const { bullet, actor } = createBullet();
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
@@ -141,15 +132,15 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     jest
       .spyOn(victim, "takeDamage")
       .mockReturnValue({ actualDamage: 1, died: false });
-    bullet.notifyOverlappedWith(world, new Set([victim]));
+    actor.notifyOverlappedWith(world, new Set([victim]));
 
-    expect(victim.takeDamage).toBeCalledWith(world, initArgs.damage, bullet, {
+    expect(victim.takeDamage).toBeCalledWith(world, initArgs.damage, actor, {
       name: initArgs.damageName,
     });
   });
 
   it("would be removed after hit", () => {
-    const { bullet } = createBullet();
+    const { bullet, actor } = createBullet();
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
@@ -158,24 +149,24 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     jest
       .spyOn(victim, "takeDamage")
       .mockReturnValue({ actualDamage: 1, died: false });
-    bullet.notifyOverlappedWith(world, new Set([victim]));
+    actor.notifyOverlappedWith(world, new Set([victim]));
 
-    expect(bullet.shouldBeRemovedFromWorld(world)).toBe(true);
+    expect(bullet.shouldBeRemovedFromWorld(world, actor)).toBe(true);
   });
 
   it("can clear for reuse self", () => {
-    const { bullet } = createBullet();
-    jest.spyOn(bullet.event, "removeAllListeners");
-    jest.spyOn(bullet, "cancelRemovingSelfFromWorld");
+    const { bullet, actor } = createBullet();
+    jest.spyOn(actor.event, "removeAllListeners");
+    jest.spyOn(actor, "cancelRemovingSelfFromWorld");
 
     bullet.clearSelfForReuse();
 
-    expect(bullet.event.removeAllListeners).toBeCalled();
-    expect(bullet.cancelRemovingSelfFromWorld).toBeCalled();
+    expect(actor.event.removeAllListeners).toBeCalled();
+    expect(actor.cancelRemovingSelfFromWorld).toBeCalled();
   });
 
   it("can hit after reused", () => {
-    const { bullet } = createBullet();
+    const { bullet, actor } = createBullet();
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
@@ -187,9 +178,9 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     jest
       .spyOn(victim, "takeDamage")
       .mockReturnValue({ actualDamage: 1, died: false });
-    bullet.notifyOverlappedWith(world, new Set([victim]));
+    actor.notifyOverlappedWith(world, new Set([victim]));
 
-    expect(victim.takeDamage).toBeCalledWith(world, initArgs.damage, bullet, {
+    expect(victim.takeDamage).toBeCalledWith(world, initArgs.damage, actor, {
       name: initArgs.damageName,
     });
   });

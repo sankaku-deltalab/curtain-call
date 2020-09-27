@@ -2,16 +2,12 @@ import { inject, autoInjectable } from "tsyringe";
 import { Matrix, Vector, VectorLike } from "trans-vector2d";
 import {
   IActor,
-  Actor,
-  ActorEvent,
-  Transformation,
-  FiniteResource,
   World,
   PositionInAreaStatus,
   Mover,
-  Collision,
   ActorRole,
   CollisionShape,
+  ActorExtension,
 } from "@curtain-call/actor";
 
 export interface LocalConstantMover extends Mover {
@@ -26,49 +22,63 @@ export interface RectCollisionShape extends CollisionShape {
  * SimpleBullet move to front with constant velocity.
  */
 @autoInjectable()
-export class SimpleBullet extends Actor {
+export class SimpleBullet implements ActorExtension {
   private damage = 0;
   private damageName = "";
   private visualRadius = 0;
+  private alreadyHit = false;
+  private owner?: IActor;
   private readonly mover: LocalConstantMover;
   private readonly collisionShape: RectCollisionShape;
 
   constructor(
-    @inject("EventEmitter") event?: ActorEvent,
-    @inject("Transformation") trans?: Transformation,
-    @inject("FiniteResource") health?: FiniteResource,
-    @inject("Collision") collision?: Collision,
     @inject("LocalConstantMover") mover?: LocalConstantMover,
     @inject("RectCollisionShape") collisionShape?: RectCollisionShape
   ) {
-    super(event, trans, health, collision);
-    if (!(event && trans && health && collision && mover && collisionShape))
-      throw new Error("DI failed");
+    if (!(mover && collisionShape)) throw new Error("DI failed");
 
     this.mover = mover;
     this.collisionShape = collisionShape;
-    this.setRole(ActorRole.bullet)
+  }
+
+  /**
+   * Notify added to actor.
+   *
+   * @param actor Actor using this.
+   */
+  notifyAddedToActor(actor: IActor): void {
+    this.owner = actor;
+    actor
+      .setRole(ActorRole.bullet)
       .addMover(this.mover)
       .addCollisionShape(this.collisionShape);
   }
 
-  setVisualRadius(radius: number): this {
-    this.visualRadius = radius;
-    return this;
+  /**
+   * Update self.
+   */
+  update(): void {
+    // do nothing
   }
 
   /**
    * If remove self from world, this function must be true.
    *
    * @param world World.
+   * @param actor Actor using this.
    * @returns Self must remove from world.
    */
-  shouldBeRemovedFromWorld(world: World): boolean {
-    const { translation } = this.getTransformation().getGlobal().decompose();
+  shouldBeRemovedFromWorld(world: World, actor: IActor): boolean {
+    const { translation } = actor.getTransformation().getGlobal().decompose();
     const isNotVisible =
       world.getCamera().calcVisibilityStatus(translation, this.visualRadius) ===
       PositionInAreaStatus.outOfArea;
-    return isNotVisible || super.shouldBeRemovedFromWorld(world);
+    return isNotVisible || this.alreadyHit;
+  }
+
+  setVisualRadius(radius: number): this {
+    this.visualRadius = radius;
+    return this;
   }
 
   /**
@@ -86,18 +96,19 @@ export class SimpleBullet extends Actor {
     damageName: string;
     size: number;
   }): this {
-    this.setLocalTransform(args.trans);
+    const owner = this.getOwner();
+    owner.setLocalTransform(args.trans);
     this.mover.setVelocity(
       Matrix.from({ translation: { x: args.speed, y: 0 } })
     );
     this.damage = args.damage;
     this.damageName = args.damageName;
-    this.setLifeTime(args.lifeTimeSec);
+    owner.setLifeTime(args.lifeTimeSec);
     this.collisionShape.setSize(Vector.one.mlt(args.size));
 
-    this.event.on("overlapped", (world, others) => {
+    owner.event.on("overlapped", (world, others) => {
       others.forEach((other) => {
-        if (this.shouldBeRemovedFromWorld(world)) return;
+        if (owner.shouldBeRemovedFromWorld(world)) return;
         this.processHit(world, other);
       });
     });
@@ -106,16 +117,24 @@ export class SimpleBullet extends Actor {
   }
 
   clearSelfForReuse(): void {
-    this.event.removeAllListeners();
-    this.cancelRemovingSelfFromWorld();
+    this.alreadyHit = false;
+    const owner = this.getOwner();
+    owner.event.removeAllListeners();
+    owner.cancelRemovingSelfFromWorld();
   }
 
   private processHit(world: World, other: IActor): boolean {
-    if (this.shouldBeRemovedFromWorld(world)) return false;
-    other.takeDamage(world, this.damage, this, {
+    const owner = this.getOwner();
+    if (owner.shouldBeRemovedFromWorld(world)) return false;
+    other.takeDamage(world, this.damage, owner, {
       name: this.damageName,
     });
-    this.reserveRemovingSelfFromWorld();
+    this.alreadyHit = true;
     return true;
+  }
+
+  private getOwner(): IActor {
+    if (!this.owner) throw new Error("Bullet is not added to actor");
+    return this.owner;
   }
 }

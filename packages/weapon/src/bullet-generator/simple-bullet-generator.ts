@@ -1,25 +1,35 @@
 import { Matrix } from "trans-vector2d";
-import { World } from "@curtain-call/actor";
+import { IActor, World } from "@curtain-call/actor";
 import { BulletGenerator } from "../bullet-generator";
-import { Weapon } from "../weapon";
 import { SimpleBullet } from "./simple-bullet";
 
 /**
  * Deal given `SimpleBullet`s and reuse them.
+ *
+ * @example
+ * const generator = new SimpleBulletGenerator(
+ *   new Array(10).fill(0).map(() => [new SimpleBullet(), new Actor()])
+ * );
  */
 export class SimpleBulletGenerator implements BulletGenerator {
+  private readonly bullets: SimpleBullet[];
   private usedBullets: SimpleBullet[] = [];
+  private readonly actors: Map<SimpleBullet, IActor>;
 
   /**
    * @param bullets Bullets used in this generator
    */
-  constructor(private readonly bullets: SimpleBullet[]) {}
+  constructor(bullets: readonly [SimpleBullet, IActor][]) {
+    this.bullets = bullets.map(([b]) => b);
+    this.actors = new Map(bullets);
+    bullets.forEach(([b, a]) => a.addExtension(b));
+  }
 
   /**
    * Generate bullet.
    *
    * @param world World.
-   * @param weapon Weapon request bullet.
+   * @param damageParent Damage dealer using bullet.
    * @param trans Bullet spawning transform.
    * @param elapsedSec Elapsed time from fired.
    * @param params Real parameters.
@@ -28,25 +38,26 @@ export class SimpleBulletGenerator implements BulletGenerator {
    */
   generate(
     world: World,
-    weapon: Weapon,
+    damageParent: IActor,
     trans: Matrix,
     elapsedSec: number,
     params: Map<string, number>,
     texts: Map<string, string>
-  ): SimpleBullet | undefined {
+  ): IActor | undefined {
     this.reuseBullets();
 
-    const bullet = this.bullets.pop();
-    if (!bullet) return undefined;
+    const bulletAndActor = this.popBullet();
+    if (!bulletAndActor) return undefined;
+    const { bullet, actor } = bulletAndActor;
 
-    bullet.event.on("dealDamage", (wold, damage, victim, damageType) =>
-      weapon.notifyDealtDamage(wold, damage, victim, damageType)
+    actor.event.on("dealDamage", (wold, damage, victim, damageType) =>
+      damageParent.notifyDealtDamage(wold, damage, victim, damageType)
     );
-    bullet.event.on("killed", (wold, victim, damageType) =>
-      weapon.notifyKilled(wold, victim, damageType)
+    actor.event.on("killed", (wold, victim, damageType) =>
+      damageParent.notifyKilled(wold, victim, damageType)
     );
 
-    bullet.event.once("removedFromWorld", () => {
+    actor.event.once("removedFromWorld", () => {
       this.usedBullets.push(bullet);
     });
 
@@ -54,7 +65,7 @@ export class SimpleBulletGenerator implements BulletGenerator {
     const movedTrans = trans.globalize(
       Matrix.from({ translation: { x: speed * elapsedSec, y: 0 } })
     );
-    bullet
+    actor
       .setLocalTransform(movedTrans)
       .setLifeTime(params.get("lifeTime") || 5);
     bullet.init({
@@ -65,15 +76,30 @@ export class SimpleBulletGenerator implements BulletGenerator {
       damageName: texts.get("damageName") || "bullet",
       size: params.get("size") || 1,
     });
-    world.addActor(bullet);
+    world.addActor(actor);
 
-    return bullet;
+    return actor;
+  }
+
+  private popBullet(): { bullet: SimpleBullet; actor: IActor } | undefined {
+    const bullet = this.bullets.pop();
+    if (!bullet) return undefined;
+
+    return {
+      bullet,
+      actor: this.getActorFor(bullet),
+    };
+  }
+
+  private getActorFor(bullet: SimpleBullet): IActor {
+    const actor = this.actors.get(bullet);
+    if (!actor) throw new Error("Actor for bullet is not found");
+    return actor;
   }
 
   private reuseBullets(): void {
     this.usedBullets.forEach((bullet) => {
-      bullet.cancelRemovingSelfFromWorld();
-      bullet.event.removeAllListeners("dealDamage");
+      bullet.clearSelfForReuse();
       this.bullets.push(bullet);
     });
 
