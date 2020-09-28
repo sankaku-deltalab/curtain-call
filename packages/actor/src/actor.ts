@@ -81,6 +81,19 @@ export class Actor implements IActor {
   }
 
   /**
+   * Get only one extension filtered by guard.
+   * If this has multiple extension filtered guard, return undefined.
+   *
+   * @param guard User defined type guard.
+   * @returns Extensions.
+   */
+  getOneExtension<T extends ActorExtension>(
+    guard: (ext: ActorExtension) => ext is T
+  ): T | undefined {
+    return this.actorExtension.getOneExtension(guard);
+  }
+
+  /**
    * Add extension.
    *
    * @param extension: Adding extension.

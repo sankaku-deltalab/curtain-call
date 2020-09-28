@@ -14,6 +14,21 @@ export class ActorWithExtension {
   }
 
   /**
+   * Get only one extension filtered by guard.
+   * If this has multiple extension filtered guard, return undefined.
+   *
+   * @param guard User defined type guard.
+   * @returns Extensions.
+   */
+  getOneExtension<T extends ActorExtension>(
+    guard: (ext: ActorExtension) => ext is T
+  ): T | undefined {
+    const extensions = this.extensions.filter(guard);
+    if (extensions.length === 1) return extensions[0];
+    return undefined;
+  }
+
+  /**
    * Add extension.
    *
    * @param extension Adding extension.

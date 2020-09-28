@@ -59,6 +59,17 @@ export interface Actor {
   getExtensions(): readonly ActorExtension[];
 
   /**
+   * Get only one extension filtered by guard.
+   * If this has multiple extension filtered guard, return undefined.
+   *
+   * @param guard User defined type guard.
+   * @returns Extensions.
+   */
+  getOneExtension<T extends ActorExtension>(
+    guard: (ext: ActorExtension) => ext is T
+  ): T | undefined;
+
+  /**
    * Add extension.
    *
    * @param extension: Adding extension.

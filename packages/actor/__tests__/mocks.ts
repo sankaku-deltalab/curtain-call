@@ -155,6 +155,7 @@ export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
   return {
     event,
     getExtensions: jest.fn(),
+    getOneExtension: jest.fn(),
     addExtension: jest.fn().mockReturnThis(),
     addTimer: jest.fn().mockReturnThis(),
     removeTimer: jest.fn().mockReturnThis(),
