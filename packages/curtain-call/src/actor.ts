@@ -7,6 +7,7 @@ import {
   Team,
   ActorRole,
   diContainer,
+  ActorExtension,
 } from "@curtain-call/actor";
 
 diContainer.register("EventEmitter", EventEmitter);
@@ -14,4 +15,4 @@ diContainer.register("Transformation", Transformation);
 diContainer.register("FiniteResource", FiniteResource);
 diContainer.register("Collision", Collision);
 
-export { Actor, DamageType, Team, ActorRole };
+export { Actor, DamageType, Team, ActorRole, ActorExtension };
