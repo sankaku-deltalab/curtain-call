@@ -18,5 +18,5 @@ export const pixiMatrixToMatrix2d = (mat: PIXI.Matrix): Matrix => {
  * @returns Pixi Matrix.
  */
 export const matrix2dToPixiMatrix = (mat: Matrix): PIXI.Matrix => {
-  return new PIXI.Matrix(...mat.asArray());
+  return new PIXI.Matrix(mat.a, mat.b, mat.c, mat.d, mat.e, mat.f);
 };
