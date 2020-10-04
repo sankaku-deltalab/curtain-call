@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/input",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -34,7 +34,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/actor": "^0.10.0",
+    "@curtain-call/actor": "^0.11.0",
     "eventemitter3": "^4.0.7",
     "trans-vector2d": "^2.0.0"
   }
