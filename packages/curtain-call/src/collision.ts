@@ -1,6 +1,23 @@
 import { Transformation } from "@curtain-call/util";
-import { Collision, diContainer } from "@curtain-call/collision";
+import {
+  Box2d,
+  Collision,
+  CollisionGroup,
+  CollisionGroupPresets,
+  CollisionShape,
+  OverlapChecker,
+  RectCollisionShape,
+  diContainer,
+} from "@curtain-call/collision";
 
 diContainer.register("Transformation", Transformation);
 
-export { Collision };
+export {
+  Box2d,
+  Collision,
+  CollisionGroup,
+  CollisionGroupPresets,
+  CollisionShape,
+  OverlapChecker,
+  RectCollisionShape,
+};

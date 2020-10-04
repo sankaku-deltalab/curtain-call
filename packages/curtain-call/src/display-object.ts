@@ -1,17 +1,21 @@
-import { EventEmitter } from "eventemitter3";
-import { Transformation, FiniteResource } from "@curtain-call/util";
-import { Collision } from "@curtain-call/collision";
+import * as PIXI from "pixi.js";
+import { Transformation } from "@curtain-call/util";
 import {
-  Actor,
-  DamageType,
-  Team,
-  ActorRole,
+  Container,
+  DisplayObjectManager,
+  MultiAnimatedSprite,
+  Sprite,
+  animSpriteFrom,
   diContainer,
-} from "@curtain-call/actor";
+} from "@curtain-call/display-object";
 
-diContainer.register("EventEmitter", EventEmitter);
+diContainer.register("PIXI.Container", PIXI.Container);
 diContainer.register("Transformation", Transformation);
-diContainer.register("FiniteResource", FiniteResource);
-diContainer.register("Collision", Collision);
 
-export { Actor, DamageType, Team, ActorRole };
+export {
+  Container,
+  DisplayObjectManager,
+  MultiAnimatedSprite,
+  Sprite,
+  animSpriteFrom,
+};
