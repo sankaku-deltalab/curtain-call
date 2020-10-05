@@ -1,13 +1,19 @@
 import { VectorLike, Vector } from "trans-vector2d";
-import { PositionInAreaStatus } from "@curtain-call/actor";
+import { autoInjectable, inject } from "tsyringe";
+import { PositionInAreaStatus, Transformation } from "@curtain-call/actor";
 import { RectArea as IRectArea } from "@curtain-call/world";
-import { Transformation } from "./transformation";
 
+@autoInjectable()
 export class RectArea implements IRectArea {
+  public readonly trans: Transformation;
+
   private nw = Vector.zero;
   private se = Vector.zero;
 
-  constructor(public readonly trans = new Transformation()) {}
+  constructor(@inject("Transformation") trans?: Transformation) {
+    if (!trans) throw new Error("DI failed");
+    this.trans = trans;
+  }
 
   /**
    * Attach self to other Transformation.
@@ -16,7 +22,7 @@ export class RectArea implements IRectArea {
    * @returns this.
    */
   attachTo(parent: Transformation): this {
-    this.trans.attachTo(parent);
+    parent.attachChild(this.trans, false);
     return this;
   }
 

@@ -36,6 +36,8 @@
     "@curtain-call/actor": "^0.11.0",
     "@curtain-call/world": "^0.11.4",
     "pixi.js": "^5.3.3",
-    "trans-vector2d": "^2.0.0"
+    "reflect-metadata": "^0.1.13",
+    "trans-vector2d": "^2.0.0",
+    "tsyringe": "^4.3.0"
   }
 }

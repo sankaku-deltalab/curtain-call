@@ -1,8 +1,18 @@
+import "reflect-metadata";
 import { Matrix, Vector } from "trans-vector2d";
+import { container } from "tsyringe";
 import { PositionInAreaStatus } from "@curtain-call/actor";
 import { RectArea, Transformation } from "../src";
 
 describe("@curtain-call/util.RectArea", () => {
+  beforeEach(() => {
+    container.register("Transformation", Transformation);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
   it.each`
     status                             | pos                 | radius
     ${PositionInAreaStatus.inArea}     | ${{ x: 0, y: 0 }}   | ${0.9}
@@ -17,7 +27,7 @@ describe("@curtain-call/util.RectArea", () => {
         scale: Vector.one.mlt(0.5),
       })
     );
-    const area = new RectArea()
+    const area = new RectArea(new Transformation())
       .init({ x: -6, y: -4 }, { x: 6, y: 4 })
       .attachTo(areaParentTrans);
 

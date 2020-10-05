@@ -1,3 +1,6 @@
+import "reflect-metadata";
+import * as PIXI from "pixi.js";
+import { container } from "tsyringe";
 import { DisplayObject } from "@curtain-call/actor";
 import { containerMock, transMockClass } from "./mock";
 import { DisplayObjectManager } from "../src";
@@ -9,6 +12,14 @@ export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
 }));
 
 describe("@curtain-call/display-object.DisplayObjectManager", () => {
+  beforeEach(() => {
+    container.register("PIXI.Container", PIXI.Container);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
   it("can construct without arguments", () => {
     expect(() => new DisplayObjectManager()).not.toThrowError();
   });

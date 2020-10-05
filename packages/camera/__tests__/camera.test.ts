@@ -1,9 +1,26 @@
+import "reflect-metadata";
+import { container } from "tsyringe";
 import * as PIXI from "pixi.js";
 import { PositionInAreaStatus } from "@curtain-call/actor";
-import { createCamera } from "./mock";
+import { createCamera, transMockClass, rectAreaMockClass } from "./mock";
 import { Matrix } from "trans-vector2d";
+import { Camera } from "../../curtain-call/dist/camera";
 
 describe("@curtain-call/camera.Camera", () => {
+  beforeEach(() => {
+    container.register("Transformation", transMockClass);
+    container.register("PIXI.Container", PIXI.Container);
+    container.register("RectArea", rectAreaMockClass);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
+  it("can construct without args", () => {
+    expect(() => new Camera()).not.toThrowError();
+  });
+
   it("can move", () => {
     const camera = createCamera().camera;
     const obj = new PIXI.Container();
