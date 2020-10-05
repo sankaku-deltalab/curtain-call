@@ -1,23 +1,32 @@
 import { Vector, VectorLike } from "trans-vector2d";
-import { EventEmitter } from "eventemitter3";
+import { inject, autoInjectable } from "tsyringe";
 import {
   World,
+  EventEmitter,
   PointerInputReceiver as IPointerInputReceiver,
 } from "@curtain-call/actor";
+
+type PointerInputReceiverEvent = EventEmitter<{
+  down: [World, Vector];
+  up: [World, Vector];
+  move: [World, Vector, Vector];
+  tap: [World, ReadonlyArray<Vector>];
+}>;
 
 /**
  * Receive pointer event from PointerInput.
  */
+@autoInjectable()
 export class PointerInputReceiver implements IPointerInputReceiver {
-  public readonly event = new EventEmitter<{
-    down: [World, Vector];
-    up: [World, Vector];
-    move: [World, Vector, Vector];
-    tap: [World, ReadonlyArray<Vector>];
-  }>();
+  public readonly event: PointerInputReceiverEvent;
 
   private modifier: (pos: VectorLike) => Vector = (p) => Vector.from(p);
   private children = new Set<PointerInputReceiver>();
+
+  constructor(@inject("EventEmitter") event?: PointerInputReceiverEvent) {
+    if (!event) throw new Error("DI failed");
+    this.event = event;
+  }
 
   /**
    * Set input point modifier used when event received.

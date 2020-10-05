@@ -1,5 +1,5 @@
-import EventEmitter from "eventemitter3";
 import { Vector } from "trans-vector2d";
+import { EventEmitter } from "./event-emitter";
 import { World } from "./world";
 
 /**
@@ -12,13 +12,6 @@ export interface Engine {
   readonly event: EventEmitter<{
     updated: [number];
   }>;
-
-  // private readonly app: PIXI.Application;
-  // private readonly worlds = new Set<World>();
-  // private readonly pointerInputConnectors = new Map<
-  //   World,
-  //   PointerInputConnector<World>
-  // >();
 
   /**
    * Canvas size.

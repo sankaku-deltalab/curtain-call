@@ -1,34 +1,46 @@
 import { Vector, VectorLike } from "trans-vector2d";
-import { EventEmitter } from "eventemitter3";
+import { inject, autoInjectable } from "tsyringe";
 import {
   World,
+  EventEmitter,
   PointerInput as IPointerInput,
   PointerInputReceiver,
 } from "@curtain-call/actor";
 import { PointerInputConnector } from "./pointer-input-connector";
 import { TapRecognizer } from "./tap-recognizer";
 
+type PointerInputEvent = EventEmitter<{
+  down: [Vector];
+  up: [Vector];
+  move: [Vector, Vector];
+  tap: [ReadonlyArray<Vector>];
+}>;
+
 /**
  * Receive pointer event from dom element.
  */
+@autoInjectable()
 export class PointerInput implements IPointerInput {
-  public readonly event = new EventEmitter<{
-    down: [Vector];
-    up: [Vector];
-    move: [Vector, Vector];
-    tap: [ReadonlyArray<Vector>];
-  }>();
+  public readonly event: PointerInputEvent;
 
   private readonly connectors = new Map<
     PointerInputReceiver,
     PointerInputConnector
   >();
+  private readonly date: Date;
+  private readonly tapRecognizer: TapRecognizer;
   private prevMovePos = Vector.zero;
 
   constructor(
-    private readonly date = new Date(),
-    private readonly tapRecognizer = new TapRecognizer()
-  ) {}
+    @inject("EventEmitter") event?: PointerInputEvent,
+    @inject("Date") date?: Date,
+    @inject("TapRecognizer") tapRecognizer?: TapRecognizer
+  ) {
+    if (!(event && date && tapRecognizer)) throw new Error("DI failed");
+    this.event = event;
+    this.date = date;
+    this.tapRecognizer = tapRecognizer;
+  }
 
   /**
    * Add event to element.

@@ -41,9 +41,9 @@ export class PointerInputConnector {
   }
 
   destroy(input: PointerInput): void {
-    input.event.removeListener("down", this.downEvent);
-    input.event.removeListener("up", this.upEvent);
-    input.event.removeListener("move", this.moveEvent);
-    input.event.removeListener("tap", this.tapEvent);
+    input.event.off("down", this.downEvent);
+    input.event.off("up", this.upEvent);
+    input.event.off("move", this.moveEvent);
+    input.event.off("tap", this.tapEvent);
   }
 }

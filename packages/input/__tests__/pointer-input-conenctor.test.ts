@@ -1,12 +1,26 @@
+import "reflect-metadata";
+import { container } from "tsyringe";
+import { Vector } from "trans-vector2d";
+import { EventEmitter } from "eventemitter3";
 import {
   PointerInput,
   PointerInputReceiver,
   PointerInputConnector,
+  TapRecognizer,
 } from "../src";
-import { Vector } from "trans-vector2d";
 import { worldMockClass } from "./mock";
 
 describe("@curtain-call/input.PointerInputConnector", () => {
+  beforeEach(() => {
+    container.register("EventEmitter", EventEmitter);
+    container.register("Date", { useValue: new Date() });
+    container.register("TapRecognizer", TapRecognizer);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
   it("notify down event to receiver when input was emit down event", () => {
     const input = new PointerInput();
     const receiver = new PointerInputReceiver();

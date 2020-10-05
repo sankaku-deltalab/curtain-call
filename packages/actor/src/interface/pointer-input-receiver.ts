@@ -1,17 +1,19 @@
 import { Vector, VectorLike } from "trans-vector2d";
-import EventEmitter from "eventemitter3";
 import { World } from "./world";
+import { EventEmitter } from "./event-emitter";
+
+export type PointerInputReceiverEvent = EventEmitter<{
+  down: [World, Vector];
+  up: [World, Vector];
+  move: [World, Vector, Vector];
+  tap: [World, ReadonlyArray<Vector>];
+}>;
 
 /**
  * Receive pointer event from PointerInput.
  */
 export interface PointerInputReceiver {
-  readonly event: EventEmitter<{
-    down: [World, Vector];
-    up: [World, Vector];
-    move: [World, Vector, Vector];
-    tap: [World, ReadonlyArray<Vector>];
-  }>;
+  readonly event: PointerInputReceiverEvent;
 
   /**
    * Set input point modifier used when event received.

@@ -1,8 +1,19 @@
+import "reflect-metadata";
+import { container } from "tsyringe";
 import { Vector } from "trans-vector2d";
+import { EventEmitter } from "eventemitter3";
 import { worldMockClass } from "./mock";
 import { PointerInputReceiver } from "../src";
 
 describe("@curtain-call/input.PointerInputReceiver", () => {
+  beforeEach(() => {
+    container.register("EventEmitter", EventEmitter);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
   it("emit event when notified from parent", () => {
     const receiver = new PointerInputReceiver();
     const ev = jest.fn();

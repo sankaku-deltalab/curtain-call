@@ -1,10 +1,16 @@
-import { EventEmitter } from "eventemitter3";
-import { inject, autoInjectable, container as diContainer } from "tsyringe";
+import { inject, autoInjectable } from "tsyringe";
 import * as PIXI from "pixi.js";
 import { Vector } from "trans-vector2d";
-import { PointerInput, World, Engine as IEngine } from "@curtain-call/actor";
+import {
+  PointerInput,
+  World,
+  Engine as IEngine,
+  EventEmitter,
+} from "@curtain-call/actor";
 
-export { diContainer };
+type EngineEvent = EventEmitter<{
+  updated: [number];
+}>;
 
 /**
  * Engine is root of system.
@@ -14,9 +20,7 @@ export { diContainer };
 @autoInjectable()
 export class Engine implements IEngine {
   /** Event. */
-  public readonly event = new EventEmitter<{
-    updated: [number];
-  }>();
+  public readonly event: EngineEvent;
 
   private readonly pointerInput: PointerInput;
   private readonly app: PIXI.Application;
@@ -31,10 +35,12 @@ export class Engine implements IEngine {
   constructor(
     canvas: HTMLCanvasElement,
     sizeElement: Window | HTMLElement,
+    @inject("EventEmitter") event?: EngineEvent,
     @inject("PointerInput") pointerInput?: PointerInput
   ) {
-    if (!pointerInput) throw new Error("DI failed");
+    if (!(event && pointerInput)) throw new Error("DI failed");
 
+    this.event = event;
     this.pointerInput = pointerInput;
 
     const resolution = window.devicePixelRatio;
