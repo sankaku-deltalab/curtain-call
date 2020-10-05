@@ -23,7 +23,7 @@ export class Collision implements ICollision {
   /**
    * @param trans Transformation
    */
-  constructor(@inject("Transformation") trans: Transformation) {
+  constructor(@inject("Transformation") trans?: Transformation) {
     if (!trans) throw new Error("DI failed");
     this.trans = trans;
   }

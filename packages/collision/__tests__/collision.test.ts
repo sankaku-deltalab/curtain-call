@@ -1,3 +1,5 @@
+import "reflect-metadata";
+import { container } from "tsyringe";
 import { Transformation } from "@curtain-call/actor";
 import { collisionShapeMockClass, transMockClass } from "./mocks";
 import { Collision, Box2d } from "../src";
@@ -12,6 +14,18 @@ const createCollision = (): {
 };
 
 describe("@curtain-call/collision.Collision", () => {
+  beforeEach(() => {
+    container.register("Transformation", transMockClass);
+  });
+
+  afterEach(() => {
+    container.reset();
+  });
+
+  it("can construct without args", () => {
+    expect(() => new Collision()).not.toThrowError();
+  });
+
   describe("can add shape", () => {
     it("by function", () => {
       const shape = new collisionShapeMockClass();
