@@ -10,6 +10,7 @@ import {
   FiniteResource,
   Collision,
   Camera,
+  PointerInputReceiverEvent,
 } from "@curtain-call/actor";
 import { World, DisplayObjectManager, RectArea, OverlapChecker } from "../src";
 
@@ -24,9 +25,13 @@ export const transMockClass = jest.fn<Transformation, []>(() => ({
   setLocal: jest.fn(),
   getLocal: jest.fn().mockReturnValue(Matrix.identity),
   getGlobal: jest.fn().mockReturnValue(Matrix.identity),
-  calcRelative: jest.fn(),
+  calcRelativeFrom: jest.fn(),
   attachChild: jest.fn(),
   detachChild: jest.fn(),
+  notifyAttachedTo: jest.fn(),
+  notifyDetachedFromParent: jest.fn(),
+  notifyParentUpdated: jest.fn(),
+  getParent: jest.fn(),
 }));
 
 const cameraMockClass = jest.fn<Camera, []>(() => {
@@ -53,7 +58,7 @@ const displayObjectManagerMockClass = jest.fn<DisplayObjectManager, []>(() => ({
 
 export const pointerInputReceiverMockClass = jest.fn<PointerInputReceiver, []>(
   () => ({
-    event: new EventEmitter(),
+    event: new EventEmitter() as PointerInputReceiverEvent,
     setModifier: jest.fn().mockReturnThis(),
     addChild: jest.fn().mockReturnThis(),
     removeChild: jest.fn().mockReturnThis(),
@@ -141,7 +146,7 @@ export const collisionMockClass = jest.fn<Collision, []>(() => ({
 }));
 
 export const engineMockClass = jest.fn<Engine, []>(() => ({
-  event: new EventEmitter(),
+  event: new EventEmitter<{}>(),
   canvasSize: jest.fn().mockReturnValue(new Vector(2, 2)),
   addWorld: jest.fn().mockReturnThis(),
   removeWorld: jest.fn().mockReturnThis(),

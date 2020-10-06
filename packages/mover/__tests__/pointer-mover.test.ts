@@ -1,11 +1,14 @@
 import { EventEmitter } from "eventemitter3";
 import { Matrix, Vector } from "trans-vector2d";
-import { PointerInputReceiver } from "@curtain-call/actor";
+import {
+  PointerInputReceiver,
+  PointerInputReceiverEvent,
+} from "@curtain-call/actor";
 import { worldMockClass } from "./mock";
 import { PointerMover } from "../src";
 
 const pointerInputReceiverMockClass = jest.fn<PointerInputReceiver, []>(() => ({
-  event: new EventEmitter(),
+  event: new EventEmitter() as PointerInputReceiverEvent,
   setModifier: jest.fn().mockReturnThis(),
   addChild: jest.fn().mockReturnThis(),
   removeChild: jest.fn().mockReturnThis(),

@@ -5,9 +5,13 @@ export const transMockClass = jest.fn<Transformation, []>(() => ({
   setLocal: jest.fn(),
   getLocal: jest.fn().mockReturnValue(Matrix.identity),
   getGlobal: jest.fn().mockReturnValue(Matrix.identity),
-  calcRelative: jest.fn(),
+  calcRelativeFrom: jest.fn(),
   attachChild: jest.fn(),
   detachChild: jest.fn(),
+  notifyAttachedTo: jest.fn(),
+  notifyDetachedFromParent: jest.fn(),
+  notifyParentUpdated: jest.fn(),
+  getParent: jest.fn(),
 }));
 
 export const collisionMockClass = jest.fn<Collision, []>(() => ({
