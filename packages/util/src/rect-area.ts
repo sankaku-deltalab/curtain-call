@@ -16,17 +16,6 @@ export class RectArea implements IRectArea {
   }
 
   /**
-   * Attach self to other Transformation.
-   *
-   * @param parent Other Transformation.
-   * @returns this.
-   */
-  attachTo(parent: Transformation): this {
-    parent.attachChild(this.trans, false);
-    return this;
-  }
-
-  /**
    * Init rectangle area.
    *
    * @param nw NW point on this.trans.

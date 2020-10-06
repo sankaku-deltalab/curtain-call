@@ -7,8 +7,8 @@ import { Transformation as ITransformation } from "@curtain-call/actor";
 export class Transformation implements ITransformation {
   private local = Matrix.identity;
   private global = Matrix.identity;
-  private parent?: Transformation;
-  private readonly children = new Set<Transformation>();
+  private parent?: ITransformation;
+  private readonly children = new Set<ITransformation>();
 
   /**
    * Set local matrix and update global matrix.
@@ -18,7 +18,7 @@ export class Transformation implements ITransformation {
    */
   setLocal(matrix: Matrix): this {
     this.local = matrix;
-    const parentGlobal = this.parent?.global || Matrix.identity;
+    const parentGlobal = this.parent?.getGlobal() || Matrix.identity;
     this.updateGlobal(parentGlobal);
     return this;
   }
@@ -47,7 +47,7 @@ export class Transformation implements ITransformation {
    * @param base Base transformation.
    * @returns Relative matrix.
    */
-  calcRelative(base: Transformation): Matrix {
+  calcRelativeFrom(base: ITransformation): Matrix {
     return base.getGlobal().localize(this.global);
   }
 
@@ -58,16 +58,17 @@ export class Transformation implements ITransformation {
    * @param keepWorldTransform When attached, keep world transform of child.
    * @returns this.
    */
-  attachChild(child: Transformation, keepWorldTransform: boolean): this {
-    if (child.parent) child.parent.detachChild(child, keepWorldTransform);
+  attachChild(child: ITransformation, keepWorldTransform: boolean): this {
+    const oldParent = child.getParent();
+    const oldGlobal = child.getGlobal();
+    if (oldParent) oldParent.detachChild(child, keepWorldTransform);
 
-    child.parent = this;
-    this.children.add(this);
+    this.children.add(child);
     if (keepWorldTransform) {
-      const newChildLocal = child.getGlobal().localizedBy(this.getGlobal());
+      const newChildLocal = oldGlobal.localizedBy(this.getGlobal());
       child.setLocal(newChildLocal);
     }
-    child.updateGlobal(this.global);
+    child.notifyAttachedTo(this);
     return this;
   }
 
@@ -78,48 +79,55 @@ export class Transformation implements ITransformation {
    * @param keepWorldTransform When detached, keep world transform of child.
    * @return this.
    */
-  detachChild(child: Transformation, keepWorldTransform: boolean): this {
+  detachChild(child: ITransformation, keepWorldTransform: boolean): this {
     if (keepWorldTransform) {
       const newChildLocal = child.getGlobal();
       child.setLocal(newChildLocal);
     }
-    child.parent = undefined;
-    this.updateGlobal(Matrix.identity);
+    this.children.delete(child);
+    child.notifyDetachedFromParent();
     return this;
   }
 
   /**
-   * Attach self to other Transformation and update global matrix.
+   * Notify attached from other.
    *
-   * @deprecated Use `attachChild`.
-   * @param parent Other Transformation.
-   * @returns this.
+   * @param parent Parent transformation.
    */
-  attachTo(parent: Transformation): this {
-    this.parent?.children.delete(this);
+  notifyAttachedTo(parent: ITransformation): void {
     this.parent = parent;
-    parent.children.add(this);
-    this.updateGlobal(parent.global);
-    return this;
+    this.updateGlobal(parent.getGlobal());
   }
 
   /**
-   * Detach self from parent.
-   *
-   * @deprecated Use `detachChild`.
-   * @return this.
+   * Notify detached from other.
    */
-  detachFromParent(): this {
-    if (!this.parent) return this;
-
-    this.parent.children.delete(this);
+  notifyDetachedFromParent(): void {
     this.parent = undefined;
     this.updateGlobal(Matrix.identity);
-    return this;
+  }
+
+  /**
+   * Get attached parent.
+   *
+   * @returns Parent transformation.
+   */
+  getParent(): ITransformation | undefined {
+    return this.parent;
+  }
+
+  /**
+   * Notify parent is updated.
+   *
+   * @returns this.
+   */
+  notifyParentUpdated(parentGlobal: Matrix): void {
+    this.updateGlobal(parentGlobal);
   }
 
   private updateGlobal(parentGlobalMatrix: Matrix): void {
     this.global = parentGlobalMatrix.globalize(this.local);
-    this.children.forEach((child) => child.updateGlobal(this.global));
+    const gloMat = this.getGlobal();
+    this.children.forEach((child) => child.notifyParentUpdated(gloMat));
   }
 }

@@ -32,7 +32,7 @@ export interface Transformation {
    * @param base Base transformation.
    * @returns Relative matrix.
    */
-  calcRelative(base: Transformation): Matrix;
+  calcRelativeFrom(base: Transformation): Matrix;
 
   /**
    * Attach other Transformation to self.
@@ -51,4 +51,28 @@ export interface Transformation {
    * @return this.
    */
   detachChild(child: Transformation, keepWorldTransform: boolean): this;
+
+  /**
+   * Notify attached to other.
+   *
+   * @param parent Parent transformation.
+   */
+  notifyAttachedTo(parent: Transformation): void;
+
+  /**
+   * Notify detached from other.
+   */
+  notifyDetachedFromParent(): void;
+
+  /**
+   * Notify parent is updated.
+   */
+  notifyParentUpdated(parentGlobal: Matrix): void;
+
+  /**
+   * Get attached parent.
+   *
+   * @returns Parent transformation.
+   */
+  getParent(): Transformation | undefined;
 }

@@ -20,26 +20,26 @@ describe("@curtain-call/util.Transformation", () => {
       Matrix.from({ translation: { x: 3, y: 5 }, rotation: Math.PI * (3 / 4) })
     );
 
-    const rel = trans.calcRelative(base).decompose();
+    const rel = trans.calcRelativeFrom(base).decompose();
 
     expect(rel.translation.x).toBeCloseTo(3);
     expect(rel.translation.y).toBeCloseTo(-2);
     expect(rel.rotation).toBeCloseTo(Math.PI / 4);
   });
 
-  describe("can attach to parent Transformation", () => {
+  describe("can attach other Transformation", () => {
     it("from function", () => {
       const parent = new Transformation();
       const child = new Transformation();
-      expect(() => child.attachTo(parent)).not.toThrowError();
+      expect(() => parent.attachChild(child, false)).not.toThrowError();
     });
 
     it("and can detach", () => {
       const parent = new Transformation();
       const child = new Transformation();
-      child.attachTo(parent);
+      parent.attachChild(child, false);
 
-      expect(() => child.detachFromParent()).not.toThrowError();
+      expect(() => parent.detachChild(child, false)).not.toThrowError();
     });
 
     it("and update global Matrix of self when attached", () => {
@@ -50,7 +50,7 @@ describe("@curtain-call/util.Transformation", () => {
         Matrix.translation({ x: 3, y: 4 })
       );
 
-      child.attachTo(parent);
+      parent.attachChild(child, false);
 
       const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
@@ -63,7 +63,7 @@ describe("@curtain-call/util.Transformation", () => {
       );
 
       parent.setLocal(Matrix.translation({ x: 1, y: 2 }));
-      child.attachTo(parent);
+      parent.attachChild(child, false);
 
       const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
@@ -75,11 +75,39 @@ describe("@curtain-call/util.Transformation", () => {
         Matrix.translation({ x: 3, y: 4 })
       );
 
-      child.attachTo(parent);
+      parent.attachChild(child, false);
       const parentOfParent = new Transformation().setLocal(
         Matrix.translation({ x: 1, y: 2 })
       );
-      parent.attachTo(parentOfParent);
+      parentOfParent.attachChild(parent, false);
+
+      const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
+      expect(child.getGlobal()).toEqual(expectedGlobal);
+    });
+
+    it("and can keep world transformation when attach", () => {
+      const parent = new Transformation().setLocal(
+        Matrix.translation({ x: 1, y: 2 })
+      );
+      const child = new Transformation().setLocal(
+        Matrix.translation({ x: 3, y: 4 })
+      );
+
+      parent.attachChild(child, true);
+
+      const expectedGlobal = Matrix.translation({ x: 3, y: 4 });
+      expect(child.getGlobal()).toEqual(expectedGlobal);
+    });
+
+    it("and can keep world transformation when detach", () => {
+      const parent = new Transformation().setLocal(
+        Matrix.translation({ x: 1, y: 2 })
+      );
+      const child = new Transformation().setLocal(
+        Matrix.translation({ x: 3, y: 4 })
+      );
+
+      parent.attachChild(child, false).detachChild(child, true);
 
       const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);

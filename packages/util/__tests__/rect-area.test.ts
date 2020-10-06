@@ -27,9 +27,11 @@ describe("@curtain-call/util.RectArea", () => {
         scale: Vector.one.mlt(0.5),
       })
     );
-    const area = new RectArea(new Transformation())
-      .init({ x: -6, y: -4 }, { x: 6, y: 4 })
-      .attachTo(areaParentTrans);
+    const area = new RectArea(new Transformation()).init(
+      { x: -6, y: -4 },
+      { x: 6, y: 4 }
+    );
+    areaParentTrans.attachChild(area.trans, false);
 
     expect(area.calcPositionStatus(pos, radius)).toBe(status);
   });
