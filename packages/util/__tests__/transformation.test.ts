@@ -112,5 +112,13 @@ describe("@curtain-call/util.Transformation", () => {
       const expectedGlobal = Matrix.translation({ x: 4, y: 6 });
       expect(child.getGlobal()).toEqual(expectedGlobal);
     });
+
+    it("and throw error if attach as circle", () => {
+      const child = new Transformation();
+      const parent = new Transformation().attachChild(child, false);
+      const parentOfParent = new Transformation().attachChild(parent, false);
+
+      expect(() => child.attachChild(parentOfParent, false)).toThrowError();
+    });
   });
 });

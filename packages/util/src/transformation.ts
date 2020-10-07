@@ -9,6 +9,7 @@ export class Transformation implements ITransformation {
   private global = Matrix.identity;
   private parent?: ITransformation;
   private readonly children = new Set<ITransformation>();
+  private isUpdating = false;
 
   /**
    * Set local matrix and update global matrix.
@@ -126,8 +127,13 @@ export class Transformation implements ITransformation {
   }
 
   private updateGlobal(parentGlobalMatrix: Matrix): void {
+    if (this.isUpdating) throw new Error("Circler attaching was detected");
+    this.isUpdating = true;
+
     this.global = parentGlobalMatrix.globalize(this.local);
     const gloMat = this.getGlobal();
     this.children.forEach((child) => child.notifyParentUpdated(gloMat));
+
+    this.isUpdating = false;
   }
 }
