@@ -119,9 +119,10 @@ export class PointerInput implements IPointerInput {
    * @returns this.
    */
   removeReceiver(receiver: PointerInputReceiver): this {
-    if (!this.connectors.has(receiver))
-      throw new Error("Receiver is not added");
+    const connector = this.connectors.get(receiver);
+    if (!connector) throw new Error("Receiver is not added");
     this.connectors.delete(receiver);
+    connector.destroy(this);
     return this;
   }
 
