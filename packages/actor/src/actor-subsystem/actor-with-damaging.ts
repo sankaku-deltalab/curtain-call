@@ -66,7 +66,7 @@ export class ActorWithDamaging {
    * @returns Self is dead.
    */
   isDead(): boolean {
-    return this.healthComponent.value() === 0;
+    return this.healthComponent.max() > 0 && this.healthComponent.value() === 0;
   }
 
   /**

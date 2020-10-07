@@ -41,6 +41,22 @@ describe("@curtain-call/actor.ActorWithDamaging", () => {
   });
 
   it.each`
+    health | healthMax | isDead
+    ${1}   | ${2}      | ${false}
+    ${0}   | ${2}      | ${true}
+    ${0}   | ${0}      | ${false}
+  `(
+    "is dead is $isDead if health: $health, healthMax: $healthMax",
+    ({ health, healthMax, isDead }) => {
+      const { actor, health: h } = createActorWithDamaging();
+      jest.spyOn(h, "value").mockReturnValue(health);
+      jest.spyOn(h, "max").mockReturnValue(healthMax);
+
+      expect(actor.isDead()).toBe(isDead);
+    }
+  );
+
+  it.each`
     victimDied
     ${false}
     ${true}
