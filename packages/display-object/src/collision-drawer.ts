@@ -20,6 +20,7 @@ export class CollisionDrawer implements ICollisionDrawer {
     this.trans = trans;
 
     this.pixiObj.visible = false;
+    this.pixiObj.zIndex = Number.POSITIVE_INFINITY;
   }
 
   /**
@@ -50,16 +51,12 @@ export class CollisionDrawer implements ICollisionDrawer {
   updateDrawing(collisions: readonly Collision[]): void {
     this.pixiObj.clear().lineStyle(2, 0x209020);
     collisions.forEach((col) =>
-      col
-        .getBox2Ds()
-        .forEach((box) =>
-          this.pixiObj.drawRect(
-            box[0],
-            box[1],
-            box[2] - box[0],
-            box[3] - box[1]
-          )
-        )
+      col.getBox2Ds().forEach((box) =>
+        this.pixiObj
+          .beginFill(0x209020, 0.25)
+          .drawRect(box[0], box[1], box[2] - box[0], box[3] - box[1])
+          .endFill()
+      )
     );
   }
 }

@@ -50,11 +50,11 @@ describe("@curtain-call/display-object.CollisionDrawer", () => {
     expect(graphics.drawRect).toBeCalledWith(3, 3, 2, 2);
   });
 
-  it("is disabled at default", () => {
+  it("has infinite z-index", () => {
     const graphics = createGraphicsMock();
     const _drawer = new CollisionDrawer(graphics, new transMockClass());
 
-    expect(graphics.visible).toBe(false);
+    expect(graphics.zIndex).toBe(Number.POSITIVE_INFINITY);
   });
 
   it("can enable pixi object", () => {
