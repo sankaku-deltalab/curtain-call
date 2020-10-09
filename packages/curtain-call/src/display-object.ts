@@ -10,6 +10,9 @@ import {
 } from "@curtain-call/display-object";
 
 diContainer.register("PIXI.Container", PIXI.Container);
+diContainer.register("PIXI.Graphics", {
+  useFactory: () => new PIXI.Graphics(),
+});
 diContainer.register("PIXI.Sprite", { useFactory: () => new PIXI.Sprite() });
 diContainer.register("Transformation", Transformation);
 

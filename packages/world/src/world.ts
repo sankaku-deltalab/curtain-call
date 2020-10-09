@@ -13,7 +13,12 @@ import {
   Transformation,
   Camera,
 } from "@curtain-call/actor";
-import { DisplayObjectManager, OverlapChecker, RectArea } from "./interface";
+import {
+  DisplayObjectManager,
+  CollisionDrawer,
+  OverlapChecker,
+  RectArea,
+} from "./interface";
 import { pixiMatrixToMatrix2d } from "./matrix-convert";
 
 export { diContainer };
@@ -35,6 +40,7 @@ export class World implements IWorld {
 
   private readonly camera: Camera;
   private readonly displayObjectManager: DisplayObjectManager;
+  private readonly collisionDrawer: CollisionDrawer;
   private readonly actors = new Set<IActor>();
   private readonly overlapChecker: OverlapChecker;
   private readonly mask = new PIXI.Graphics();
@@ -56,6 +62,7 @@ export class World implements IWorld {
     @inject("PIXI.Container") pixiTail?: PIXI.Container,
     @inject("Camera") camera?: Camera,
     @inject("DisplayObjectManager") displayObjectManager?: DisplayObjectManager,
+    @inject("CollisionDrawer") CollisionDrawer?: CollisionDrawer,
     @inject("PointerInputReceiver") pointerInput?: PointerInputReceiver,
     @inject("RectArea") coreArea?: RectArea,
     @inject("OverlapChecker") overlapChecker?: OverlapChecker,
@@ -67,6 +74,7 @@ export class World implements IWorld {
         pixiTail &&
         camera &&
         displayObjectManager &&
+        CollisionDrawer &&
         pointerInput &&
         coreArea &&
         overlapChecker &&
@@ -78,6 +86,7 @@ export class World implements IWorld {
     this.pixiTail = pixiTail;
     this.camera = camera;
     this.displayObjectManager = displayObjectManager;
+    this.collisionDrawer = CollisionDrawer;
     this.pointerInput = pointerInput;
     this.coreArea = coreArea;
     this.overlapChecker = overlapChecker;
@@ -328,6 +337,17 @@ export class World implements IWorld {
     return this.coreArea.calcPositionStatus(globalPos, radius);
   }
 
+  /**
+   * Enable collision drawing.
+   *
+   * @param enable Enable
+   * @returns this.
+   */
+  setEnableCollisionDrawing(enable: boolean): this {
+    this.collisionDrawer.setEnable(enable);
+    return this;
+  }
+
   private removeActorsShouldRemove(): void {
     const removing = Array.from(this.actors).filter((ac) =>
       ac.shouldBeRemovedFromWorld(this)
@@ -347,7 +367,12 @@ export class World implements IWorld {
   }
 
   private updatePixiDisplayObject(): void {
+    this.collisionDrawer.updateDrawing(
+      Array.from(this.actors).map((ac) => ac.getCollision())
+    );
+
     const displayObjects: DisplayObject[] = [];
+    displayObjects.push(this.collisionDrawer);
     this.actors.forEach((actor) => {
       actor.iterateDisplayObject((obj) => {
         displayObjects.push(obj);

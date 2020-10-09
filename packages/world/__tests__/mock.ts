@@ -12,7 +12,13 @@ import {
   Camera,
   PointerInputReceiverEvent,
 } from "@curtain-call/actor";
-import { World, DisplayObjectManager, RectArea, OverlapChecker } from "../src";
+import {
+  World,
+  DisplayObjectManager,
+  RectArea,
+  OverlapChecker,
+  CollisionDrawer,
+} from "../src";
 
 const containerMock = (): PIXI.Container => {
   const container = new PIXI.Container();
@@ -56,6 +62,14 @@ const displayObjectManagerMockClass = jest.fn<DisplayObjectManager, []>(() => ({
   updatePixiObjects: jest.fn(),
 }));
 
+const collisionDrawerMockClass = jest.fn<CollisionDrawer, []>(() => ({
+  pixiObj: containerMock(),
+  trans: new transMockClass(),
+  update: jest.fn(),
+  setEnable: jest.fn(),
+  updateDrawing: jest.fn(),
+}));
+
 export const pointerInputReceiverMockClass = jest.fn<PointerInputReceiver, []>(
   () => ({
     event: new EventEmitter() as PointerInputReceiverEvent,
@@ -85,6 +99,7 @@ export const createWorld = (): {
   pixiTail: PIXI.Container;
   camera: Camera;
   displayObjectManager: DisplayObjectManager;
+  collisionDrawer: CollisionDrawer;
   pointerInput: PointerInputReceiver;
   coreArea: RectArea;
   overlapChecker: OverlapChecker;
@@ -96,6 +111,7 @@ export const createWorld = (): {
   const pixiTail = containerMock();
   const camera = new cameraMockClass();
   const displayObjectManager = new displayObjectManagerMockClass();
+  const collisionDrawer = new collisionDrawerMockClass();
   const pointerInput = new pointerInputReceiverMockClass();
   const coreArea = new reactAreaMockClass();
   const overlapChecker = new overlapCheckerMockClass();
@@ -105,6 +121,7 @@ export const createWorld = (): {
     pixiTail,
     camera,
     displayObjectManager,
+    collisionDrawer,
     pointerInput,
     coreArea,
     overlapChecker,
@@ -116,6 +133,7 @@ export const createWorld = (): {
     pixiTail,
     camera,
     displayObjectManager,
+    collisionDrawer,
     pointerInput,
     coreArea,
     overlapChecker,

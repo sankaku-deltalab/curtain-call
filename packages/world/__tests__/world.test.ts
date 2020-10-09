@@ -75,6 +75,32 @@ describe("@curtain-call/world.World", () => {
     expect(ev).toBeCalledWith(deltaSec);
   });
 
+  it("update collision drawer", () => {
+    const { world, collisionDrawer } = createWorld();
+
+    const actor = new Actor();
+    jest.spyOn(actor.getCollision(), "getBox2Ds").mockReturnValue([]);
+    world.addActor(actor);
+
+    world.update(new engineMockClass(), 0);
+
+    expect(collisionDrawer.updateDrawing).toBeCalledWith([
+      actor.getCollision(),
+    ]);
+  });
+
+  it.each`
+    enable
+    ${true}
+    ${false}
+  `("can enable collision drawer", ({ enable }) => {
+    const { world, collisionDrawer } = createWorld();
+
+    world.setEnableCollisionDrawing(enable);
+
+    expect(collisionDrawer.setEnable).toBeCalledWith(enable);
+  });
+
   describe("can add actor", () => {
     it("by function", () => {
       const { world } = createWorld();
@@ -215,7 +241,7 @@ describe("@curtain-call/world.World", () => {
     });
 
     it("and add DisplayObject in actor to manager when updated", () => {
-      const { world, displayObjectManager } = createWorld();
+      const { world, displayObjectManager, collisionDrawer } = createWorld();
       const a1 = actorMock();
       const a2 = actorMock();
 
@@ -224,13 +250,14 @@ describe("@curtain-call/world.World", () => {
       world.update(new engineMockClass(), 0.125);
 
       expect(displayObjectManager.updatePixiObjects).toBeCalledWith([
+        collisionDrawer,
         a1.sprite,
         a2.sprite,
       ]);
     });
 
     it("and remove DisplayObject in actor when DisplayObject was removed from actor", () => {
-      const { world, displayObjectManager } = createWorld();
+      const { world, displayObjectManager, collisionDrawer } = createWorld();
       const { actor, sprite } = actorMock();
 
       const engine = new engineMockClass();
@@ -239,13 +266,13 @@ describe("@curtain-call/world.World", () => {
       actor.removeDisplayObject(sprite);
       world.update(engine, 0.125);
 
-      expect(displayObjectManager.updatePixiObjects).toHaveBeenLastCalledWith(
-        []
-      );
+      expect(displayObjectManager.updatePixiObjects).toHaveBeenLastCalledWith([
+        collisionDrawer,
+      ]);
     });
 
     it("and remove DisplayObject in actor when actor removed", () => {
-      const { world, displayObjectManager } = createWorld();
+      const { world, displayObjectManager, collisionDrawer } = createWorld();
       const { actor } = actorMock();
 
       const engine = new engineMockClass();
@@ -254,9 +281,9 @@ describe("@curtain-call/world.World", () => {
       world.removeActor(actor);
       world.update(engine, 0.125);
 
-      expect(displayObjectManager.updatePixiObjects).toHaveBeenLastCalledWith(
-        []
-      );
+      expect(displayObjectManager.updatePixiObjects).toHaveBeenLastCalledWith([
+        collisionDrawer,
+      ]);
     });
   });
 

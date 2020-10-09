@@ -86,6 +86,7 @@ export const worldMockClass = jest.fn<World, []>(() => {
     calcPositionStatusWithCoreArea: jest
       .fn()
       .mockReturnValue(PositionInAreaStatus),
+    setEnableCollisionDrawing: jest.fn(),
   };
 });
 

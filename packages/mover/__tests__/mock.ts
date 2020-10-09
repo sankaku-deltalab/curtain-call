@@ -105,6 +105,7 @@ export const worldMockClass = jest.fn<World, []>(() => ({
   gamePosToCanvasPos: jest.fn(),
   setCoreArea: jest.fn(),
   calcPositionStatusWithCoreArea: jest.fn(),
+  setEnableCollisionDrawing: jest.fn(),
 }));
 
 export const moverMockClass = jest.fn<Mover, [boolean, Vector]>(

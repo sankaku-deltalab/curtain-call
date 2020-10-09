@@ -155,4 +155,12 @@ export interface World {
     globalPos: VectorLike,
     radius: number
   ): PositionInAreaStatus;
+
+  /**
+   * Enable collision drawing.
+   *
+   * @param enable Enable
+   * @returns this.
+   */
+  setEnableCollisionDrawing(enable: boolean): this;
 }
