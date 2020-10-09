@@ -28,6 +28,13 @@ describe("@curtain-call/display-object.Sprite", () => {
     expect(pixiObj.position.y).toBeCloseTo(2);
   });
 
+  it("set sprite anchor to (0.5, 0.5)", () => {
+    const { pixiObj } = createSprite();
+
+    expect(pixiObj.anchor.x).toBe(0.5);
+    expect(pixiObj.anchor.y).toBe(0.5);
+  });
+
   it("can set texture", () => {
     const { pixiObj, sprite } = createSprite();
 

@@ -30,6 +30,7 @@ export class Sprite implements DisplayObject {
     if (!(pixiObj && trans)) throw new Error("DI failed");
     this.pixiObj = pixiObj;
     this.trans = trans;
+    this.pixiObj.anchor = new PIXI.Point(0.5, 0.5);
   }
 
   /**
