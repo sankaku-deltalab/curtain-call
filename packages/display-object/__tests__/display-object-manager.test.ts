@@ -24,6 +24,13 @@ describe("@curtain-call/display-object.DisplayObjectManager", () => {
     expect(() => new DisplayObjectManager()).not.toThrowError();
   });
 
+  it("has container that sortable children", () => {
+    const pixiContainer = containerMock();
+    const manager = new DisplayObjectManager(pixiContainer);
+
+    expect(manager.container.sortableChildren).toBe(true);
+  });
+
   it("can add pixi sprite to pixi container", () => {
     const pixiContainer = containerMock();
     const manager = new DisplayObjectManager(pixiContainer);

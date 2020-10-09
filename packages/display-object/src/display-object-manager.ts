@@ -18,6 +18,7 @@ export class DisplayObjectManager implements IDisplayObjectManager {
   constructor(@inject("PIXI.Container") container?: PIXI.Container) {
     if (!container) throw new Error("DI failed");
     this.container = container;
+    container.sortableChildren = true;
   }
 
   updatePixiObjects(displayObjects: readonly DisplayObject[]): void {
