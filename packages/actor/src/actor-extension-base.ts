@@ -31,7 +31,7 @@ export abstract class ActorExtensionBase implements ActorExtension {
    * @returns Self must remove from world.
    */
   shouldBeRemovedFromWorld(world: World, actor: Actor): boolean {
-    return true;
+    return false;
   }
 
   /**
