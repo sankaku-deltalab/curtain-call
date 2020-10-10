@@ -1,5 +1,5 @@
 import { World, ActorExtension } from "../interface";
-import { Actor as IActor } from "../actor-interface";
+import { Actor as IActor, DamageType } from "../actor-interface";
 
 export class ActorWithExtension {
   private readonly extensions: ActorExtension[] = [];
@@ -62,6 +62,31 @@ export class ActorWithExtension {
   shouldBeRemovedFromWorld(world: World, actor: IActor): boolean {
     return this.extensions.some((ex) =>
       ex.shouldBeRemovedFromWorld(world, actor)
+    );
+  }
+
+  /**
+   * Calculate taken damage multiplier.
+   *
+   * @param world World.
+   * @param damage Original damage amount.
+   * @param dealer Damage dealer.
+   * @param actor Damage taking actor.
+   * @param type Damage type.
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(
+    world: World,
+    damage: number,
+    dealer: IActor,
+    actor: IActor,
+    type: DamageType
+  ): number {
+    return this.getExtensions().reduce(
+      (mlt, ext) =>
+        mlt *
+        ext.calcTakingDamageMultiplier(world, damage, dealer, actor, type),
+      1
     );
   }
 }

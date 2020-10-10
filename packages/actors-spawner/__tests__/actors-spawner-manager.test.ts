@@ -55,10 +55,6 @@ describe("@curtain-call/actors-spawner.ActorsSpawnerManager", () => {
       .start(world);
     const parent = actorMock().addExtension(asm);
 
-    // TODO: Extensionをremoveできるようにして、spawnerは自分のactorにaddし、終わったらremoveするか？
-    // いや、将来spawnerがactorの状態に依存するようになるかもしれないので、actorを作ったほうがよさそう。
-    // ならactorを作る関数をmanagerに渡すか？
-
     expect(world.addActor).toBeCalledTimes(1);
     expect(world.addActor).toBeCalledWith(spawnerActors[0]);
     expect(spawners[0].start).toBeCalledWith(world);

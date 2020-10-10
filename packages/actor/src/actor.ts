@@ -510,7 +510,19 @@ export class Actor implements IActor {
     dealer: IActor,
     type: DamageType
   ): { actualDamage: number; died: boolean } {
-    return this.actorDamaging.takeDamage(world, damage, dealer, type);
+    const damageMlt = this.actorExtension.calcTakingDamageMultiplier(
+      world,
+      damage,
+      dealer,
+      this,
+      type
+    );
+    return this.actorDamaging.takeDamage(
+      world,
+      damage * damageMlt,
+      dealer,
+      type
+    );
   }
 
   /**

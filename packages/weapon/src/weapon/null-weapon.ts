@@ -28,6 +28,15 @@ export class NullWeapon implements Weapon {
   }
 
   /**
+   * Calculate taken damage multiplier.
+   *
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(): number {
+    return 1;
+  }
+
+  /**
    * Start firing.
    */
   startFire(): void {

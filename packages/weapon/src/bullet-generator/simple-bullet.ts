@@ -81,6 +81,15 @@ export class SimpleBullet implements ActorExtension {
     return isNotVisible || this.alreadyHit;
   }
 
+  /**
+   * Calculate taken damage multiplier.
+   *
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(): number {
+    return 1;
+  }
+
   setVisualRadius(radius: number): this {
     this.visualRadius = radius;
     return this;

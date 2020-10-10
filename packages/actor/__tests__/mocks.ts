@@ -139,6 +139,7 @@ export const extensionMockClass = jest.fn<ActorExtension, []>(() => ({
   notifyAddedToActor: jest.fn(),
   update: jest.fn(),
   shouldBeRemovedFromWorld: jest.fn(),
+  calcTakingDamageMultiplier: jest.fn(),
 }));
 
 export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {

@@ -130,6 +130,15 @@ export class ActorsSpawnerManager implements ActorExtension {
     if (this.isActive()) this.progress(world, deltaSec);
   }
 
+  /**
+   * Calculate taken damage multiplier.
+   *
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(): number {
+    return 1;
+  }
+
   private progress(world: World, deltaSec: number): void {
     this.deactivatingSpawners.forEach((remain, spawner) => {
       const newRemain = remain - deltaSec;

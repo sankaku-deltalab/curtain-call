@@ -44,4 +44,5 @@ export const weaponMockClass = jest.fn<Weapon, []>(() => ({
   isFiring: jest.fn(),
   stopFire: jest.fn(),
   forceStopFire: jest.fn(),
+  calcTakingDamageMultiplier: jest.fn(),
 }));

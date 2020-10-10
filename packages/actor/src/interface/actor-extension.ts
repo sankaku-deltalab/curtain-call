@@ -1,4 +1,4 @@
-import { Actor } from "../actor-interface";
+import { Actor, DamageType } from "../actor-interface";
 import { World } from "./world";
 
 export interface ActorExtension {
@@ -26,4 +26,22 @@ export interface ActorExtension {
    * @returns Self must remove from world.
    */
   shouldBeRemovedFromWorld(world: World, actor: Actor): boolean;
+
+  /**
+   * Calculate taken damage multiplier.
+   *
+   * @param world World.
+   * @param damage Original damage amount.
+   * @param dealer Damage dealer.
+   * @param actor Damage taking actor.
+   * @param type Damage type.
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(
+    world: World,
+    damage: number,
+    dealer: Actor,
+    actor: Actor,
+    type: DamageType
+  ): number;
 }

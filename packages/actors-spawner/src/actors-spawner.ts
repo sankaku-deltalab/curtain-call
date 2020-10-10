@@ -117,6 +117,15 @@ export class ActorsSpawner implements ActorExtension {
     return this.allActorsRemoved;
   }
 
+  /**
+   * Calculate taken damage multiplier.
+   *
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(): number {
+    return 1;
+  }
+
   private progress(world: World, deltaSec: number): void {
     this.elapsedSec += deltaSec;
     while (

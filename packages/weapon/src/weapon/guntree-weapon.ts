@@ -80,6 +80,15 @@ export class GuntreeWeapon implements Weapon {
   }
 
   /**
+   * Calculate taken damage multiplier.
+   *
+   * @returns Damage multiplier.
+   */
+  calcTakingDamageMultiplier(): number {
+    return 1;
+  }
+
+  /**
    * Init weapon.
    *
    * @param args Arguments for firing.
