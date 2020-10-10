@@ -29,9 +29,12 @@ const createGraphicsMock = (): PIXI.Graphics => {
 };
 
 describe("@curtain-call/display-object.CollisionDrawer", () => {
-  it("draw collisions", () => {
+  it("draw collisions while enabled", () => {
     const graphics = createGraphicsMock();
-    const drawer = new CollisionDrawer(graphics, new transMockClass());
+    const drawer = new CollisionDrawer(
+      graphics,
+      new transMockClass()
+    ).setEnable(true);
     const boxes1: Box2d[] = [
       [0, 1, 2, 4],
       [2, 2, 4, 4],

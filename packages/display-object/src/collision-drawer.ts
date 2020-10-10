@@ -49,6 +49,7 @@ export class CollisionDrawer implements ICollisionDrawer {
    * @param collisions Collisions would be drawn.
    */
   updateDrawing(collisions: readonly Collision[]): void {
+    if (!this.pixiObj.visible) return;
     this.pixiObj.clear().lineStyle(2, 0x209020);
     collisions.forEach((col) =>
       col.getBox2Ds().forEach((box) =>
