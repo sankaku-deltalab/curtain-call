@@ -30,6 +30,11 @@ export class SimpleBullet implements ActorExtension {
   private owner?: IActor;
   private readonly mover: LocalConstantMover;
   private readonly collisionShape: RectCollisionShape;
+  private readonly thisIsSimpleBullet: true = true;
+
+  static isSimpleBullet(ext: ActorExtension): ext is SimpleBullet {
+    return "thisIsSimpleBullet" in ext;
+  }
 
   constructor(
     @inject("LocalConstantMover") mover?: LocalConstantMover,
