@@ -1,6 +1,11 @@
 import * as gt from "guntree";
 import { Matrix } from "trans-vector2d";
-import { IActor, Transformation, World } from "@curtain-call/actor";
+import {
+  IActor,
+  Transformation,
+  World,
+  ActorExtensionBase,
+} from "@curtain-call/actor";
 import { BulletGenerator } from "../bullet-generator";
 import { TargetProvider } from "../target-provider";
 import { NullTargetProvider } from "../target-provider/null-target-provider";
@@ -37,7 +42,7 @@ class GuntreeOwner implements gt.Owner {
 /**
  * Fire bullets with Guntree.
  */
-export class GuntreeWeapon implements Weapon {
+export class GuntreeWeapon extends ActorExtensionBase implements Weapon {
   private readonly player = new gt.Player();
   private world?: World;
   private guntree: gt.Gun = gt.nop();
@@ -47,6 +52,7 @@ export class GuntreeWeapon implements Weapon {
   private owner?: IActor;
 
   constructor() {
+    super();
     this.player.events.on("fired", (data) => this.fireBullet(data));
   }
   /**
@@ -68,24 +74,6 @@ export class GuntreeWeapon implements Weapon {
   update(world: World, actor: IActor, deltaSec: number): void {
     this.world = world;
     this.player.update(deltaSec);
-  }
-
-  /**
-   * If remove self from world, this function must be true.
-   *
-   * @returns Self must remove from world.
-   */
-  shouldBeRemovedFromWorld(): boolean {
-    return false;
-  }
-
-  /**
-   * Calculate taken damage multiplier.
-   *
-   * @returns Damage multiplier.
-   */
-  calcTakingDamageMultiplier(): number {
-    return 1;
   }
 
   /**

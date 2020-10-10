@@ -8,6 +8,7 @@ import {
   ActorRole,
   CollisionShape,
   ActorExtension,
+  ActorExtensionBase,
 } from "@curtain-call/actor";
 
 export interface LocalConstantMover extends Mover {
@@ -22,7 +23,7 @@ export interface RectCollisionShape extends CollisionShape {
  * SimpleBullet move to front with constant velocity.
  */
 @autoInjectable()
-export class SimpleBullet implements ActorExtension {
+export class SimpleBullet extends ActorExtensionBase implements ActorExtension {
   private damage = 0;
   private damageName = "";
   private visualRadius = 0;
@@ -40,6 +41,7 @@ export class SimpleBullet implements ActorExtension {
     @inject("LocalConstantMover") mover?: LocalConstantMover,
     @inject("RectCollisionShape") collisionShape?: RectCollisionShape
   ) {
+    super();
     if (!(mover && collisionShape)) throw new Error("DI failed");
 
     this.mover = mover;
@@ -60,13 +62,6 @@ export class SimpleBullet implements ActorExtension {
   }
 
   /**
-   * Update self.
-   */
-  update(): void {
-    // do nothing
-  }
-
-  /**
    * If remove self from world, this function must be true.
    *
    * @param world World.
@@ -79,15 +74,6 @@ export class SimpleBullet implements ActorExtension {
       world.getCamera().calcVisibilityStatus(translation, this.visualRadius) ===
       PositionInAreaStatus.outOfArea;
     return isNotVisible || this.alreadyHit;
-  }
-
-  /**
-   * Calculate taken damage multiplier.
-   *
-   * @returns Damage multiplier.
-   */
-  calcTakingDamageMultiplier(): number {
-    return 1;
   }
 
   setVisualRadius(radius: number): this {

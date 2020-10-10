@@ -3,7 +3,7 @@ import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
   IActor,
   Actor,
-  ActorExtension,
+  ActorExtensionBase,
   World,
   EventEmitter as IEventEmitter,
 } from "@curtain-call/actor";
@@ -36,7 +36,7 @@ type IActorsSpawnerEvent = IEventEmitter<{
  * world.addActor(spawner);
  */
 @autoInjectable()
-export class ActorsSpawner implements ActorExtension {
+export class ActorsSpawner extends ActorExtensionBase {
   /** Events. */
   public readonly event: IActorsSpawnerEvent;
 
@@ -53,15 +53,9 @@ export class ActorsSpawner implements ActorExtension {
   private readonly removedActors = new Set<IActor>();
 
   constructor(@inject("EventEmitter") event?: IActorsSpawnerEvent) {
+    super();
     if (!event) throw new Error("DI failed");
     this.event = event;
-  }
-
-  /**
-   * Notify added to actor.
-   */
-  notifyAddedToActor(): void {
-    // do nothing
   }
 
   /**
@@ -115,15 +109,6 @@ export class ActorsSpawner implements ActorExtension {
    */
   shouldBeRemovedFromWorld(): boolean {
     return this.allActorsRemoved;
-  }
-
-  /**
-   * Calculate taken damage multiplier.
-   *
-   * @returns Damage multiplier.
-   */
-  calcTakingDamageMultiplier(): number {
-    return 1;
   }
 
   private progress(world: World, deltaSec: number): void {

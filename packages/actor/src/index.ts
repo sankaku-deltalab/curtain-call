@@ -8,5 +8,6 @@ export {
   Team,
   DamageType,
 } from "./actor-interface";
+export * from "./actor-extension-base";
 export * from "./actor";
 export * from "./interface";

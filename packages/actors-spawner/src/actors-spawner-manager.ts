@@ -3,7 +3,7 @@ import {
   Actor,
   World,
   EventEmitter as IEventEmitter,
-  ActorExtension,
+  ActorExtensionBase,
 } from "@curtain-call/actor";
 import EventEmitter from "eventemitter3";
 import { ActorsSpawner } from "./actors-spawner";
@@ -27,7 +27,7 @@ type ActorsSpawnerManagerEvent = IEventEmitter<{
  * const actor = new Actor().addExtension(asm);
  * world.addActor(actor);
  */
-export class ActorsSpawnerManager implements ActorExtension {
+export class ActorsSpawnerManager extends ActorExtensionBase {
   /** Events. */
   public readonly event: ActorsSpawnerManagerEvent = new EventEmitter<{
     allSpawnersWereFinished: [World];
@@ -50,13 +50,6 @@ export class ActorsSpawnerManager implements ActorExtension {
     spawner: ActorsSpawner,
     index: number
   ) => IActor = () => new Actor();
-
-  /**
-   * Notify added to actor.
-   */
-  notifyAddedToActor(): void {
-    // do nothing
-  }
 
   /**
    * If remove self from world, this function must be true.
@@ -128,15 +121,6 @@ export class ActorsSpawnerManager implements ActorExtension {
    */
   update(world: World, actor: IActor, deltaSec: number): void {
     if (this.isActive()) this.progress(world, deltaSec);
-  }
-
-  /**
-   * Calculate taken damage multiplier.
-   *
-   * @returns Damage multiplier.
-   */
-  calcTakingDamageMultiplier(): number {
-    return 1;
   }
 
   private progress(world: World, deltaSec: number): void {

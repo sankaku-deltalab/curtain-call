@@ -8,6 +8,7 @@ import {
   ActorRole,
   diContainer,
   ActorExtension,
+  ActorExtensionBase,
   PositionInAreaStatus,
 } from "@curtain-call/actor";
 
@@ -22,5 +23,6 @@ export {
   Team,
   ActorRole,
   ActorExtension,
+  ActorExtensionBase,
   PositionInAreaStatus,
 };

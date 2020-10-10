@@ -1,41 +1,10 @@
+import { ActorExtensionBase } from "@curtain-call/actor";
 import { Weapon } from "./weapon";
 
 /**
  * Weapon do nothing.
  */
-export class NullWeapon implements Weapon {
-  /**
-   * Notify added to actor.
-   */
-  notifyAddedToActor(): void {
-    // do nothing
-  }
-
-  /**
-   * Update self.
-   */
-  update(): void {
-    // do nothing
-  }
-
-  /**
-   * If remove self from world, this function must be true.
-   *
-   * @returns Self must remove from world.
-   */
-  shouldBeRemovedFromWorld(): boolean {
-    return false;
-  }
-
-  /**
-   * Calculate taken damage multiplier.
-   *
-   * @returns Damage multiplier.
-   */
-  calcTakingDamageMultiplier(): number {
-    return 1;
-  }
-
+export class NullWeapon extends ActorExtensionBase implements Weapon {
   /**
    * Start firing.
    */
