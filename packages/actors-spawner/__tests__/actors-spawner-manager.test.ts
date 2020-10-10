@@ -5,7 +5,7 @@ import {
   transMockClass,
   healthMockClass,
   collisionMockClass,
-} from "./mocks";
+} from "@curtain-call/actor-test-mocks";
 import {
   ActorsSpawner,
   ActorsSpawnerManager,

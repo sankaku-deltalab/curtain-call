@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import { Collision, Box2d } from "@curtain-call/actor";
-import { transMockClass } from "./mock";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
 import { CollisionDrawer } from "../src";
 
 const collisionMockClass = jest.fn<Collision, [Box2d[]]>((boxes) => {

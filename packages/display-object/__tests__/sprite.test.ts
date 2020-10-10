@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Matrix, Vector } from "trans-vector2d";
 import { Transformation } from "@curtain-call/actor";
-import { spriteMock, transMockClass } from "./mock";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
+import { spriteMock } from "./mock";
 import { Sprite } from "../src";
 
 const createSprite = (): {

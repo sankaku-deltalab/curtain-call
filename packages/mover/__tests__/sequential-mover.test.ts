@@ -1,5 +1,6 @@
 import { Vector, Matrix } from "trans-vector2d";
-import { worldMockClass, moverMockClass } from "./mock";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
+import { moverMockClass } from "./mock";
 import { SequentialMover } from "../src";
 
 describe("@curtain-call/mover.SequentialMover", () => {

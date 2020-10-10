@@ -6,7 +6,7 @@ import {
   transMockClass,
   healthMockClass,
   collisionMockClass,
-} from "./mocks";
+} from "@curtain-call/actor-test-mocks";
 import { ActorsSpawner, diContainer as spawnerDiContainer } from "../src";
 
 const diContainers = [actorDiContainer, spawnerDiContainer];

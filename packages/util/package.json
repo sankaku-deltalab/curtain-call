@@ -29,13 +29,13 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "pixi.js": "^5.3.3",
     "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/actor": "^0.11.7",
     "@curtain-call/world": "^0.11.7",
-    "pixi.js": "^5.3.3",
     "reflect-metadata": "^0.1.13",
     "trans-vector2d": "^2.0.0",
     "tsyringe": "^4.3.0"

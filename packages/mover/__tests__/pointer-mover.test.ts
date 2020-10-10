@@ -4,7 +4,7 @@ import {
   PointerInputReceiver,
   PointerInputReceiverEvent,
 } from "@curtain-call/actor";
-import { worldMockClass } from "./mock";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
 import { PointerMover } from "../src";
 
 const pointerInputReceiverMockClass = jest.fn<PointerInputReceiver, []>(() => ({

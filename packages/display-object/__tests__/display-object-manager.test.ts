@@ -2,7 +2,8 @@ import "reflect-metadata";
 import * as PIXI from "pixi.js";
 import { container } from "tsyringe";
 import { DisplayObject } from "@curtain-call/actor";
-import { containerMock, transMockClass } from "./mock";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
+import { containerMock } from "./mock";
 import { DisplayObjectManager } from "../src";
 
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({

@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Matrix } from "trans-vector2d";
-import { containerMock, transMockClass, worldMockClass } from "./mock";
+import { transMockClass, worldMockClass } from "@curtain-call/actor-test-mocks";
+import { containerMock } from "./mock";
 import { MultiAnimatedSprite } from "../src";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

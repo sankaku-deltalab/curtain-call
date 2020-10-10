@@ -1,5 +1,5 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { worldMockClass } from "./mock";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
 import { LocalConstantMover } from "../src";
 
 const currentTrans = Matrix.from({

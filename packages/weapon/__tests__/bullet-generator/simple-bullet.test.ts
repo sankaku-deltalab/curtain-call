@@ -6,12 +6,16 @@ import {
   diContainer as actorDiContainer,
   PositionInAreaStatus,
   IActor,
+  World,
 } from "@curtain-call/actor";
 import {
   transMockClass,
-  worldMockClass,
   healthMockClass,
   collisionMockClass,
+  worldMockClass,
+} from "@curtain-call/actor-test-mocks";
+import {
+  cameraMockClass,
   localConstantMoverMockClass,
   rectCollisionShapeMockClass,
 } from "../mocks";
@@ -23,6 +27,12 @@ import {
 } from "../../src";
 
 const containers = [actorDiContainer, weaponDiContainer];
+
+export const createWorldMockHasCamera = (): World => {
+  const world = new worldMockClass();
+  jest.spyOn(world, "getCamera").mockReturnValue(new cameraMockClass());
+  return world;
+};
 
 const victimMock = (): Actor => {
   const victim = new Actor();
@@ -112,7 +122,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
   });
 
   it("remove self if bullet is not in visible area", () => {
-    const world = new worldMockClass();
+    const world = createWorldMockHasCamera();
     jest
       .spyOn(world.getCamera(), "calcVisibilityStatus")
       .mockReturnValue(PositionInAreaStatus.outOfArea);
@@ -127,7 +137,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
-    const world = new worldMockClass();
+    const world = createWorldMockHasCamera();
     const victim = victimMock().setTeam(Team.enemySide);
     jest
       .spyOn(victim, "takeDamage")
@@ -144,7 +154,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     const initArgs = createInitArgs();
     bullet.init(initArgs);
 
-    const world = new worldMockClass();
+    const world = createWorldMockHasCamera();
     const victim = victimMock().setTeam(Team.enemySide);
     jest
       .spyOn(victim, "takeDamage")
@@ -173,7 +183,7 @@ describe("@curtain-call/contents.SimpleBullet", () => {
     bullet.clearSelfForReuse();
     bullet.init(initArgs);
 
-    const world = new worldMockClass();
+    const world = createWorldMockHasCamera();
     const victim = victimMock();
     jest
       .spyOn(victim, "takeDamage")

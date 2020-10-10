@@ -13,7 +13,7 @@ import {
   worldMockClass,
   healthMockClass,
   collisionMockClass,
-} from "../mocks";
+} from "@curtain-call/actor-test-mocks";
 import { NearestTargetProvider } from "../../src";
 
 const targetableActor = (): Actor => {

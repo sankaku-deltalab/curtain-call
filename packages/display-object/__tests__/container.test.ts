@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Matrix } from "trans-vector2d";
 import { Transformation } from "@curtain-call/actor";
-import { containerMock, transMockClass } from "./mock";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
+import { containerMock } from "./mock";
 import { Container } from "../src";
 
 const createContainer = (): {

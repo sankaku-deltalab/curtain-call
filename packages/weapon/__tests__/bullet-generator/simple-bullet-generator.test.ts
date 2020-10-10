@@ -6,9 +6,11 @@ import {
   worldMockClass,
   healthMockClass,
   collisionMockClass,
+  actorInterfaceMockClass,
+} from "@curtain-call/actor-test-mocks";
+import {
   localConstantMoverMockClass,
   rectCollisionShapeMockClass,
-  actorInterfaceMockClass,
 } from "../mocks";
 import {
   SimpleBullet,

@@ -1,7 +1,10 @@
 import "reflect-metadata";
 import { container } from "tsyringe";
 import { Transformation } from "@curtain-call/actor";
-import { collisionShapeMockClass, transMockClass } from "./mocks";
+import {
+  collisionShapeMockClass,
+  transMockClass,
+} from "@curtain-call/actor-test-mocks";
 import { Collision, Box2d } from "../src";
 
 const createCollision = (): {

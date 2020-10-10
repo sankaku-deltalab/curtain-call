@@ -1,5 +1,5 @@
 import { Vector, Matrix } from "trans-vector2d";
-import { transMockClass } from "../mocks";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
 import { RectCollisionShape, diContainer } from "../../src";
 
 describe("@curtain-call/collision.RectCollisionShape", () => {

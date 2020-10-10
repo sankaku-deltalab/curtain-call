@@ -10,7 +10,7 @@ import {
   healthMockClass,
   collisionMockClass,
   actorInterfaceMockClass,
-} from "../mocks";
+} from "@curtain-call/actor-test-mocks";
 import { GuntreeWeapon, BulletGenerator, TargetProvider } from "../../src";
 
 const exampleGun = (): gt.Gun => {

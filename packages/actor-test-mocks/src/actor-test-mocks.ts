@@ -50,23 +50,21 @@ export const healthMockClass = jest.fn<FiniteResource, []>(() => ({
   sub: jest.fn(),
 }));
 
-export const collisionMockClass = jest.fn<Collision, [Transformation]>(
-  (trans: Transformation) => ({
-    trans,
-    addShape: jest.fn(),
-    removeShape: jest.fn(),
-    getBox2Ds: jest.fn(),
-    setIsHugeNumber: jest.fn(),
-    isHugeNumber: jest.fn(),
-    getGroup: jest.fn(),
-    setGroup: jest.fn(),
-    canCollideWith: jest.fn(),
-    setEnable: jest.fn(),
-    isEnabled: jest.fn(),
-  })
-);
+export const collisionMockClass = jest.fn<Collision, []>(() => ({
+  trans: transMockClass(),
+  addShape: jest.fn(),
+  removeShape: jest.fn(),
+  getBox2Ds: jest.fn(),
+  setIsHugeNumber: jest.fn(),
+  isHugeNumber: jest.fn(),
+  getGroup: jest.fn(),
+  setGroup: jest.fn(),
+  canCollideWith: jest.fn(),
+  setEnable: jest.fn(),
+  isEnabled: jest.fn(),
+}));
 
-export const collisionShapeMock = jest.fn<CollisionShape, []>(() => ({
+export const collisionShapeMockClass = jest.fn<CollisionShape, []>(() => ({
   trans: new transMockClass(),
   getBox2Ds: jest.fn(),
 }));
@@ -94,7 +92,7 @@ export const worldMockClass = jest.fn<World, []>(() => ({
   setEnableCollisionDrawing: jest.fn(),
 }));
 
-export const displayObjectMock = jest.fn<DisplayObject, []>(() => ({
+export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
   pixiObj: new PIXI.Container(),
   trans: new transMockClass(),
   update: jest.fn(),
@@ -204,14 +202,13 @@ export const createActor = (): {
   }>();
   const trans = new transMockClass();
   const health = new healthMockClass();
-  const collisionTrans = new transMockClass();
-  const collision = new collisionMockClass(collisionTrans);
+  const collision = new collisionMockClass();
   const actor = new Actor(event, trans, health, collision);
   return {
     actor,
     trans,
     health,
-    collisionTrans,
+    collisionTrans: collision.trans,
     collision,
   };
 };

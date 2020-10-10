@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 import { Vector } from "trans-vector2d";
 import { EventEmitter } from "eventemitter3";
-import { worldMockClass } from "./mock";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
 import { PointerInputReceiver } from "../src";
 
 describe("@curtain-call/input.PointerInputReceiver", () => {

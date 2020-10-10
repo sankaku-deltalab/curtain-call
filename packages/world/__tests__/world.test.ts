@@ -7,13 +7,15 @@ import {
   DisplayObject,
 } from "@curtain-call/actor";
 import {
-  createWorld,
-  engineMockClass,
-  displayObjectMockClass,
-  pointerInputReceiverMockClass,
   transMockClass,
   healthMockClass,
   collisionMockClass,
+  displayObjectMockClass,
+} from "@curtain-call/actor-test-mocks";
+import {
+  createWorld,
+  engineMockClass,
+  pointerInputReceiverMockClass,
 } from "./mock";
 import EventEmitter from "eventemitter3";
 

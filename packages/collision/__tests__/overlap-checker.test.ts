@@ -1,5 +1,5 @@
 import { Collision } from "@curtain-call/actor";
-import { collisionMockClass } from "./mocks";
+import { collisionMockClass } from "@curtain-call/actor-test-mocks";
 import { Box2d, OverlapChecker } from "../src";
 
 const collisionMock = (isHuge: boolean, boxes: Box2d[] = []): Collision => {

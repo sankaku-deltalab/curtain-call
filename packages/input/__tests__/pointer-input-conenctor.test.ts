@@ -8,7 +8,7 @@ import {
   PointerInputConnector,
   TapRecognizer,
 } from "../src";
-import { worldMockClass } from "./mock";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
 
 describe("@curtain-call/input.PointerInputConnector", () => {
   beforeEach(() => {

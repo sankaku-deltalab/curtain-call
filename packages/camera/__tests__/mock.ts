@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
-import { Matrix } from "trans-vector2d";
 import { Transformation } from "@curtain-call/actor";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
 import { RectArea } from "@curtain-call/world";
 import { Camera } from "../src";
 
@@ -10,19 +10,6 @@ const containerMock = (): PIXI.Container => {
   jest.spyOn(container, "removeChild");
   return container;
 };
-
-export const transMockClass = jest.fn<Transformation, []>(() => ({
-  setLocal: jest.fn(),
-  getLocal: jest.fn().mockReturnValue(Matrix.identity),
-  getGlobal: jest.fn().mockReturnValue(Matrix.identity),
-  calcRelativeFrom: jest.fn(),
-  attachChild: jest.fn(),
-  detachChild: jest.fn(),
-  notifyAttachedTo: jest.fn(),
-  notifyDetachedFromParent: jest.fn(),
-  notifyParentUpdated: jest.fn(),
-  getParent: jest.fn(),
-}));
 
 export const rectAreaMockClass = jest.fn<RectArea, []>(() => ({
   trans: new transMockClass(),

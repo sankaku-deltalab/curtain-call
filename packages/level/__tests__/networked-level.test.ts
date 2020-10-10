@@ -1,5 +1,6 @@
 import { NetworkedLevels, Level } from "../src";
-import { levelMockClass, assetMock, worldMockClass } from "./mocks";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
+import { levelMockClass, assetMock } from "./mocks";
 
 const createNetworkedLevels = (
   activateDistance = 0,

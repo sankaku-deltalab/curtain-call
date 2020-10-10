@@ -2,7 +2,8 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 import * as PIXI from "pixi.js";
 import { PositionInAreaStatus } from "@curtain-call/actor";
-import { createCamera, transMockClass, rectAreaMockClass } from "./mock";
+import { transMockClass } from "@curtain-call/actor-test-mocks";
+import { createCamera, rectAreaMockClass } from "./mock";
 import { Matrix } from "trans-vector2d";
 import { Camera } from "../../curtain-call/dist/camera";
 
