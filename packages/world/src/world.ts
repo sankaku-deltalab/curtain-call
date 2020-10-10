@@ -56,6 +56,14 @@ export class World implements IWorld {
     drawSizeInCanvas: canvasSize,
     gameUnitPerPixel: 1,
   });
+  private prevDrawAreaUpdater?: (
+    canvasSize: Vector
+  ) => {
+    drawCenterInCanvas: VectorLike;
+    drawSizeInCanvas: VectorLike;
+    gameUnitPerPixel: number;
+  };
+  private prevCanvasSize = new Vector(0, 0);
 
   constructor(
     @inject("PIXI.Container") pixiHead?: PIXI.Container,
@@ -146,6 +154,15 @@ export class World implements IWorld {
   }
 
   private updateDrawArea(canvasSize: Vector): this {
+    if (
+      this.drawAreaUpdater === this.prevDrawAreaUpdater &&
+      canvasSize.equals(this.prevCanvasSize)
+    )
+      return this;
+
+    this.prevDrawAreaUpdater = this.drawAreaUpdater;
+    this.prevCanvasSize = canvasSize;
+
     const {
       drawCenterInCanvas,
       drawSizeInCanvas,
