@@ -3,6 +3,7 @@ import { inject, autoInjectable, container as diContainer } from "tsyringe";
 import {
   IActor,
   Actor,
+  ActorExtension,
   ActorExtensionBase,
   World,
   EventEmitter as IEventEmitter,
@@ -39,6 +40,7 @@ type IActorsSpawnerEvent = IEventEmitter<{
 export class ActorsSpawner extends ActorExtensionBase {
   /** Events. */
   public readonly event: IActorsSpawnerEvent;
+  public readonly thisIsActorsSpawner: true = true;
 
   private spawningFunction: (
     spawnedCount: number,
@@ -51,6 +53,10 @@ export class ActorsSpawner extends ActorExtensionBase {
   private allActorsRemoved = false;
   private readonly deadActors = new Set<IActor>();
   private readonly removedActors = new Set<IActor>();
+
+  static isActorsSpawner(ext: ActorExtension): ext is ActorsSpawner {
+    return "thisIsActorsSpawner" in ext;
+  }
 
   constructor(@inject("EventEmitter") event?: IActorsSpawnerEvent) {
     super();

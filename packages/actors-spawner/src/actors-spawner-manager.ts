@@ -1,6 +1,5 @@
 import {
   IActor,
-  Actor,
   World,
   EventEmitter as IEventEmitter,
   ActorExtensionBase,
@@ -39,17 +38,13 @@ export class ActorsSpawnerManager extends ActorExtensionBase {
   private spawnIntervalMin = 0;
   private activeSpawners = new Set<ActorsSpawner>();
   private deactivatingSpawners = new Map<ActorsSpawner, number>();
-  private spawners: readonly ActorsSpawner[] = [];
+  private spawners: readonly IActor[] = [];
   private lastSpawnedTimeSec = Number.NEGATIVE_INFINITY;
   private elapsedSec = 0;
   private isStarted = false;
   private isPaused = false;
   private startedCount = 0;
   private allSpawnersWereFinished = false;
-  private actorGenerator: (
-    spawner: ActorsSpawner,
-    index: number
-  ) => IActor = () => new Actor();
 
   /**
    * If remove self from world, this function must be true.
@@ -75,15 +70,14 @@ export class ActorsSpawnerManager extends ActorExtensionBase {
     return this;
   }
 
-  setSpawners(spawners: readonly ActorsSpawner[]): this {
+  /**
+   * Set spawners.
+   *
+   * @param spawners Actors contain ActorsSpawner extension.
+   * @returns this.
+   */
+  setSpawners(spawners: readonly IActor[]): this {
     this.spawners = spawners;
-    return this;
-  }
-
-  setActorGenerator(
-    generator: (spawner: ActorsSpawner, index: number) => IActor
-  ): this {
-    this.actorGenerator = generator;
     return this;
   }
 
@@ -141,13 +135,13 @@ export class ActorsSpawnerManager extends ActorExtensionBase {
         this.activeSpawnersLimit &&
       this.elapsedSec >= this.lastSpawnedTimeSec + this.spawnIntervalMin
     ) {
-      const spawner = this.spawners[this.startedCount];
-      const actor = this.actorGenerator(
-        spawner,
-        this.startedCount
-      ).addExtension(spawner);
+      const spawnerActor = this.spawners[this.startedCount];
+      const spawner = spawnerActor.getOneExtension(
+        ActorsSpawner.isActorsSpawner
+      );
+      if (!spawner) throw new Error("Actor don't have ActorsSpawner");
       this.setupSpawner(spawner);
-      world.addActor(actor);
+      world.addActor(spawnerActor);
       spawner.start(world);
 
       this.startedCount += 1;
