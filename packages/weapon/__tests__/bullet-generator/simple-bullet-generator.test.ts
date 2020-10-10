@@ -40,27 +40,31 @@ const createActorMock = (): IActor => {
 
 const createBullets = (
   num: number
-): {
-  bullets: SimpleBullet[];
-  bulletToActor: Map<SimpleBullet, IActor>;
-  bulletAndActors: [SimpleBullet, IActor][];
-} => {
-  const bullets = new Array(num).fill(0).map(() => new SimpleBullet());
-  const bulletAndActors: [SimpleBullet, IActor][] = bullets.map((b) => [
-    b,
-    createActorMock(),
-  ]);
-  const bulletToActor = new Map(bulletAndActors);
-  bullets.forEach((b) => {
-    const a = bulletToActor.get(b);
-    if (!a) throw new Error("test error");
-    b.notifyAddedToActor(a);
+): { actors: IActor[]; actorToBullet: Map<IActor, SimpleBullet> } => {
+  const bullets = new Array(num).fill(0).map(() => {
+    const b = new SimpleBullet();
+    jest.spyOn(b, "init");
+    return b;
   });
-  return {
-    bullets,
-    bulletToActor,
-    bulletAndActors,
-  };
+
+  const actors = bullets.map((b) => {
+    const ac = createActorMock();
+    jest.spyOn(ac, "getOneExtension").mockReturnValue(b);
+    jest.spyOn(ac, "notifyRemovedFromWorld").mockImplementation((w) => {
+      ac.event.emit("removedFromWorld", w);
+    });
+    b.notifyAddedToActor(ac);
+    return ac;
+  });
+
+  const actorToBullet = new Map(
+    actors.map((ac) => {
+      const b = ac.getOneExtension(SimpleBullet.isSimpleBullet);
+      if (!b) throw new Error("Bullet is not in actor at test");
+      return [ac, b];
+    })
+  );
+  return { actors, actorToBullet };
 };
 
 describe("@curtain-call/contents.SimpleBulletGenerator", () => {
@@ -81,19 +85,9 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
     });
   });
 
-  it("add bullet to actor at constructed", () => {
-    const { bulletAndActors } = createBullets(2);
-    new SimpleBulletGenerator(bulletAndActors);
-
-    expect(bulletAndActors.length).not.toBe(0);
-    bulletAndActors.forEach(([b, a]) => {
-      expect(a.addExtension).toBeCalledWith(b);
-    });
-  });
-
   it("use given bullets", () => {
-    const { bulletAndActors, bulletToActor } = createBullets(2);
-    const generator = new SimpleBulletGenerator(bulletAndActors);
+    const { actors } = createBullets(2);
+    const generator = new SimpleBulletGenerator(actors);
 
     const world = new worldMockClass();
     jest.spyOn(world, "addActor");
@@ -110,18 +104,15 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
     const generated1 = gen();
     const generated2 = gen();
 
-    expect(generated1).toBe(bulletToActor.get(bulletAndActors[1][0]));
-    expect(generated2).toBe(bulletToActor.get(bulletAndActors[0][0]));
+    expect(generated1).toBe(actors[1]);
+    expect(generated2).toBe(actors[0]);
   });
 
   it("init bullet and add to world", () => {
-    const bullet1 = new SimpleBullet();
-    const actor1 = createActorMock();
-    jest.spyOn(bullet1, "init");
-    const generator = new SimpleBulletGenerator([[bullet1, actor1]]);
+    const { actors, actorToBullet } = createBullets(1);
+    const generator = new SimpleBulletGenerator(actors);
 
     const world = new worldMockClass();
-    jest.spyOn(world, "addActor");
     const weaponParent = new actorInterfaceMockClass();
     generator.generate(
       world,
@@ -132,8 +123,8 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
       generateTexts()
     );
 
-    expect(world.addActor).toBeCalledWith(actor1);
-    expect(bullet1.init).toBeCalledWith({
+    expect(world.addActor).toBeCalledWith(actors[0]);
+    expect(actorToBullet.get(actors[0])?.init).toBeCalledWith({
       // trans: Matrix.from({ translation: { x: 0.25 * 100, y: 0 } }), // This trans is not usable because c is -0 not +0
       trans: new Matrix(1, 0, 0, 1, 25, 0),
       speed: 100,
@@ -145,12 +136,10 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
   });
 
   it("do not deal bullet if all given bullets was used", () => {
-    const bullet1 = new SimpleBullet();
-    const actor1 = createActorMock();
-    const generator = new SimpleBulletGenerator([[bullet1, actor1]]);
+    const { actors } = createBullets(1);
+    const generator = new SimpleBulletGenerator(actors);
 
     const world = new worldMockClass();
-    jest.spyOn(world, "addActor");
     const weaponParent = createActorMock();
     const gen = (): IActor | undefined =>
       generator.generate(
@@ -164,20 +153,15 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
     const generated1 = gen();
     const generated2 = gen();
 
-    expect(generated1).toBe(actor1);
+    expect(generated1).toBe(actors[0]);
     expect(generated2).toBe(undefined);
   });
 
   it("reuse bullets removed from world", () => {
-    const bullet1 = new SimpleBullet();
-    const actor1 = createActorMock();
-    jest.spyOn(actor1, "notifyRemovedFromWorld").mockImplementation((w) => {
-      actor1.event.emit("removedFromWorld", w);
-    });
-    const generator = new SimpleBulletGenerator([[bullet1, actor1]]);
+    const { actors } = createBullets(1);
+    const generator = new SimpleBulletGenerator(actors);
 
     const world = new worldMockClass();
-    jest.spyOn(world, "addActor");
     const weaponParent = new actorInterfaceMockClass();
     const gen = (): IActor | undefined =>
       generator.generate(
@@ -193,7 +177,7 @@ describe("@curtain-call/contents.SimpleBulletGenerator", () => {
 
     const generated2 = gen();
 
-    expect(generated1).toBe(actor1);
-    expect(generated2).toBe(actor1);
+    expect(generated1).toBe(actors[0]);
+    expect(generated2).toBe(actors[0]);
   });
 });

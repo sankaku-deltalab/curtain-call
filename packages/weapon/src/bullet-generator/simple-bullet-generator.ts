@@ -8,21 +8,18 @@ import { SimpleBullet } from "./simple-bullet";
  *
  * @example
  * const generator = new SimpleBulletGenerator(
- *   new Array(10).fill(0).map(() => [new SimpleBullet(), new Actor()])
+ *   new Array(10).fill(0).map(() => new Actor().addExtension(new SimpleBullet()))
  * );
  */
 export class SimpleBulletGenerator implements BulletGenerator {
-  private readonly bullets: SimpleBullet[];
-  private usedBullets: SimpleBullet[] = [];
-  private readonly actors: Map<SimpleBullet, IActor>;
+  private usedBullets: IActor[] = [];
+  private readonly actors: IActor[];
 
   /**
-   * @param bullets Bullets used in this generator
+   * @param actors Actors contains SimpleBullet extension. Actors would be used in this generator.
    */
-  constructor(bullets: readonly [SimpleBullet, IActor][]) {
-    this.bullets = bullets.map(([b]) => b);
-    this.actors = new Map(bullets);
-    bullets.forEach(([b, a]) => a.addExtension(b));
+  constructor(actors: readonly IActor[]) {
+    this.actors = Array.from(actors);
   }
 
   /**
@@ -58,7 +55,7 @@ export class SimpleBulletGenerator implements BulletGenerator {
     );
 
     actor.event.once("removedFromWorld", () => {
-      this.usedBullets.push(bullet);
+      this.usedBullets.push(actor);
     });
 
     const speed = params.get("speed") || 1;
@@ -82,25 +79,25 @@ export class SimpleBulletGenerator implements BulletGenerator {
   }
 
   private popBullet(): { bullet: SimpleBullet; actor: IActor } | undefined {
-    const bullet = this.bullets.pop();
-    if (!bullet) return undefined;
+    const actor = this.actors.pop();
+    if (!actor) return undefined;
+    const bullet = actor.getOneExtension(SimpleBullet.isSimpleBullet);
+    if (!bullet)
+      throw new Error("Actor don't have SINGLE SimpleBullet extension");
 
     return {
       bullet,
-      actor: this.getActorFor(bullet),
+      actor: actor,
     };
   }
 
-  private getActorFor(bullet: SimpleBullet): IActor {
-    const actor = this.actors.get(bullet);
-    if (!actor) throw new Error("Actor for bullet is not found");
-    return actor;
-  }
-
   private reuseBullets(): void {
-    this.usedBullets.forEach((bullet) => {
+    this.usedBullets.forEach((ac) => {
+      const bullet = ac.getOneExtension(SimpleBullet.isSimpleBullet);
+      if (!bullet)
+        throw new Error("Actor don't have SINGLE SimpleBullet extension");
       bullet.clearSelfForReuse();
-      this.bullets.push(bullet);
+      this.actors.push(ac);
     });
 
     this.usedBullets = [];
