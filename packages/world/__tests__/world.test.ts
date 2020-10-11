@@ -473,4 +473,23 @@ describe("@curtain-call/world.World", () => {
     expect(updatedEv).not.toBeCalled();
     expect(updatedWhilePausedEv).toBeCalledWith(deltaSec);
   });
+
+  it("can scale update time with multiple instigator", () => {
+    const scaler1 = "cheat-scale";
+    const scale1 = 0.5;
+    const scaler2 = "slomo-scale";
+    const scale2 = 0.1;
+    const { world } = createWorld();
+    const actor = new Actor();
+    jest.spyOn(actor, "update");
+    world.addActor(actor);
+
+    world.addTimeScaler(scaler1, scale1);
+    world.addTimeScaler(scaler2, scale2);
+    const engine = new engineMockClass();
+    const deltaSec = 0.125;
+    world.update(engine, deltaSec);
+
+    expect(actor.update).toBeCalledWith(world, deltaSec * scale1 * scale2);
+  });
 });

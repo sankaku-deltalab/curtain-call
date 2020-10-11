@@ -92,6 +92,8 @@ export const worldMockClass = jest.fn<World, []>(() => ({
   setEnableCollisionDrawing: jest.fn(),
   pause: jest.fn(),
   unpause: jest.fn(),
+  addTimeScaler: jest.fn(),
+  removeTimeScaler: jest.fn(),
 }));
 
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({

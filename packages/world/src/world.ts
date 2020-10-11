@@ -66,6 +66,7 @@ export class World implements IWorld {
   };
   private prevCanvasSize = new Vector(0, 0);
   private readonly pausers = new Set<unknown>();
+  private readonly timeScalers = new Map<unknown, number>();
 
   constructor(
     @inject("PIXI.Container") pixiHead?: PIXI.Container,
@@ -201,8 +202,9 @@ export class World implements IWorld {
    * @param deltaSec Update delta seconds.
    */
   update(engine: Engine, deltaSec: number): void {
+    const modifiedDeltaSec = this.calcDeltaSec(deltaSec);
     if (this.pausers.size > 0) {
-      this.event.emit("updatedWhilePaused", deltaSec);
+      this.event.emit("updatedWhilePaused", modifiedDeltaSec);
       return;
     }
 
@@ -212,12 +214,12 @@ export class World implements IWorld {
 
     this.addSubActorsIfNotAdded();
 
-    this.actors.forEach((up) => up.update(this, deltaSec));
+    this.actors.forEach((up) => up.update(this, modifiedDeltaSec));
     this.checkCollision();
     this.updatePixiDisplayObject();
-    this.camera.update(deltaSec);
+    this.camera.update(modifiedDeltaSec);
 
-    this.event.emit("updated", deltaSec);
+    this.event.emit("updated", modifiedDeltaSec);
   }
 
   /**
@@ -390,6 +392,26 @@ export class World implements IWorld {
     this.pausers.delete(pauser);
   }
 
+  /**
+   * Add time scaler.
+   * Time scale was applied in update.
+   *
+   * @param scaler Time scaling instigator.
+   * @param scale Time scale.
+   */
+  addTimeScaler(scaler: unknown, scale: number): void {
+    this.timeScalers.set(scaler, scale);
+  }
+
+  /**
+   * Remove time scaler.
+   *
+   * @param scaler Time scaling instigator.
+   */
+  removeTimeScaler(scaler: unknown): void {
+    this.timeScalers.delete(scaler);
+  }
+
   private removeActorsShouldRemove(): void {
     const removing = Array.from(this.actors).filter((ac) =>
       ac.shouldBeRemovedFromWorld(this)
@@ -440,5 +462,12 @@ export class World implements IWorld {
       const othersActor = new Set(Array.from(others).map((c) => getActor(c)));
       ac.notifyOverlappedWith(this, othersActor);
     });
+  }
+
+  private calcDeltaSec(originalDeltaSec: number): number {
+    return Array.from(this.timeScalers.values()).reduce(
+      (prev, curr) => prev * curr,
+      originalDeltaSec
+    );
   }
 }

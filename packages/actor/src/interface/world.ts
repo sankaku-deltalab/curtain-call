@@ -177,4 +177,20 @@ export interface World {
    * @param pauser Paused instigator.
    */
   unpause(pauser: unknown): void;
+
+  /**
+   * Add time scaler.
+   * Time scale was applied in update.
+   *
+   * @param scaler Time scaling instigator.
+   * @param scale Time scale.
+   */
+  addTimeScaler(scaler: unknown, scale: number): void;
+
+  /**
+   * Remove time scaler.
+   *
+   * @param scaler Time scaling instigator.
+   */
+  removeTimeScaler(scaler: unknown): void;
 }
