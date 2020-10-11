@@ -163,4 +163,18 @@ export interface World {
    * @returns this.
    */
   setEnableCollisionDrawing(enable: boolean): this;
+
+  /**
+   * Pause time.
+   *
+   * @param pauser Pause instigator.
+   */
+  pause(pauser: unknown): void;
+
+  /**
+   * Unpause time.
+   *
+   * @param pauser Paused instigator.
+   */
+  unpause(pauser: unknown): void;
 }

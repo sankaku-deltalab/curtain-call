@@ -31,6 +31,7 @@ export class World implements IWorld {
   /** Event. */
   public readonly event = new EventEmitter<{
     updated: [number];
+    updatedWhilePaused: [number];
   }>();
 
   public readonly backgroundTrans: Transformation;
@@ -64,6 +65,7 @@ export class World implements IWorld {
     gameUnitPerPixel: number;
   };
   private prevCanvasSize = new Vector(0, 0);
+  private readonly pausers = new Set<unknown>();
 
   constructor(
     @inject("PIXI.Container") pixiHead?: PIXI.Container,
@@ -199,6 +201,11 @@ export class World implements IWorld {
    * @param deltaSec Update delta seconds.
    */
   update(engine: Engine, deltaSec: number): void {
+    if (this.pausers.size > 0) {
+      this.event.emit("updatedWhilePaused", deltaSec);
+      return;
+    }
+
     this.removeActorsShouldRemove();
 
     this.updateDrawArea(engine.canvasSize());
@@ -363,6 +370,24 @@ export class World implements IWorld {
   setEnableCollisionDrawing(enable: boolean): this {
     this.collisionDrawer.setEnable(enable);
     return this;
+  }
+
+  /**
+   * Pause time.
+   *
+   * @param pauser Pause instigator.
+   */
+  pause(pauser: unknown): void {
+    this.pausers.add(pauser);
+  }
+
+  /**
+   * Unpause time.
+   *
+   * @param pauser Paused instigator.
+   */
+  unpause(pauser: unknown): void {
+    this.pausers.delete(pauser);
   }
 
   private removeActorsShouldRemove(): void {

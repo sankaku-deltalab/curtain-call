@@ -90,6 +90,8 @@ export const worldMockClass = jest.fn<World, []>(() => ({
   setCoreArea: jest.fn(),
   calcPositionStatusWithCoreArea: jest.fn(),
   setEnableCollisionDrawing: jest.fn(),
+  pause: jest.fn(),
+  unpause: jest.fn(),
 }));
 
 export const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({

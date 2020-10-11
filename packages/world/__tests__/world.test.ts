@@ -425,4 +425,52 @@ describe("@curtain-call/world.World", () => {
     expect(coreArea.calcPositionStatus).toBeCalledWith(Vector.one, 3);
     expect(status).toBe(PositionInAreaStatus.inArea);
   });
+
+  it("can pause and unpause updating", () => {
+    const pauser = "player-pause";
+    const { world } = createWorld();
+    const actor = new Actor();
+    jest.spyOn(actor, "update");
+    world.addActor(actor);
+
+    world.pause(pauser);
+    world.update(new engineMockClass(), 1);
+    expect(actor.update).not.toBeCalled();
+
+    world.unpause(pauser);
+    world.update(new engineMockClass(), 1);
+    expect(actor.update).toBeCalled();
+  });
+
+  it("can pause with multiple pauser", () => {
+    const pauser1 = "player-pause";
+    const pauser2 = "hit-stop-pause";
+    const { world } = createWorld();
+    const actor = new Actor();
+    jest.spyOn(actor, "update");
+    world.addActor(actor);
+
+    world.pause(pauser1);
+    world.pause(pauser2);
+    world.unpause(pauser2);
+    world.update(new engineMockClass(), 1);
+    expect(actor.update).not.toBeCalled();
+  });
+
+  it("emit `updatedWhilePaused` event and not emit `updated` event while paused", () => {
+    const pauser = "player-pause";
+    const { world } = createWorld();
+    const updatedEv = jest.fn();
+    world.event.on("updated", updatedEv);
+    const updatedWhilePausedEv = jest.fn();
+    world.event.on("updatedWhilePaused", updatedWhilePausedEv);
+
+    const engine = new engineMockClass();
+    const deltaSec = 0.125;
+    world.pause(pauser);
+    world.update(engine, deltaSec);
+
+    expect(updatedEv).not.toBeCalled();
+    expect(updatedWhilePausedEv).toBeCalledWith(deltaSec);
+  });
 });
