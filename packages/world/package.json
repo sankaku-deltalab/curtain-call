@@ -1,6 +1,6 @@
 {
   "name": "@curtain-call/world",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
   "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
@@ -29,14 +29,14 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
-    "@curtain-call/actor-test-mocks": "^0.13.1",
+    "@curtain-call/actor-test-mocks": "^0.14.0",
     "eventemitter3": "^4.0.7",
     "pixi.js": "^5.3.3",
     "typescript": "^3.9.7"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/actor": "^0.13.1",
+    "@curtain-call/actor": "^0.14.0",
     "reflect-metadata": "^0.1.13",
     "trans-vector2d": "^2.0.0",
     "tsyringe": "^4.3.0"
