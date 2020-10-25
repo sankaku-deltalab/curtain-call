@@ -1,30 +1,5 @@
-import { EventEmitter } from "eventemitter3";
-import * as PIXI from "pixi.js";
-import { World } from "@curtain-call/actor";
+import { worldMockClass } from "@curtain-call/actor-test-mocks";
 import { Timer } from "../src";
-
-const worldMockClass = jest.fn<World, []>(() => ({
-  event: new EventEmitter<{
-    updated: [number];
-  }>(),
-  pixiHead: new PIXI.Container(),
-  pixiTail: new PIXI.Container(),
-  getCamera: jest.fn(),
-  setDrawAreaUpdater: jest.fn(),
-  update: jest.fn(),
-  addActor: jest.fn(),
-  removeActor: jest.fn(),
-  hasActor: jest.fn(),
-  iterateActors: jest.fn(),
-  addPointerInputReceiver: jest.fn(),
-  removePointerInputReceiver: jest.fn(),
-  getPointerInputReceiver: jest.fn(),
-  canvasPosToGamePos: jest.fn(),
-  gamePosToCanvasPos: jest.fn(),
-  setCoreArea: jest.fn(),
-  calcPositionStatusWithCoreArea: jest.fn(),
-  setEnableCollisionDrawing: jest.fn(),
-}));
 
 describe("@curtain-call/timer", () => {
   it("call callback when updated", () => {
