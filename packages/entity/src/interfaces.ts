@@ -58,6 +58,15 @@ export function canCollideGroup(
 }
 
 /**
+ * `CollisionStatus` describe current collision status.
+ */
+export interface CollisionStatus {
+  readonly box2ds: readonly Box2d[];
+  readonly group: CollisionGroup;
+  readonly isExcess: boolean;
+}
+
+/**
  * `ActorExtension` would be used for extending `ActorBase` without inheritance.
  */
 export interface ActorExtension {

@@ -4,7 +4,7 @@ import {
   Movement,
   Sprite,
   Box2d,
-  CollisionGroup,
+  CollisionStatus,
   ActorExtension,
   Timer,
 } from "./interfaces";
@@ -93,11 +93,7 @@ export interface ActorBase {
    *
    * @returns Collision Status.
    */
-  calcCollisionStatus(): {
-    box2ds: readonly Box2d[];
-    group: CollisionGroup;
-    isExcess: boolean;
-  };
+  calcCollisionStatus(): CollisionStatus;
 
   /**
    * Notify overlapped with other actor.
