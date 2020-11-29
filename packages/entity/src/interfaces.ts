@@ -70,7 +70,9 @@ export interface CollisionStatus {
  * `ActorExtension` would be used for extending `ActorBase` without inheritance.
  */
 export interface ActorExtension {
+  preUpdate(world: WorldBase, actor: ActorBase, deltaSec: number): void;
   update(world: WorldBase, actor: ActorBase, deltaSec: number): void;
+  postUpdate(world: WorldBase, actor: ActorBase, deltaSec: number): void;
 }
 
 /**
