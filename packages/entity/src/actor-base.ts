@@ -101,7 +101,7 @@ export interface ActorBase {
    * @param world Our world.
    * @param others Collided Other actors.
    */
-  notifyOverlappedWith(world: WorldBase, others: ReadonlySet<ActorBase>): void;
+  notifyOverlappedWith(world: WorldBase, others: readonly ActorBase[]): void;
 
   /**
    * Notify added to world.
