@@ -1,5 +1,5 @@
 import { CollisionGroup } from "@curtain-call/entity";
-import { Collision, CollisionShape } from "./collision";
+import { Collision, CollisionShape } from "../collision";
 
 /**
  * Player want to modify collision.

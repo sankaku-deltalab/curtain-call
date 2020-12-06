@@ -1,5 +1,5 @@
 import { ActorBase, CollisionStatus, WorldBase } from "@curtain-call/entity";
-import { CheckActorOverlapService } from "../check-actor-overlap-service";
+import { CheckActorOverlapService } from "../use-cases/check-actor-overlap-service";
 import { CollisionOverlapChecker } from "../overlap-checker";
 
 const givenIsNotUndefined = <T>(v: T | undefined): v is T => v !== undefined;

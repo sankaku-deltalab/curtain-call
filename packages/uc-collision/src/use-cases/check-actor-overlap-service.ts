@@ -1,5 +1,5 @@
 import { WorldBase } from "@curtain-call/entity";
-import { CollisionOverlapChecker } from "./overlap-checker";
+import { CollisionOverlapChecker } from "../overlap-checker";
 
 /**
  * `WorldBase` check actor overlapping when updated.

@@ -1,5 +1,5 @@
 import { CollisionGroup } from "@curtain-call/entity";
-import { CollisionModifyService } from "../collision-modify-service";
+import { CollisionModifyService } from "../use-cases/collision-modify-service";
 import { Collision, CollisionShape } from "../collision";
 
 /**

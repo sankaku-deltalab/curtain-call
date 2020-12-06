@@ -1,2 +1,2 @@
-export * from "./check-actor-overlap-service-impl";
-export * from "./collision-modify-service-impl";
+export * from "./check-actor-overlap-service";
+export * from "./collision-modify-service";
