@@ -1,0 +1,42 @@
+{
+  "name": "@curtain-call/ia-display-object",
+  "version": "0.14.0",
+  "description": "> TODO: description",
+  "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
+  "homepage": "https://github.com/sankaku-deltalab/curtain-call#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sankaku-deltalab/curtain-call.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "prepare": "tsc"
+  },
+  "bugs": {
+    "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.0",
+    "typescript": "^4.1.2"
+  },
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@curtain-call/entity": "^0.14.0",
+    "@curtain-call/uc-rendering": "^0.14.0",
+    "trans-vector2d": "^2.0.0",
+    "uuid": "^8.3.1"
+  }
+}
