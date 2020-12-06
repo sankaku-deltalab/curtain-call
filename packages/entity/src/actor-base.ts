@@ -2,7 +2,7 @@ import { Matrix, Vector } from "trans-vector2d";
 import { WorldBase } from "./world-base";
 import {
   Movement,
-  Sprite,
+  DrawingObject,
   Box2d,
   CollisionStatus,
   ActorExtension,
@@ -82,11 +82,11 @@ export interface ActorBase {
   addMovement(movement: Movement): this;
 
   /**
-   * Calc sprites of this.
+   * Calc drawing objects of this.
    *
    * @returns Sprites.
    */
-  calcSprites(): readonly Sprite[];
+  calcDrawingObjects(): readonly DrawingObject[];
 
   /**
    * Calc collision status of this.

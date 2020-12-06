@@ -20,12 +20,12 @@ export interface Movement {
 }
 
 /**
- * `Sprite` is object would be rendered.
+ * `DrawingObject` represent drawing thing.
  */
-export interface Sprite {
-  imageId(): string;
-  children(): readonly Sprite[];
-  update(deltaSec: number): void;
+export interface DrawingObject {
+  /** `objectId` is used for linking between in-game drawing thing and in-rendering drawing thing for speed. */
+  readonly objectId: string;
+  readonly zIndex: number;
 }
 
 /**
