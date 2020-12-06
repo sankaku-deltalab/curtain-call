@@ -3,7 +3,10 @@ import {
   actorBaseMockClass,
   worldBaseMockClass,
 } from "@curtain-call/entity-mock";
-import { CheckActorOverlapService, CollisionOverlapChecker } from "../../src";
+import {
+  CheckActorOverlapServiceImpl,
+  CollisionOverlapChecker,
+} from "../../src";
 
 const overlapCheckerMockClass = jest.fn<
   CollisionOverlapChecker,
@@ -55,7 +58,7 @@ describe("@curtain-call/CheckActorOverlapService", () => {
       iterateActors: jest.fn().mockReturnValue([actor1, actor2, actor3]),
     });
 
-    const service = new CheckActorOverlapService();
+    const service = new CheckActorOverlapServiceImpl();
     service.checkOverlapAndNotifyToActors(world, overlapChecker);
 
     expect(actor1.notifyOverlappedWith).toBeCalledWith(world, [actor2, actor3]);

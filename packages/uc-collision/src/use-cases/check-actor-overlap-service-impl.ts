@@ -1,4 +1,5 @@
 import { ActorBase, CollisionStatus, WorldBase } from "@curtain-call/entity";
+import { CheckActorOverlapService } from "../check-actor-overlap-service";
 import { CollisionOverlapChecker } from "../overlap-checker";
 
 const givenIsNotUndefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -6,7 +7,7 @@ const givenIsNotUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 /**
  * `WorldBase` check actor overlapping when updated.
  */
-export class CheckActorOverlapService {
+export class CheckActorOverlapServiceImpl implements CheckActorOverlapService {
   /**
    * Check `ActorBase`-wise collide in world and notify collide to `ActorBase`.
    *

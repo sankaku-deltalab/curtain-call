@@ -1,10 +1,11 @@
 import { CollisionGroup } from "@curtain-call/entity";
+import { CollisionModifyService } from "../collision-modify-service";
 import { Collision, CollisionShape } from "../collision";
 
 /**
  * Player want to modify collision.
  */
-export class CollisionModifyService {
+export class CollisionModifyServiceImpl implements CollisionModifyService {
   /**
    * Initialize collision.
    *

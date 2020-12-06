@@ -1,6 +1,7 @@
-import { Box2d } from "@curtain-call/entity";
 import { Matrix } from "trans-vector2d";
-import { Collision, CollisionShape } from "../src";
+import { Box2d } from "@curtain-call/entity";
+import { CollisionShape } from "@curtain-call/uc-collision";
+import { CollisionImpl } from "../src";
 
 const collisionShapeMockClass = jest.fn<CollisionShape, [readonly Box2d[]]>(
   (boxes: readonly Box2d[]) => ({
@@ -8,7 +9,7 @@ const collisionShapeMockClass = jest.fn<CollisionShape, [readonly Box2d[]]>(
   })
 );
 
-describe("@curtain-call/Collision", () => {
+describe("@curtain-call/ia-collision.Collision", () => {
   it("calculate CollisionStatus from initialized values", () => {
     const boxes1: readonly Box2d[] = [
       [0, 0, 1, 1],
@@ -28,7 +29,7 @@ describe("@curtain-call/Collision", () => {
 
     const isExcess = true;
 
-    const collision = new Collision();
+    const collision = new CollisionImpl();
     collision.init({
       shapes: [shape1, shape2],
       group,
@@ -58,7 +59,7 @@ describe("@curtain-call/Collision", () => {
     };
     const isExcess = true;
 
-    const collision = new Collision();
+    const collision = new CollisionImpl();
     collision.init({
       shapes: [shape1],
       group,
