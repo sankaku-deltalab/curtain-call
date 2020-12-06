@@ -1,5 +1,5 @@
 import { Box2d, canCollideGroup, CollisionStatus } from "@curtain-call/entity";
-import { CollisionOverlapChecker } from "@curtain-call/use-case-collision";
+import { CollisionOverlapChecker } from "@curtain-call/uc-collision";
 
 export interface BoxIntersect {
   calcIntersectAllVsAll(boxes: readonly Box2d[]): [number, number][];

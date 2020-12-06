@@ -66,7 +66,7 @@ const createCollision = (
   isExcess,
 });
 
-describe("@curtain-call/interface-adapter-collision", () => {
+describe("@curtain-call/ia-collision", () => {
   it("not-excess collision can overlap if group can collide", () => {
     const col1 = createCollision(group1, false);
     const col2 = createCollision(group2, false);

@@ -1,5 +1,5 @@
 {
-  "name": "@curtain-call/interface-adapter-collision",
+  "name": "@curtain-call/uc-collision",
   "version": "0.14.0",
   "description": "> TODO: description",
   "author": "Sankaku <sankaku_dlt.45631@outlook.jp>",
@@ -34,6 +34,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@curtain-call/entity": "^0.14.0",
-    "@curtain-call/use-case-collision": "^0.14.0"
+    "@curtain-call/entity-mock": "^0.14.0",
+    "trans-vector2d": "^2.0.0"
   }
 }
