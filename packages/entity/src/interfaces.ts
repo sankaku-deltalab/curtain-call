@@ -25,6 +25,7 @@ export interface Movement {
 export interface DrawingObject {
   /** `objectId` is used for linking between in-game drawing thing and in-rendering drawing thing for speed. */
   readonly objectId: string;
+  readonly drawingObjectType: string;
   readonly zIndex: number;
 }
 

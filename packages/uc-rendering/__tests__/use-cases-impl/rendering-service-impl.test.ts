@@ -9,6 +9,8 @@ export const rendererMockClass = jest.fn<Renderer, [Partial<Renderer>]>(
   (option: Partial<Renderer> = {}) =>
     Object.assign(
       {
+        load: jest.fn(),
+        unload: jest.fn(),
         render: jest.fn(),
       },
       option
@@ -18,7 +20,9 @@ export const rendererMockClass = jest.fn<Renderer, [Partial<Renderer>]>(
 const createActorAndDrawingObjects = (
   objectId: string
 ): [ActorBase, DrawingObject[]] => {
-  const drawingObjects: DrawingObject[] = [{ objectId, zIndex: 0 }];
+  const drawingObjects: DrawingObject[] = [
+    { drawingObjectType: "", objectId, zIndex: 0 },
+  ];
   const actor = new actorBaseMockClass({
     calcDrawingObjects: jest.fn().mockReturnValue(drawingObjects),
   });

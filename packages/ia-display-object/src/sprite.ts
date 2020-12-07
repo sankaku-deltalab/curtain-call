@@ -33,6 +33,7 @@ export class Sprite implements DisplayObject {
   calcDrawingObject(parentTransform: Matrix): readonly [DrawingObjectSprite] {
     return [
       {
+        drawingObjectType: "sprite",
         objectId: this.objectId,
         zIndex: this.zIndex,
         imageId: this.imageId,
