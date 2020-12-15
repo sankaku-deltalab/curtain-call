@@ -9,5 +9,6 @@ export {
   DamageType,
 } from "./actor-interface";
 export * from "./actor-extension-base";
+export * from "./actor-manipulator";
 export * from "./actor";
 export * from "./interface";
