@@ -1,10 +1,11 @@
 import { ActorExtensionBase } from "@curtain-call/actor";
-import { Weapon } from "./weapon";
+import { WeaponAsExtension } from "./weapon-as-extension";
 
 /**
  * Weapon do nothing.
  */
-export class NullWeapon extends ActorExtensionBase implements Weapon {
+export class NullWeapon extends ActorExtensionBase
+  implements WeaponAsExtension {
   /**
    * Start firing.
    */

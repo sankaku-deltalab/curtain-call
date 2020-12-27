@@ -37,6 +37,7 @@
   "dependencies": {
     "@curtain-call/actor": "^0.14.0",
     "guntree": "^0.9.1",
+    "predefined-promise": "^2.0.3",
     "reflect-metadata": "^0.1.13",
     "trans-vector2d": "^2.0.0",
     "tsyringe": "^4.3.0"

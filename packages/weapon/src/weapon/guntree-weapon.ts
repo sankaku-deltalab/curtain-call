@@ -9,7 +9,7 @@ import {
 import { BulletGenerator } from "../bullet-generator";
 import { TargetProvider } from "../target-provider";
 import { NullTargetProvider } from "../target-provider/null-target-provider";
-import { Weapon } from "./weapon";
+import { WeaponAsExtension } from "./weapon-as-extension";
 
 class GuntreeOwner implements gt.Owner {
   constructor(
@@ -42,7 +42,8 @@ class GuntreeOwner implements gt.Owner {
 /**
  * Fire bullets with Guntree.
  */
-export class GuntreeWeapon extends ActorExtensionBase implements Weapon {
+export class GuntreeWeapon extends ActorExtensionBase
+  implements WeaponAsExtension {
   private readonly player = new gt.Player();
   private world?: World;
   private guntree: gt.Gun = gt.nop();

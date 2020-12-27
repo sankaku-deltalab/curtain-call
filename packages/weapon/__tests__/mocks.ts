@@ -2,7 +2,11 @@ import { Matrix } from "trans-vector2d";
 import * as PIXI from "pixi.js";
 import { Camera } from "@curtain-call/actor";
 import { transMockClass } from "@curtain-call/actor-test-mocks";
-import { LocalConstantMover, RectCollisionShape, Weapon } from "../src";
+import {
+  LocalConstantMover,
+  RectCollisionShape,
+  WeaponAsExtension,
+} from "../src";
 
 export const cameraMockClass = jest.fn<Camera, []>(() => {
   return {
@@ -36,7 +40,7 @@ export const rectCollisionShapeMockClass = jest.fn<RectCollisionShape, []>(
   })
 );
 
-export const weaponMockClass = jest.fn<Weapon, []>(() => ({
+export const weaponMockClass = jest.fn<WeaponAsExtension, []>(() => ({
   notifyAddedToActor: jest.fn(),
   update: jest.fn(),
   shouldBeRemovedFromWorld: jest.fn(),

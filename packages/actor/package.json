@@ -35,6 +35,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "pixi.js": "^5.3.3",
+    "predefined-promise": "^2.0.3",
     "reflect-metadata": "^0.1.13",
     "trans-vector2d": "^2.0.0",
     "tsyringe": "^4.3.0"

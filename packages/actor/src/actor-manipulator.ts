@@ -1,7 +1,9 @@
 import { VectorLike } from "trans-vector2d";
 import { autoInjectable, inject } from "tsyringe";
+import { World } from "./interface";
 import { Actor as IActor } from "./actor-interface";
 import {
+  ActorManipulationCancelerFactory,
   ActorManipulatorForTimer,
   ActorManipulatorForMovement,
   ActorManipulatorForCollision,
@@ -10,52 +12,90 @@ import {
   ActorManipulatorForMisc,
   ActorManipulatorForWorld,
   ActorManipulatorForHealth,
-  ActorManipulatorCleanerGenerator,
-  Cleaner,
   Easing,
+  ActorManipulationCanceler,
+  Weapon,
 } from "./actor-manipulator-subsystems";
 
 @autoInjectable()
 export class ActorManipulator {
+  private readonly cancelerFactory: ActorManipulationCancelerFactory;
+  private readonly amForTimer: ActorManipulatorForTimer;
+  private readonly amForMovement: ActorManipulatorForMovement;
+  private readonly amForCollision: ActorManipulatorForCollision;
+  private readonly amForPositionCheck: ActorManipulatorForPositionCheck;
+  private readonly amForWeapon: ActorManipulatorForWeapon;
+  private readonly amForHealth: ActorManipulatorForHealth;
+  private readonly amForWorld: ActorManipulatorForWorld;
+  private readonly amForMisc: ActorManipulatorForMisc;
+
   constructor(
+    @inject("ActorManipulationCancelerFactory")
+    cancelerFactory?: ActorManipulationCancelerFactory,
     @inject("ActorManipulatorForTimer")
-    private readonly amForTimer: ActorManipulatorForTimer,
+    amForTimer?: ActorManipulatorForTimer,
     @inject("ActorManipulatorForMovement")
-    private readonly amForMovement: ActorManipulatorForMovement,
+    amForMovement?: ActorManipulatorForMovement,
     @inject("ActorManipulatorForCollision")
-    private readonly amForCollision: ActorManipulatorForCollision,
+    amForCollision?: ActorManipulatorForCollision,
     @inject("ActorManipulatorForPositionCheck")
-    private readonly amForPositionCheck: ActorManipulatorForPositionCheck,
+    amForPositionCheck?: ActorManipulatorForPositionCheck,
     @inject("ActorManipulatorForWeapon")
-    private readonly amForWeapon: ActorManipulatorForWeapon,
+    amForWeapon?: ActorManipulatorForWeapon,
     @inject("ActorManipulatorForHealth")
-    private readonly amForHealth: ActorManipulatorForHealth,
+    amForHealth?: ActorManipulatorForHealth,
     @inject("ActorManipulatorForWorld")
-    private readonly amForWorld: ActorManipulatorForWorld,
+    amForWorld?: ActorManipulatorForWorld,
     @inject("ActorManipulatorForMisc")
-    private readonly amForMisc: ActorManipulatorForMisc,
-    @inject("ActorManipulatorCleanerGenerator")
-    private readonly amCleanerGenerator: ActorManipulatorCleanerGenerator
-  ) {}
+    amForMisc?: ActorManipulatorForMisc
+  ) {
+    if (
+      !(
+        cancelerFactory &&
+        amForTimer &&
+        amForMovement &&
+        amForCollision &&
+        amForPositionCheck &&
+        amForWeapon &&
+        amForHealth &&
+        amForWorld &&
+        amForMisc
+      )
+    )
+      throw new Error("DI failed");
+    this.cancelerFactory = cancelerFactory;
+    this.amForTimer = amForTimer;
+    this.amForMovement = amForMovement;
+    this.amForCollision = amForCollision;
+    this.amForPositionCheck = amForPositionCheck;
+    this.amForWeapon = amForWeapon;
+    this.amForHealth = amForHealth;
+    this.amForWorld = amForWorld;
+    this.amForMisc = amForMisc;
+  }
 
   /**
-   * Create Cleaner for ActorManipulator.
+   * Create canceler.
    *
-   * @returns Cleaner.
+   * @returns New canceler.
    */
-  createCleaner(): Cleaner {
-    return this.amCleanerGenerator.createCleaner();
+  createCanceler(): ActorManipulationCanceler {
+    return this.cancelerFactory.createCanceler();
   }
 
   /**
    * Wait time.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param timeSec
    */
-  waitTime(cleaner: Cleaner, actor: IActor, timeSec: number): Promise<void> {
-    return this.amForTimer.waitTime(cleaner, actor, timeSec);
+  waitTime(
+    canceler: ActorManipulationCanceler,
+    actor: IActor,
+    timeSec: number
+  ): Promise<void> {
+    return this.amForTimer.waitTime(canceler, actor, timeSec);
   }
 
   /**
@@ -63,12 +103,12 @@ export class ActorManipulator {
    *
    * Movement space is local of given actor.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   move(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -82,7 +122,7 @@ export class ActorManipulator {
           averageSpeed: number;
         }
   ): Promise<void> {
-    return this.amForMovement.move(cleaner, actor, args);
+    return this.amForMovement.move(canceler, actor, args);
   }
 
   /**
@@ -90,12 +130,12 @@ export class ActorManipulator {
    *
    * Movement space is given actor transformation ({x: 1, y: 0} is front of actor).
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   moveLocally(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -109,18 +149,18 @@ export class ActorManipulator {
           averageSpeed: number;
         }
   ): Promise<void> {
-    return this.amForMovement.moveLocally(cleaner, actor, args);
+    return this.amForMovement.moveLocally(canceler, actor, args);
   }
 
   /**
    * Rotate actor and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotate(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -134,160 +174,164 @@ export class ActorManipulator {
           averageSpeed: number;
         }
   ): Promise<void> {
-    return this.amForMovement.rotate(cleaner, actor, args);
+    return this.amForMovement.rotate(canceler, actor, args);
   }
 
   /**
    * Rotate actor to given direction and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotateTo(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
-          angleRad: number;
+          targetAngleRad: number;
           easing: Easing;
           rotateDurationSec: number;
         }
       | {
-          angleRad: number;
+          targetAngleRad: number;
           easing: Easing;
           averageSpeed: number;
         }
   ): Promise<void> {
-    return this.amForMovement.rotateTo(cleaner, actor, args);
+    return this.amForMovement.rotateTo(canceler, actor, args);
   }
 
   /**
    * Rotate actor to target and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotateToTarget(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
-    args:
-      | {
-          angleRad: number;
-          easing: Easing;
-          tolerance: number;
-          rotateDurationSec: number;
-        }
-      | {
-          angleRad: number;
-          easing: Easing;
-          tolerance: number;
-          averageSpeed: number;
-        }
+    args: {
+      tolerance: number;
+      speed: number;
+    }
   ): Promise<void> {
-    return this.amForMovement.rotateToTarget(cleaner, actor, args);
+    return this.amForMovement.rotateToTarget(canceler, actor, args);
   }
 
   /**
    * Wait actor overlap with filtered other actor.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param filter
    * @return Filtered overlapped actors.
    */
   waitOverlap(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     filter: (other: IActor) => boolean
   ): Promise<ReadonlySet<IActor>> {
-    return this.amForCollision.waitOverlap(cleaner, actor, filter);
+    return this.amForCollision.waitOverlap(canceler, actor, filter);
   }
 
   /**
    * Wait actor bounds is in given area.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param area
    */
   waitBoundsIsIn(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     area: [number, number, number, number]
   ): Promise<void> {
-    return this.amForPositionCheck.waitBoundsIsIn(cleaner, actor, area);
+    return this.amForPositionCheck.waitBoundsIsIn(canceler, actor, area);
   }
 
   /**
    * Wait actor position is in given area.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param area
    */
   waitPositionIsIn(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     area: [number, number, number, number]
   ): Promise<void> {
-    return this.amForPositionCheck.waitPositionIsIn(cleaner, actor, area);
+    return this.amForPositionCheck.waitPositionIsIn(canceler, actor, area);
   }
 
   /**
    * Fire and wait finish firing.
    *
-   * @param cleaner
-   * @param actor
+   * @param canceler
+   * @param weapon
+   * @param world
    */
-  fireOnce(cleaner: Cleaner, actor: IActor): Promise<void> {
-    return this.amForWeapon.fireOnce(cleaner, actor);
+  fireOnce(
+    canceler: ActorManipulationCanceler,
+    weapon: Weapon,
+    world: World
+  ): Promise<void> {
+    return this.amForWeapon.fireOnce(canceler, weapon, world);
   }
 
   /**
    * Wait finish firing.
    *
-   * @param cleaner
-   * @param actor
+   * @param canceler
+   * @param weapon
+   * @param world
    */
-  waitFinishFiring(cleaner: Cleaner, actor: IActor): Promise<void> {
-    return this.amForWeapon.waitFinishFiring(cleaner, actor);
+  waitFinishFiring(
+    canceler: ActorManipulationCanceler,
+    weapon: Weapon,
+    world: World
+  ): Promise<void> {
+    return this.amForWeapon.waitFinishFiring(canceler, weapon, world);
   }
 
   /**
    * Wait actor dead.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    */
-  waitDead(cleaner: Cleaner, actor: IActor): Promise<void> {
-    return this.amForHealth.waitDead(cleaner, actor);
+  waitDead(canceler: ActorManipulationCanceler, actor: IActor): Promise<void> {
+    return this.amForHealth.waitDead(canceler, actor);
   }
 
   /**
    * Wait actor was removed from world.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    */
-  waitRemovedFromWorld(cleaner: Cleaner, actor: IActor): Promise<void> {
-    return this.amForWorld.waitRemovedFromWorld(cleaner, actor);
+  waitRemovedFromWorld(
+    canceler: ActorManipulationCanceler,
+    actor: IActor
+  ): Promise<void> {
+    return this.amForWorld.waitRemovedFromWorld(canceler, actor);
   }
 
   /**
    * Wait until is true.
    * Condition was checked when actor was updated.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param condition
    */
   waitUntil(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     condition: () => boolean
   ): Promise<void> {
-    return this.amForMisc.waitUntil(cleaner, actor, condition);
+    return this.amForMisc.waitUntil(canceler, actor, condition);
   }
 }

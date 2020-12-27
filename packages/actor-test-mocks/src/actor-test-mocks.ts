@@ -124,6 +124,8 @@ export const actorInterfaceMockClass = jest.fn<IActor, []>(() => {
     // damage dealer
     dealDamage: [World, number, IActor, DamageType];
     killed: [World, IActor, DamageType];
+    // movement
+    movementFinished: [World, Mover];
   }>();
   return {
     event,
@@ -204,6 +206,8 @@ export const createActor = (): {
     // damage dealer
     dealDamage: [World, number, IActor, DamageType];
     killed: [World, IActor, DamageType];
+    // movement
+    movementFinished: [World, Mover];
   }>();
   const trans = new transMockClass();
   const health = new healthMockClass();

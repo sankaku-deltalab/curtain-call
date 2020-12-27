@@ -1,6 +1,6 @@
 import { ActorExtension, World } from "@curtain-call/actor";
 
-export interface Weapon extends ActorExtension {
+export interface WeaponAsExtension extends ActorExtension {
   /**
    * Start firing.
    *

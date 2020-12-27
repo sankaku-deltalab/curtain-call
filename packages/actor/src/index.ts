@@ -1,5 +1,6 @@
 import "reflect-metadata";
 
+export * from "./actor-manipulator-subsystems-impl";
 export * from "./actor-subsystem";
 export {
   Actor as IActor,

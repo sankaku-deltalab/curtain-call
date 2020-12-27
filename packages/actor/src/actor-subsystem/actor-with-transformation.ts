@@ -1,11 +1,22 @@
 import { Matrix, VectorLike } from "trans-vector2d";
-import { World, Mover, Transformation } from "../interface";
+import {
+  World,
+  Mover,
+  Transformation,
+  EventEmitter as IEventEmitter,
+} from "../interface";
 import { Actor as IActor } from "../actor-interface";
 
+export type ActorWithTransformationEvent = IEventEmitter<{
+  movementFinished: [World, Mover];
+}>;
 export class ActorWithTransformation {
   private readonly movers = new Set<Mover>();
 
-  constructor(private readonly sharedTrans: Transformation) {}
+  constructor(
+    private readonly sharedEvent: ActorWithTransformationEvent,
+    private readonly sharedTrans: Transformation
+  ) {}
 
   /**
    * Move to specified position.
@@ -154,7 +165,7 @@ export class ActorWithTransformation {
    */
   update(world: World, deltaSec: number): void {
     this.sharedTrans.setLocal(
-      this.updateMovement(world, deltaSec, this.sharedTrans.getLocal()).newTrans
+      this.updateMovement(world, deltaSec, this.sharedTrans.getLocal())
     );
   }
 
@@ -170,21 +181,20 @@ export class ActorWithTransformation {
     world: World,
     deltaSec: number,
     currentTrans: Matrix
-  ): {
-    done: boolean;
-    newTrans: Matrix;
-  } {
-    const movers = Array.from(this.movers);
-    const result = movers.reduce(
-      (prev, mov) => {
-        const r = mov.update(world, deltaSec, prev.newTrans);
-        return {
-          done: prev.done && r.done,
-          newTrans: r.newTrans,
-        };
-      },
-      { done: true, newTrans: currentTrans }
-    );
-    return result;
+  ): Matrix {
+    const moversShouldRemove = new Set<Mover>();
+    let newTrans = currentTrans;
+    this.movers.forEach((mover) => {
+      const r = mover.update(world, deltaSec, newTrans);
+      newTrans = r.newTrans;
+      if (r.done) moversShouldRemove.add(mover);
+    });
+
+    moversShouldRemove.forEach((mover) => {
+      this.movers.delete(mover);
+      this.sharedEvent.emit("movementFinished", world, mover);
+    });
+
+    return newTrans;
   }
 }

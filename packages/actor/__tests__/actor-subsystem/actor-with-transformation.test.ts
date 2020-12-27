@@ -1,3 +1,4 @@
+import EventEmitter from "eventemitter3";
 import { Matrix, Vector } from "trans-vector2d";
 import {
   actorInterfaceMockClass,
@@ -5,14 +6,15 @@ import {
   worldMock,
   transMockClass,
 } from "../mocks";
-import { Transformation, ActorWithTransformation } from "../../src";
+import { Transformation, ActorWithTransformation, ActorEvent } from "../../src";
 
 export const createActorWithDamaging = (): {
   actor: ActorWithTransformation;
   trans: Transformation;
 } => {
+  const event = new EventEmitter() as ActorEvent;
   const trans = new transMockClass();
-  const actor = new ActorWithTransformation(trans);
+  const actor = new ActorWithTransformation(event, trans);
   return { actor, trans };
 };
 

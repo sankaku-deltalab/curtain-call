@@ -34,6 +34,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@curtain-call/actor": "^0.14.0"
+    "@curtain-call/actor": "^0.14.0",
+    "predefined-promise": "^2.0.3"
   }
 }

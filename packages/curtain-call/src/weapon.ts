@@ -12,7 +12,7 @@ import {
   TargetProvider,
   GuntreeWeapon,
   NullWeapon,
-  Weapon,
+  WeaponAsExtension,
   diContainer,
 } from "@curtain-call/weapon";
 
@@ -33,5 +33,5 @@ export {
   TargetProvider,
   GuntreeWeapon,
   NullWeapon,
-  Weapon,
+  WeaponAsExtension,
 };

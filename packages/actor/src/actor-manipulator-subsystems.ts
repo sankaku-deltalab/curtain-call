@@ -1,22 +1,37 @@
 import { VectorLike } from "trans-vector2d";
+import { World } from "./interface";
 import { Actor as IActor } from "./actor-interface";
 
-export interface Cleaner {
-  onClean(fn: () => void): () => void;
-  offClean(fn: () => void): void;
+export type Easing = (v: number) => number;
+
+export interface ActorManipulationCanceler {
+  cancel(): void;
+  onCanceled(callback: () => void): void;
+  offCanceled(callback: () => void): void;
 }
 
-export type Easing = (v: number) => number;
+export interface ActorManipulationCancelerFactory {
+  /**
+   * Create canceler.
+   *
+   * @returns New canceler.
+   */
+  createCanceler(): ActorManipulationCanceler;
+}
 
 export interface ActorManipulatorForTimer {
   /**
    * Wait time.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param timeSec
    */
-  waitTime(cleaner: Cleaner, actor: IActor, timeSec: number): Promise<void>;
+  waitTime(
+    canceler: ActorManipulationCanceler,
+    actor: IActor,
+    timeSec: number
+  ): Promise<void>;
 }
 
 export interface ActorManipulatorForMovement {
@@ -25,12 +40,12 @@ export interface ActorManipulatorForMovement {
    *
    * Movement space is local of given actor.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   move(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -50,12 +65,12 @@ export interface ActorManipulatorForMovement {
    *
    * Movement space is given actor transformation ({x: 1, y: 0} is front of actor).
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   moveLocally(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -73,12 +88,12 @@ export interface ActorManipulatorForMovement {
   /**
    * Rotate actor and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotate(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
@@ -96,21 +111,21 @@ export interface ActorManipulatorForMovement {
   /**
    * Rotate actor to given direction and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotateTo(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     args:
       | {
-          angleRad: number;
+          targetAngleRad: number;
           easing: Easing;
           rotateDurationSec: number;
         }
       | {
-          angleRad: number;
+          targetAngleRad: number;
           easing: Easing;
           averageSpeed: number;
         }
@@ -119,26 +134,17 @@ export interface ActorManipulatorForMovement {
   /**
    * Rotate actor to target and wait rotating.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param args
    */
   rotateToTarget(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
-    args:
-      | {
-          angleRad: number;
-          easing: Easing;
-          tolerance: number;
-          rotateDurationSec: number;
-        }
-      | {
-          angleRad: number;
-          easing: Easing;
-          tolerance: number;
-          averageSpeed: number;
-        }
+    args: {
+      tolerance: number;
+      speed: number;
+    }
   ): Promise<void>;
 }
 
@@ -146,13 +152,13 @@ export interface ActorManipulatorForCollision {
   /**
    * Wait actor overlap with filtered other actor.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param filter
    * @return Filtered overlapped actors.
    */
   waitOverlap(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     filter: (other: IActor) => boolean
   ): Promise<ReadonlySet<IActor>>;
@@ -162,12 +168,12 @@ export interface ActorManipulatorForPositionCheck {
   /**
    * Wait actor bounds is in given area.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param area
    */
   waitBoundsIsIn(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     area: [number, number, number, number]
   ): Promise<void>;
@@ -175,53 +181,92 @@ export interface ActorManipulatorForPositionCheck {
   /**
    * Wait actor position is in given area.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param area
    */
   waitPositionIsIn(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
     area: [number, number, number, number]
   ): Promise<void>;
+}
+
+export interface Weapon {
+  /**
+   * Start firing.
+   *
+   * @param world World.
+   */
+  startFire(world: World): void;
+
+  /**
+   * Is firing now.
+   *
+   * @returns Is firing.
+   */
+  isFiring(): boolean;
+
+  /**
+   * Request stop firing.
+   */
+  stopFire(): void;
+
+  /**
+   * Stop firing process immediately.
+   */
+  forceStopFire(): void;
 }
 
 export interface ActorManipulatorForWeapon {
   /**
    * Fire and wait finish firing.
    *
-   * @param cleaner
-   * @param actor
+   * @param canceler
+   * @param weapon
+   * @param world
    */
-  fireOnce(cleaner: Cleaner, actor: IActor): Promise<void>;
+  fireOnce(
+    canceler: ActorManipulationCanceler,
+    weapon: Weapon,
+    world: World
+  ): Promise<void>;
 
   /**
    * Wait finish firing.
    *
-   * @param cleaner
-   * @param actor
+   * @param canceler
+   * @param weapon
+   * @param world
    */
-  waitFinishFiring(cleaner: Cleaner, actor: IActor): Promise<void>;
+  waitFinishFiring(
+    canceler: ActorManipulationCanceler,
+    weapon: Weapon,
+    world: World
+  ): Promise<void>;
 }
 
 export interface ActorManipulatorForHealth {
   /**
    * Wait actor dead.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    */
-  waitDead(cleaner: Cleaner, actor: IActor): Promise<void>;
+  waitDead(canceler: ActorManipulationCanceler, actor: IActor): Promise<void>;
 }
 
 export interface ActorManipulatorForWorld {
   /**
    * Wait actor was removed from world.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    */
-  waitRemovedFromWorld(cleaner: Cleaner, actor: IActor): Promise<void>;
+  waitRemovedFromWorld(
+    canceler: ActorManipulationCanceler,
+    actor: IActor
+  ): Promise<void>;
 }
 
 export interface ActorManipulatorForMisc {
@@ -229,22 +274,13 @@ export interface ActorManipulatorForMisc {
    * Wait until is true.
    * Condition was checked when actor was updated.
    *
-   * @param cleaner
+   * @param canceler
    * @param actor
    * @param condition
    */
   waitUntil(
-    cleaner: Cleaner,
+    canceler: ActorManipulationCanceler,
     actor: IActor,
-    condition: () => boolean
+    condition: (world: World) => boolean
   ): Promise<void>;
-}
-
-export interface ActorManipulatorCleanerGenerator {
-  /**
-   * Create Cleaner for ActorManipulator.
-   *
-   * @returns Cleaner.
-   */
-  createCleaner(): Cleaner;
 }

@@ -37,6 +37,7 @@ export type ActorEvent = IEventEmitter<{
   removedFromWorld: [World];
   updated: [World, number];
   overlapped: [World, Set<Actor>];
+  movementFinished: [World, Mover];
   takenDamage: [World, number, Actor, DamageType];
   dead: [World, Actor, DamageType];
   beHealed: [World, number];

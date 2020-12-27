@@ -67,7 +67,7 @@ export class Actor implements IActor {
     this.actorInfo = new ActorWithInfo();
     this.actorSubActors = new ActorWithSubActors(trans);
     this.actorTimer = new ActorWithTimer();
-    this.actorTransform = new ActorWithTransformation(trans);
+    this.actorTransform = new ActorWithTransformation(event, trans);
     this.actorWithWorld = new ActorWithWorld(event);
   }
 

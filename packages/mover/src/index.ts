@@ -1,5 +1,6 @@
 import "reflect-metadata";
 
+export * from "./actor-manipulator-for-movement-impl";
 export * from "./eased-route";
 export * from "./parallel-mover";
 export * from "./pointer-mover";

@@ -1,4 +1,4 @@
-import { Actor, World } from "../src";
+import { Actor, World, ActorManipulator } from "../src";
 
 describe("curtain-call", () => {
   it("has actor", () => {
@@ -7,5 +7,9 @@ describe("curtain-call", () => {
 
   it("has world", () => {
     expect(() => new World()).not.toThrowError();
+  });
+
+  it("has actor-manipulator", () => {
+    expect(() => new ActorManipulator()).not.toThrowError();
   });
 });
