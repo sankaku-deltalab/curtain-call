@@ -19,7 +19,7 @@ export const actorBaseMockClass = jest.fn<ActorBase, [Partial<ActorBase>]>(
         notifyRemovedFromWorld: jest.fn(),
         shouldBeRemovedFromWorld: jest.fn(),
         update: jest.fn(),
-        aaBB: jest.fn(),
+        bounds: jest.fn(),
         health: jest.fn(),
         healthMax: jest.fn(),
         takeDamage: jest.fn(),

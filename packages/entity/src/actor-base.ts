@@ -140,7 +140,7 @@ export interface ActorBase {
    *
    * @returns Global axis-aligned bounding box.
    */
-  aaBB(): Box2d;
+  bounds(): Box2d;
 
   /**
    * Get current health of this.

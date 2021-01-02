@@ -76,18 +76,18 @@ export interface WorldBase {
   /**
    * Calc given axis-aligned bounding box is in core area.
    *
-   * @param globalAABB Global AABB.
+   * @param globalBounds Global AABB.
    * @returns Given AABB is in core area.
    */
-  aabbIsInCoreArea(globalAABB: Box2d): boolean;
+  boundsIsInCoreArea(globalBounds: Box2d): boolean;
 
   /**
    * Calc given axis-aligned bounding box is NOT in core area.
    *
-   * @param globalAABB Global AABB.
+   * @param globalBounds Global AABB.
    * @returns Given AABB is NOT in core area.
    */
-  aabbIsNotInCoreArea(globalAABB: Box2d): boolean;
+  boundsIsNotInCoreArea(globalBounds: Box2d): boolean;
 
   /**
    * Add hit stop.
