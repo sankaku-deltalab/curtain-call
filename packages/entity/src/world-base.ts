@@ -3,10 +3,38 @@ import { ActorBase } from "./actor-base";
 import { Box2d } from "./interfaces";
 import { WorldExtension } from "./world-extension";
 
+export type WorldEvent = Readonly<{
+  preUpdate: [WorldBase, number];
+  updated: [WorldBase, number];
+  postUpdate: [WorldBase, number];
+}>;
+
 /**
  * `WorldBase` is container for `ActorBase`.
  */
 export interface WorldBase {
+  /**
+   * Add event listener.
+   *
+   * @param type
+   * @param listener
+   */
+  addEventListener<T extends keyof WorldEvent>(
+    type: T,
+    listener: (...args: WorldEvent[T]) => unknown
+  ): this;
+
+  /**
+   * Remove event listener.
+   *
+   * @param type
+   * @param listener
+   */
+  removeEventListener<T extends keyof WorldEvent>(
+    type: T,
+    listener: (...args: WorldEvent[T]) => unknown
+  ): this;
+
   /**
    * Set canvas drawing method.
    *

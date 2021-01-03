@@ -27,10 +27,44 @@ export enum ActorRole {
   misc = "misc",
 }
 
+export type ActorEvent = Readonly<{
+  addedToWorldBase: [WorldBase];
+  removedFromWorldBase: [WorldBase];
+  preUpdate: [WorldBase, number];
+  updated: [WorldBase, number];
+  postUpdate: [WorldBase, number];
+  overlapped: [WorldBase, Set<ActorBase>];
+  movementFinished: [WorldBase, Movement];
+  takenDamage: [WorldBase, number, ActorBase, string[]];
+  dead: [WorldBase, ActorBase, string[]];
+}>;
+
 /**
  * `ActorBase` is individual contained in `WorldBase`.
  */
 export interface ActorBase {
+  /**
+   * Add event listener.
+   *
+   * @param type
+   * @param listener
+   */
+  addEventListener<T extends keyof ActorEvent>(
+    type: T,
+    listener: (...args: ActorEvent[T]) => unknown
+  ): this;
+
+  /**
+   * Remove event listener.
+   *
+   * @param type
+   * @param listener
+   */
+  removeEventListener<T extends keyof ActorEvent>(
+    type: T,
+    listener: (...args: ActorEvent[T]) => unknown
+  ): this;
+
   /**
    * Get team.
    *
