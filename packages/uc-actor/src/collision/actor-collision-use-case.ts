@@ -1,5 +1,13 @@
 import { Matrix } from "trans-vector2d";
-import { Box2d, CollisionGroup, CollisionStatus } from "@curtain-call/entity";
+import {
+  ActorBase,
+  ActorEvent,
+  Box2d,
+  CollisionGroup,
+  CollisionStatus,
+  WorldBase,
+} from "@curtain-call/entity";
+import { EventEmitter } from "..";
 
 /**
  * `CollisionShape` express global collision shape.
@@ -77,5 +85,20 @@ export class ActorCollisionUseCase {
       group: data.group,
       isExcess: data.isExcess,
     };
+  }
+
+  /**
+   * Emit overlap event when overlapping was notified by world.
+   *
+   * @param event
+   * @param world
+   * @param others
+   */
+  emitEventWhenOverlapped(
+    event: EventEmitter<ActorEvent>,
+    world: WorldBase,
+    others: ReadonlySet<ActorBase>
+  ): void {
+    event.emit("overlapped", world, others);
   }
 }

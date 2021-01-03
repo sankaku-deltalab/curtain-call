@@ -1,6 +1,11 @@
 import { Matrix } from "trans-vector2d";
-import { Box2d } from "@curtain-call/entity";
+import { ActorEvent, Box2d } from "@curtain-call/entity";
+import {
+  worldBaseMockClass,
+  actorBaseMockClass,
+} from "@curtain-call/entity-mock";
 import { ActorCollisionUseCase, CollisionShape } from "../../src";
+import { createEventEmitterMock } from "../mocks";
 
 const collisionShapeMockClass = jest.fn<CollisionShape, [readonly Box2d[]]>(
   (boxes: readonly Box2d[]) => ({
@@ -106,5 +111,18 @@ describe("@curtain-call/ActorCollisionUseCase", () => {
 
     expect(shape1.calcCollisionBox2ds).toBeCalledWith(parentTrans);
     expect(shape2.calcCollisionBox2ds).toBeCalledWith(parentTrans);
+  });
+
+  it("emit event when overlapped", () => {
+    const event = createEventEmitterMock<ActorEvent>();
+    const world = new worldBaseMockClass({});
+    const actors = new Set(
+      new Array(2).fill(0).map(() => new actorBaseMockClass({}))
+    );
+
+    const uc = new ActorCollisionUseCase();
+    uc.emitEventWhenOverlapped(event, world, actors);
+
+    expect(event.emit).toBeCalledWith("overlapped", world, actors);
   });
 });
