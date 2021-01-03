@@ -1,6 +1,7 @@
 import { Vector, VectorLike } from "trans-vector2d";
 import { ActorBase } from "./actor-base";
 import { Box2d } from "./interfaces";
+import { WorldExtension } from "./world-extension";
 
 /**
  * `WorldBase` is container for `ActorBase`.
@@ -88,6 +89,24 @@ export interface WorldBase {
    * @returns Given AABB is NOT in core area.
    */
   boundsIsNotInCoreArea(globalBounds: Box2d): boolean;
+
+  /**
+   * Get extensions.
+   *
+   * @returns Extensions.
+   */
+  getExtensions(): readonly WorldExtension[];
+
+  /**
+   * Get only one extension filtered by guard.
+   * If this has multiple extension filtered guard, return undefined.
+   *
+   * @param guard User defined type guard.
+   * @returns Extensions.
+   */
+  getOneExtension<T extends WorldExtension>(
+    guard: (ext: WorldExtension) => ext is T
+  ): T | undefined;
 
   /**
    * Add hit stop.
