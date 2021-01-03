@@ -5,9 +5,9 @@ import {
   DrawingObject,
   Box2d,
   CollisionStatus,
-  ActorExtension,
   Timer,
 } from "./interfaces";
+import { ActorExtension } from "./actor-extension";
 
 /**
  * Team.

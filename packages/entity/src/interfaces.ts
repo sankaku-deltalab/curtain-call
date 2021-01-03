@@ -1,5 +1,4 @@
 import { Matrix } from "trans-vector2d";
-import { ActorBase } from "./actor-base";
 import { WorldBase } from "./world-base";
 
 /**
@@ -65,15 +64,6 @@ export interface CollisionStatus {
   readonly box2ds: readonly Box2d[];
   readonly group: CollisionGroup;
   readonly isExcess: boolean;
-}
-
-/**
- * `ActorExtension` would be used for extending `ActorBase` without inheritance.
- */
-export interface ActorExtension {
-  preUpdate(world: WorldBase, actor: ActorBase, deltaSec: number): void;
-  update(world: WorldBase, actor: ActorBase, deltaSec: number): void;
-  postUpdate(world: WorldBase, actor: ActorBase, deltaSec: number): void;
 }
 
 /**
