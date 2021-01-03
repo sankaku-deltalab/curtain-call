@@ -16,22 +16,34 @@ export interface WorldBase {
   /**
    * Add event listener.
    *
-   * @param type
+   * @param event
    * @param listener
    */
-  addEventListener<T extends keyof WorldEvent>(
-    type: T,
+  on<T extends keyof WorldEvent>(
+    event: T,
+    listener: (...args: WorldEvent[T]) => unknown
+  ): this;
+
+  /**
+   * Add event listener.
+   * Listener would be removed after emitted.
+   *
+   * @param event
+   * @param listener
+   */
+  once<T extends keyof WorldEvent>(
+    event: T,
     listener: (...args: WorldEvent[T]) => unknown
   ): this;
 
   /**
    * Remove event listener.
    *
-   * @param type
+   * @param event
    * @param listener
    */
-  removeEventListener<T extends keyof WorldEvent>(
-    type: T,
+  off<T extends keyof WorldEvent>(
+    event: T,
     listener: (...args: WorldEvent[T]) => unknown
   ): this;
 

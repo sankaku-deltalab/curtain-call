@@ -5,8 +5,9 @@ export const worldBaseMockClass = jest.fn<WorldBase, [Partial<WorldBase>]>(
   (option: Partial<WorldBase>) =>
     Object.assign(
       {
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
+        on: jest.fn(),
+        once: jest.fn(),
+        off: jest.fn(),
         setDrawAreaUpdater: jest.fn(),
         update: jest.fn(),
         addActor: jest.fn(),

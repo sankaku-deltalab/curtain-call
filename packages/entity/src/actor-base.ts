@@ -33,10 +33,10 @@ export type ActorEvent = Readonly<{
   preUpdate: [WorldBase, number];
   updated: [WorldBase, number];
   postUpdate: [WorldBase, number];
-  overlapped: [WorldBase, Set<ActorBase>];
+  overlapped: [WorldBase, ReadonlySet<ActorBase>];
   movementFinished: [WorldBase, Movement];
-  takenDamage: [WorldBase, number, ActorBase, string[]];
-  dead: [WorldBase, ActorBase, string[]];
+  takenDamage: [WorldBase, number, ActorBase, readonly string[]];
+  dead: [WorldBase, ActorBase, readonly string[]];
 }>;
 
 /**
@@ -46,22 +46,34 @@ export interface ActorBase {
   /**
    * Add event listener.
    *
-   * @param type
+   * @param event
    * @param listener
    */
-  addEventListener<T extends keyof ActorEvent>(
-    type: T,
+  on<T extends keyof ActorEvent>(
+    event: T,
+    listener: (...args: ActorEvent[T]) => unknown
+  ): this;
+
+  /**
+   * Add event listener.
+   * Listener would be removed after emitted.
+   *
+   * @param event
+   * @param listener
+   */
+  once<T extends keyof ActorEvent>(
+    event: T,
     listener: (...args: ActorEvent[T]) => unknown
   ): this;
 
   /**
    * Remove event listener.
    *
-   * @param type
+   * @param event
    * @param listener
    */
-  removeEventListener<T extends keyof ActorEvent>(
-    type: T,
+  off<T extends keyof ActorEvent>(
+    event: T,
     listener: (...args: ActorEvent[T]) => unknown
   ): this;
 
