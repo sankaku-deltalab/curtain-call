@@ -5,6 +5,8 @@ export const actorBaseMockClass = jest.fn<ActorBase, [Partial<ActorBase>]>(
   (option: Partial<ActorBase> = {}) =>
     Object.assign(
       {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
         team: jest.fn(),
         role: jest.fn(),
         position: jest.fn(),
