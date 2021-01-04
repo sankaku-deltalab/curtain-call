@@ -139,7 +139,7 @@ export interface ActorBase {
    *
    * @returns Collision Representation.
    */
-  calcCollisionRepresentation(): CollisionRepresentation;
+  calcCollisionRepresentation(): Readonly<CollisionRepresentation>;
 
   /**
    * Notify overlapped with other actor.
