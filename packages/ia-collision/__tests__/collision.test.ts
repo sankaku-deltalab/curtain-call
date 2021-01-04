@@ -10,7 +10,7 @@ const collisionShapeMockClass = jest.fn<CollisionShape, [readonly Box2d[]]>(
 );
 
 describe("@curtain-call/ia-collision.Collision", () => {
-  it("calculate CollisionStatus from initialized values", () => {
+  it("calculate CollisionRepresentation from initialized values", () => {
     const boxes1: readonly Box2d[] = [
       [0, 0, 1, 1],
       [1, 2, 3, 4],
@@ -37,7 +37,7 @@ describe("@curtain-call/ia-collision.Collision", () => {
     });
 
     const parentTrans = Matrix.from({ translation: { x: 1, y: 2 } });
-    const status = collision.calcCollisionStatus(parentTrans);
+    const status = collision.calcCollisionRepresentation(parentTrans);
 
     expect(status.box2ds).toEqual([...boxes1, ...boxes2]);
     expect(status.group).toEqual(group);
@@ -69,12 +69,16 @@ describe("@curtain-call/ia-collision.Collision", () => {
     const parentTrans = Matrix.from({ translation: { x: 1, y: 2 } });
 
     collision.disable();
-    const statusWhileDisabled = collision.calcCollisionStatus(parentTrans);
+    const statusWhileDisabled = collision.calcCollisionRepresentation(
+      parentTrans
+    );
     expect(statusWhileDisabled.box2ds).toEqual([]);
     expect(shape1.calcCollisionBox2ds).not.toBeCalled();
 
     collision.enable();
-    const statusWhileEnabled = collision.calcCollisionStatus(parentTrans);
+    const statusWhileEnabled = collision.calcCollisionRepresentation(
+      parentTrans
+    );
     expect(statusWhileEnabled.box2ds).toEqual(boxes1);
   });
 });

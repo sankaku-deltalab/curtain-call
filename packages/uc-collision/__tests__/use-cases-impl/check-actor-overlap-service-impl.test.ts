@@ -1,4 +1,4 @@
-import { CollisionStatus, ActorBase } from "@curtain-call/entity";
+import { CollisionRepresentation, ActorBase } from "@curtain-call/entity";
 import {
   actorBaseMockClass,
   worldBaseMockClass,
@@ -20,8 +20,11 @@ const overlapCheckerMockClass = jest.fn<
   )
 );
 
-const createActorAndCollisionStatus = (): [ActorBase, CollisionStatus] => {
-  const collisionStatus: CollisionStatus = {
+const createActorAndCollisionRepresentation = (): [
+  ActorBase,
+  CollisionRepresentation
+] => {
+  const collisionRepresentation: CollisionRepresentation = {
     box2ds: [],
     group: {
       mask: 0,
@@ -30,16 +33,18 @@ const createActorAndCollisionStatus = (): [ActorBase, CollisionStatus] => {
     isExcess: false,
   };
   const actor = new actorBaseMockClass({
-    calcCollisionStatus: jest.fn().mockReturnValue(collisionStatus),
+    calcCollisionRepresentation: jest
+      .fn()
+      .mockReturnValue(collisionRepresentation),
   });
-  return [actor, collisionStatus];
+  return [actor, collisionRepresentation];
 };
 
 describe("@curtain-call/CheckActorOverlapService", () => {
   it("find collision overlapping and notify it", () => {
-    const [actor1, status1] = createActorAndCollisionStatus();
-    const [actor2, status2] = createActorAndCollisionStatus();
-    const [actor3, status3] = createActorAndCollisionStatus();
+    const [actor1, status1] = createActorAndCollisionRepresentation();
+    const [actor2, status2] = createActorAndCollisionRepresentation();
+    const [actor3, status3] = createActorAndCollisionRepresentation();
 
     // st1 -> st2, st3
     // st2 -> st1

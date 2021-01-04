@@ -1,5 +1,9 @@
 import { Matrix } from "trans-vector2d";
-import { CollisionGroup, Box2d, CollisionStatus } from "@curtain-call/entity";
+import {
+  CollisionGroup,
+  Box2d,
+  CollisionRepresentation,
+} from "@curtain-call/entity";
 import { Collision, CollisionShape } from "@curtain-call/uc-collision";
 
 /**
@@ -29,12 +33,14 @@ export class CollisionImpl implements Collision {
   }
 
   /**
-   * Calc collision status of this.
+   * Calc collision representation of this.
    *
    * @param parentTransform Global transformation matrix of parent.
-   * @returns Collision Status.
+   * @returns Collision Representation.
    */
-  calcCollisionStatus(parentTransform: Matrix): CollisionStatus {
+  calcCollisionRepresentation(
+    parentTransform: Matrix
+  ): CollisionRepresentation {
     const box2ds: readonly Box2d[] = !this.enabled
       ? []
       : this.shapes

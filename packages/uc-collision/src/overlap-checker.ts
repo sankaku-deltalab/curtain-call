@@ -1,4 +1,4 @@
-import { CollisionStatus } from "@curtain-call/entity";
+import { CollisionRepresentation } from "@curtain-call/entity";
 
 /**
  * `CollisionOverlapChecker` is used for collide detection.
@@ -8,9 +8,9 @@ export interface CollisionOverlapChecker {
    * Calculate all collision overlapping.
    *
    * @param statuses Collision statuses.
-   * @returns Overlapping collision statuses.
+   * @returns Overlapping collision representationes.
    */
   calcOverlapAllVsAll(
-    statuses: ReadonlySet<CollisionStatus>
-  ): ReadonlyMap<CollisionStatus, readonly CollisionStatus[]>;
+    statuses: ReadonlySet<CollisionRepresentation>
+  ): ReadonlyMap<CollisionRepresentation, readonly CollisionRepresentation[]>;
 }

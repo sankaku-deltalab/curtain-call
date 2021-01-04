@@ -5,7 +5,7 @@ export const collisionMockClass = jest.fn<Collision, [Partial<Collision>]>(
     Object.assign(
       {
         init: jest.fn(),
-        calcCollisionStatus: jest.fn(),
+        calcCollisionRepresentation: jest.fn(),
         enable: jest.fn(),
         disable: jest.fn(),
       },

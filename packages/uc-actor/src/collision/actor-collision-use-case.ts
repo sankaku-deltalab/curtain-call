@@ -4,7 +4,7 @@ import {
   ActorEvent,
   Box2d,
   CollisionGroup,
-  CollisionStatus,
+  CollisionRepresentation,
   WorldBase,
 } from "@curtain-call/entity";
 import { EventEmitter } from "..";
@@ -65,16 +65,16 @@ export class ActorCollisionUseCase {
   }
 
   /**
-   * Calc collision status of this.
+   * Calc collision representation of this.
    *
    * @param data ActorCollisionData would be used.
    * @param parentTransform Global transformation matrix of parent.
-   * @returns Collision Status.
+   * @returns Collision Representation.
    */
-  calcCollisionStatus(
+  calcCollisionRepresentation(
     data: Readonly<ActorCollisionData>,
     parentTransform: Matrix
-  ): CollisionStatus {
+  ): CollisionRepresentation {
     const box2ds: readonly Box2d[] = !data.enabled
       ? []
       : data.shapes

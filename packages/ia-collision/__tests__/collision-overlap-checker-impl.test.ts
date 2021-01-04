@@ -1,4 +1,8 @@
-import { Box2d, CollisionGroup, CollisionStatus } from "@curtain-call/entity";
+import {
+  Box2d,
+  CollisionGroup,
+  CollisionRepresentation,
+} from "@curtain-call/entity";
 import { CollisionOverlapCheckerImpl, BoxIntersect } from "../src";
 
 export const boxIntersectMockClass = jest.fn<
@@ -60,7 +64,7 @@ const group5 = { category: 0b0000, mask: 0b0000 };
 const createCollision = (
   group: CollisionGroup,
   isExcess: boolean
-): CollisionStatus => ({
+): CollisionRepresentation => ({
   box2ds: [[0, 0, 1, 1]],
   group,
   isExcess,

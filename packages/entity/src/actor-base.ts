@@ -4,7 +4,7 @@ import {
   Movement,
   DrawingRepresentation,
   Box2d,
-  CollisionStatus,
+  CollisionRepresentation,
   Timer,
 } from "./interfaces";
 import { ActorExtension } from "./actor-extension";
@@ -135,11 +135,11 @@ export interface ActorBase {
   calcDrawingRepresentations(): readonly DrawingRepresentation[];
 
   /**
-   * Calc collision status of this.
+   * Calc collision representation of this.
    *
-   * @returns Collision Status.
+   * @returns Collision Representation.
    */
-  calcCollisionStatus(): CollisionStatus;
+  calcCollisionRepresentation(): CollisionRepresentation;
 
   /**
    * Notify overlapped with other actor.

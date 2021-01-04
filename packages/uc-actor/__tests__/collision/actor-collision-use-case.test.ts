@@ -75,7 +75,7 @@ describe("@curtain-call/ActorCollisionUseCase", () => {
     });
   });
 
-  it("calculate CollisionStatus from initialized values", () => {
+  it("calculate CollisionRepresentation from initialized values", () => {
     const boxes1: readonly Box2d[] = [
       [0, 0, 1, 1],
       [1, 2, 3, 4],
@@ -103,7 +103,7 @@ describe("@curtain-call/ActorCollisionUseCase", () => {
     };
 
     const parentTrans = Matrix.from({ translation: { x: 1, y: 2 } });
-    const status = uc.calcCollisionStatus(data, parentTrans);
+    const status = uc.calcCollisionRepresentation(data, parentTrans);
 
     expect(status.box2ds).toEqual([...boxes1, ...boxes2]);
     expect(status.group).toEqual(group);

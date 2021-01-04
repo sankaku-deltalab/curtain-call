@@ -16,7 +16,7 @@ export const actorBaseMockClass = jest.fn<ActorBase, [Partial<ActorBase>]>(
         transformation: jest.fn(),
         addMovement: jest.fn().mockReturnThis(),
         calcDrawingRepresentations: jest.fn(),
-        calcCollisionStatus: jest.fn(),
+        calcCollisionRepresentation: jest.fn(),
         notifyOverlappedWith: jest.fn(),
         notifyAddedToWorld: jest.fn(),
         notifyRemovedFromWorld: jest.fn(),

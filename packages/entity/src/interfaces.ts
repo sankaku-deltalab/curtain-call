@@ -58,9 +58,9 @@ export function canCollideGroup(
 }
 
 /**
- * `CollisionStatus` describe current collision status.
+ * `CollisionRepresentation` describe current collision representation.
  */
-export interface CollisionStatus {
+export interface CollisionRepresentation {
   readonly box2ds: readonly Box2d[];
   readonly group: CollisionGroup;
   readonly isExcess: boolean;

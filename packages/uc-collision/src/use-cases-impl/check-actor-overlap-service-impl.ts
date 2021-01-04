@@ -1,4 +1,8 @@
-import { ActorBase, CollisionStatus, WorldBase } from "@curtain-call/entity";
+import {
+  ActorBase,
+  CollisionRepresentation,
+  WorldBase,
+} from "@curtain-call/entity";
 import { CheckActorOverlapService } from "../use-cases/check-actor-overlap-service";
 import { CollisionOverlapChecker } from "../overlap-checker";
 
@@ -36,7 +40,7 @@ export class CheckActorOverlapServiceImpl implements CheckActorOverlapService {
 
   private calcStatusToActor(
     actors: readonly ActorBase[]
-  ): ReadonlyMap<CollisionStatus, ActorBase> {
-    return new Map(actors.map((ac) => [ac.calcCollisionStatus(), ac]));
+  ): ReadonlyMap<CollisionRepresentation, ActorBase> {
+    return new Map(actors.map((ac) => [ac.calcCollisionRepresentation(), ac]));
   }
 }

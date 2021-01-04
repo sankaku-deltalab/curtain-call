@@ -1,5 +1,9 @@
 import { Matrix } from "trans-vector2d";
-import { CollisionGroup, Box2d, CollisionStatus } from "@curtain-call/entity";
+import {
+  CollisionGroup,
+  Box2d,
+  CollisionRepresentation,
+} from "@curtain-call/entity";
 
 /**
  * `CollisionShape` express global collision shape.
@@ -31,12 +35,12 @@ export interface Collision {
   }): void;
 
   /**
-   * Calc collision status of this.
+   * Calc collision representation of this.
    *
    * @param parentTransform Global transformation matrix of parent.
-   * @returns Collision Status.
+   * @returns Collision Representation.
    */
-  calcCollisionStatus(parentTransform: Matrix): CollisionStatus;
+  calcCollisionRepresentation(parentTransform: Matrix): CollisionRepresentation;
 
   /**
    * Enable this.
