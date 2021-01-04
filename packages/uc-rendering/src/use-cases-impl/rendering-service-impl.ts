@@ -11,7 +11,9 @@ export class RenderingServiceImpl implements RenderingService {
    */
   renderActorsInWorld(world: WorldBase, renderer: Renderer): void {
     const actors = Array.from(world.iterateActors());
-    const drawingObjects = actors.map((ac) => ac.calcDrawingObjects()).flat();
-    renderer.render(drawingObjects);
+    const drawingRepresentations = actors
+      .map((ac) => ac.calcDrawingRepresentations())
+      .flat();
+    renderer.render(drawingRepresentations);
   }
 }

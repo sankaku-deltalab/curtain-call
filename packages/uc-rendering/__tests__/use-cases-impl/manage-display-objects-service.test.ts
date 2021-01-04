@@ -11,7 +11,7 @@ export const displayObjectMockClass = jest.fn<
   Object.assign(
     {
       update: jest.fn(),
-      calcDrawingObject: jest.fn(),
+      calcDrawingRepresentation: jest.fn(),
     },
     option
   )
@@ -26,7 +26,7 @@ export const multiDOMockClass = jest.fn<
       add: jest.fn(),
       remove: jest.fn(),
       update: jest.fn(),
-      calcDrawingObject: jest.fn(),
+      calcDrawingRepresentation: jest.fn(),
     },
     option
   )

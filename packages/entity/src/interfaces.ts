@@ -19,12 +19,12 @@ export interface Movement {
 }
 
 /**
- * `DrawingObject` represent drawing thing.
+ * `DrawingRepresentation` represent drawing thing.
  */
-export interface DrawingObject {
+export interface DrawingRepresentation {
   /** `objectId` is used for linking between in-game drawing thing and in-rendering drawing thing for speed. */
   readonly objectId: string;
-  readonly drawingObjectType: string;
+  readonly drawingRepresentationType: string;
   readonly zIndex: number;
 }
 

@@ -1,57 +1,61 @@
 import { Matrix, Vector } from "trans-vector2d";
-import { DrawingObject, Box2d } from "@curtain-call/entity";
+import { DrawingRepresentation, Box2d } from "@curtain-call/entity";
 
 /**
- * `DrawingObjectContainer` represent any multiple drawing thing.
+ * `DrawingRepresentationContainer` represent any multiple drawing thing.
  */
-export interface DrawingObjectContainer extends DrawingObject {
-  readonly drawingObjectType: "container";
-  readonly children: readonly DrawingObject[];
+export interface DrawingRepresentationContainer extends DrawingRepresentation {
+  readonly drawingRepresentationType: "container";
+  readonly children: readonly DrawingRepresentation[];
 }
 
-export const isDrawingObjectContainer = (
-  obj: DrawingObject
-): obj is DrawingObjectContainer => obj.drawingObjectType === "container";
+export const isDrawingRepresentationContainer = (
+  obj: DrawingRepresentation
+): obj is DrawingRepresentationContainer =>
+  obj.drawingRepresentationType === "container";
 
 /**
- * `DrawingObjectSprite` represent single image.
+ * `DrawingRepresentationSprite` represent single image.
  */
-export interface DrawingObjectSprite extends DrawingObject {
-  readonly drawingObjectType: "sprite";
+export interface DrawingRepresentationSprite extends DrawingRepresentation {
+  readonly drawingRepresentationType: "sprite";
   readonly imageId: string;
   readonly transform: Matrix;
 }
 
-export const isDrawingObjectSprite = (
-  obj: DrawingObject
-): obj is DrawingObjectSprite => obj.drawingObjectType === "sprite";
+export const isDrawingRepresentationSprite = (
+  obj: DrawingRepresentation
+): obj is DrawingRepresentationSprite =>
+  obj.drawingRepresentationType === "sprite";
 
 /**
- * `DrawingObjectSprite` represent multiple AABB.
+ * `DrawingRepresentationSprite` represent multiple AABB.
  * NOTE: Axes is axes of game, not rendering.
  */
-export interface DrawingObjectRectangles extends DrawingObject {
-  readonly drawingObjectType: "rectangles";
+export interface DrawingRepresentationRectangles extends DrawingRepresentation {
+  readonly drawingRepresentationType: "rectangles";
   readonly rectangles: readonly Box2d[];
   readonly lineColor: number;
   readonly lineThickness: number;
   readonly fillColor: number;
 }
 
-export const isDrawingObjectRectangles = (
-  obj: DrawingObject
-): obj is DrawingObjectRectangles => obj.drawingObjectType === "rectangles";
+export const isDrawingRepresentationRectangles = (
+  obj: DrawingRepresentation
+): obj is DrawingRepresentationRectangles =>
+  obj.drawingRepresentationType === "rectangles";
 
 /**
- * `DrawingObjectLines` represent multiple lines.
+ * `DrawingRepresentationLines` represent multiple lines.
  */
-export interface DrawingObjectLines extends DrawingObject {
-  readonly drawingObjectType: "lines";
+export interface DrawingRepresentationLines extends DrawingRepresentation {
+  readonly drawingRepresentationType: "lines";
   readonly lines: readonly [Vector, Vector][];
   readonly lineColor: number;
   readonly lineThickness: number;
 }
 
-export const isDrawingObjectLines = (
-  obj: DrawingObject
-): obj is DrawingObjectLines => obj.drawingObjectType === "lines";
+export const isDrawingRepresentationLines = (
+  obj: DrawingRepresentation
+): obj is DrawingRepresentationLines =>
+  obj.drawingRepresentationType === "lines";

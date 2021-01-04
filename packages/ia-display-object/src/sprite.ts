@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import { Matrix } from "trans-vector2d";
-import { DrawingObjectSprite, DisplayObject } from "@curtain-call/uc-rendering";
+import {
+  DrawingRepresentationSprite,
+  DisplayObject,
+} from "@curtain-call/uc-rendering";
 
 export class Sprite implements DisplayObject {
   private objectId = uuidv4();
@@ -30,10 +33,12 @@ export class Sprite implements DisplayObject {
    * @param parentTransform Parent transformation matrix.
    * @returns Drawing objects.
    */
-  calcDrawingObject(parentTransform: Matrix): readonly [DrawingObjectSprite] {
+  calcDrawingRepresentation(
+    parentTransform: Matrix
+  ): readonly [DrawingRepresentationSprite] {
     return [
       {
-        drawingObjectType: "sprite",
+        drawingRepresentationType: "sprite",
         objectId: this.objectId,
         zIndex: this.zIndex,
         imageId: this.imageId,

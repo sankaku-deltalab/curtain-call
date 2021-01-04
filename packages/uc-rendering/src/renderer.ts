@@ -1,4 +1,4 @@
-import { DrawingObject } from "@curtain-call/entity";
+import { DrawingRepresentation } from "@curtain-call/entity";
 
 export interface Renderer {
   /**
@@ -20,5 +20,5 @@ export interface Renderer {
    *
    * @param objects
    */
-  render(objects: readonly DrawingObject[]): void;
+  render(objects: readonly DrawingRepresentation[]): void;
 }

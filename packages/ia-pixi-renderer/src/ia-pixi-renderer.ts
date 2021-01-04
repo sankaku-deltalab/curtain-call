@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
-import { DrawingObject } from "@curtain-call/entity";
+import { DrawingRepresentation } from "@curtain-call/entity";
 import {
   Renderer,
-  DrawingObjectSprite,
-  isDrawingObjectSprite,
+  DrawingRepresentationSprite,
+  isDrawingRepresentationSprite,
 } from "@curtain-call/uc-rendering";
 
 /**
@@ -54,7 +54,7 @@ export class RendererPixi implements Renderer {
    *
    * @param objects
    */
-  render(objects: readonly DrawingObject[]): void {
+  render(objects: readonly DrawingRepresentation[]): void {
     if (!this.rendererPixi) return;
 
     const root = new PIXI.Container();
@@ -62,7 +62,7 @@ export class RendererPixi implements Renderer {
     this.usedSprites = new Map();
 
     objects.forEach((obj) => {
-      if (isDrawingObjectSprite(obj)) this.renderSprite(obj, root);
+      if (isDrawingRepresentationSprite(obj)) this.renderSprite(obj, root);
     });
 
     this.rendererPixi.render(root);
@@ -71,7 +71,10 @@ export class RendererPixi implements Renderer {
     this.unusedSprites.clear();
   }
 
-  private renderSprite(obj: DrawingObjectSprite, parent: PIXI.Container): void {
+  private renderSprite(
+    obj: DrawingRepresentationSprite,
+    parent: PIXI.Container
+  ): void {
     const sprite = this.popSprite(obj.objectId, obj.imageId);
     sprite.setTransform(...obj.transform.asArray());
     sprite.zIndex = obj.zIndex;

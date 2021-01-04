@@ -1,4 +1,4 @@
-import { ActorBase, DrawingObject } from "@curtain-call/entity";
+import { ActorBase, DrawingRepresentation } from "@curtain-call/entity";
 import {
   actorBaseMockClass,
   worldBaseMockClass,
@@ -17,22 +17,24 @@ export const rendererMockClass = jest.fn<Renderer, [Partial<Renderer>]>(
     )
 );
 
-const createActorAndDrawingObjects = (
+const createActorAndDrawingRepresentations = (
   objectId: string
-): [ActorBase, DrawingObject[]] => {
-  const drawingObjects: DrawingObject[] = [
-    { drawingObjectType: "", objectId, zIndex: 0 },
+): [ActorBase, DrawingRepresentation[]] => {
+  const drawingRepresentations: DrawingRepresentation[] = [
+    { drawingRepresentationType: "", objectId, zIndex: 0 },
   ];
   const actor = new actorBaseMockClass({
-    calcDrawingObjects: jest.fn().mockReturnValue(drawingObjects),
+    calcDrawingRepresentations: jest
+      .fn()
+      .mockReturnValue(drawingRepresentations),
   });
-  return [actor, drawingObjects];
+  return [actor, drawingRepresentations];
 };
 
 describe("@curtain-call/uc-rendering.RenderingServiceImpl", () => {
   it("render actors in world", () => {
-    const [actor1, objects1] = createActorAndDrawingObjects("1");
-    const [actor2, objects2] = createActorAndDrawingObjects("2");
+    const [actor1, objects1] = createActorAndDrawingRepresentations("1");
+    const [actor2, objects2] = createActorAndDrawingRepresentations("2");
     const world = new worldBaseMockClass({
       iterateActors: jest.fn().mockReturnValue([actor1, actor2]),
     });

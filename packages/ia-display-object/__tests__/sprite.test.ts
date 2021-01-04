@@ -20,7 +20,7 @@ describe("@curtain-call/ia-display-object.SSprite", () => {
 
     const sprite = new Sprite().init({ imageId, zIndex, offset });
     const parentTrans = Matrix.rotation(1);
-    const r = sprite.calcDrawingObject(parentTrans);
+    const r = sprite.calcDrawingRepresentation(parentTrans);
 
     expect(r).toHaveLength(1);
     expect(r[0].imageId).toBe(imageId);
@@ -37,9 +37,9 @@ describe("@curtain-call/ia-display-object.SSprite", () => {
     const sprite2 = new Sprite().init({ imageId, zIndex, offset });
 
     const parentTrans = Matrix.rotation(1);
-    const r1 = sprite1.calcDrawingObject(parentTrans);
-    const r2 = sprite2.calcDrawingObject(parentTrans);
-    const r3From1 = sprite1.calcDrawingObject(parentTrans);
+    const r1 = sprite1.calcDrawingRepresentation(parentTrans);
+    const r2 = sprite2.calcDrawingRepresentation(parentTrans);
+    const r3From1 = sprite1.calcDrawingRepresentation(parentTrans);
 
     expect(r1[0].objectId).not.toEqual(r2[0].objectId);
     expect(r1[0].objectId).toEqual(r3From1[0].objectId);

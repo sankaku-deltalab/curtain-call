@@ -1,8 +1,8 @@
 import { Matrix } from "trans-vector2d";
-import { DrawingObject } from "@curtain-call/entity";
+import { DrawingRepresentation } from "@curtain-call/entity";
 
 /**
- * `DisplayObject` deal `DrawingObject` for rendering.
+ * `DisplayObject` deal `DrawingRepresentation` for rendering.
  */
 export interface DisplayObject {
   /**
@@ -18,5 +18,7 @@ export interface DisplayObject {
    * @param parentTransform Parent transformation matrix.
    * @returns Drawing objects.
    */
-  calcDrawingObject(parentTransform: Matrix): readonly DrawingObject[];
+  calcDrawingRepresentation(
+    parentTransform: Matrix
+  ): readonly DrawingRepresentation[];
 }
