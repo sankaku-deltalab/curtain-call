@@ -132,7 +132,7 @@ export interface ActorBase {
    *
    * @returns Sprites.
    */
-  calcDrawingRepresentations(): readonly DrawingRepresentation[];
+  calcDrawingRepresentations(): readonly Readonly<DrawingRepresentation>[];
 
   /**
    * Calc collision representation of this.
