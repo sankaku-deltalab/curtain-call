@@ -24,28 +24,34 @@ export const isContainerDrawing = (
 ): obj is ContainerDrawing => obj.style === "container";
 
 /**
- * `SpriteDrawing` represent single image.
+ * `SpriteLikeDrawing` represent image like object.
+ * Image contains
+ *
+ * - State
+ * - Animation time
  */
-export interface SpriteDrawing extends DrawingRepresentation {
-  readonly style: "sprite";
-  readonly imageId: string;
-  readonly transform: Matrix;
+export interface SpriteLikeDrawing extends DrawingRepresentation {
+  style: "sprite";
+  imageId: string;
+  state: string;
+  elapsedSec: number;
+  transform: Matrix;
 }
 
-export const isSpriteDrawing = (
+export const isSpriteLikeDrawing = (
   obj: DrawingRepresentation
-): obj is SpriteDrawing => obj.style === "sprite";
+): obj is SpriteLikeDrawing => obj.style === "sprite";
 
 /**
  * `RectanglesDrawing` represent multiple AABB.
  * NOTE: Axes is axes of game, not rendering.
  */
 export interface RectanglesDrawing extends DrawingRepresentation {
-  readonly style: "rectangles";
-  readonly rectangles: readonly Box2d[];
-  readonly lineColor: number;
-  readonly lineThickness: number;
-  readonly fillColor: number;
+  style: "rectangles";
+  rectangles: readonly Box2d[];
+  lineColor: number;
+  lineThickness: number;
+  fillColor: number;
 }
 
 export const isRectanglesDrawing = (
@@ -56,10 +62,10 @@ export const isRectanglesDrawing = (
  * `LinesDrawing` represent multiple lines.
  */
 export interface LinesDrawing extends DrawingRepresentation {
-  readonly style: "lines";
-  readonly lines: readonly [Vector, Vector][];
-  readonly lineColor: number;
-  readonly lineThickness: number;
+  style: "lines";
+  lines: readonly [Vector, Vector][];
+  lineColor: number;
+  lineThickness: number;
 }
 
 export const isLinesDrawing = (
