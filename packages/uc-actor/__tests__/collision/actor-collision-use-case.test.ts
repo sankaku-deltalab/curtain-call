@@ -116,9 +116,7 @@ describe("@curtain-call/ActorCollisionUseCase", () => {
   it("emit event when overlapped", () => {
     const event = createEventEmitterMock<ActorEvent>();
     const world = new worldBaseMockClass({});
-    const actors = new Set(
-      new Array(2).fill(0).map(() => new actorBaseMockClass({}))
-    );
+    const actors = new Array(2).fill(0).map(() => new actorBaseMockClass({}));
 
     const uc = new ActorCollisionUseCase();
     uc.emitEventWhenOverlapped(event, world, actors);
