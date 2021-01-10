@@ -21,7 +21,7 @@ const createActorAndDrawingRepresentations = (
   objectId: string
 ): [ActorBase, DrawingRepresentation[]] => {
   const drawingRepresentations: DrawingRepresentation[] = [
-    { drawingRepresentationType: "", objectId, zIndex: 0 },
+    { style: "", objectId, zIndex: 0 },
   ];
   const actor = new actorBaseMockClass({
     calcDrawingRepresentations: jest

@@ -38,7 +38,7 @@ export class Sprite implements DisplayObject {
   ): readonly [DrawingRepresentationSprite] {
     return [
       {
-        drawingRepresentationType: "sprite",
+        style: "sprite",
         objectId: this.objectId,
         zIndex: this.zIndex,
         imageId: this.imageId,

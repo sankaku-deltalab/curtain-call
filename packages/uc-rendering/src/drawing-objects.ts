@@ -5,35 +5,33 @@ import { DrawingRepresentation, Box2d } from "@curtain-call/entity";
  * `DrawingRepresentationContainer` represent any multiple drawing thing.
  */
 export interface DrawingRepresentationContainer extends DrawingRepresentation {
-  readonly drawingRepresentationType: "container";
+  readonly style: "container";
   readonly children: readonly DrawingRepresentation[];
 }
 
 export const isDrawingRepresentationContainer = (
   obj: DrawingRepresentation
-): obj is DrawingRepresentationContainer =>
-  obj.drawingRepresentationType === "container";
+): obj is DrawingRepresentationContainer => obj.style === "container";
 
 /**
  * `DrawingRepresentationSprite` represent single image.
  */
 export interface DrawingRepresentationSprite extends DrawingRepresentation {
-  readonly drawingRepresentationType: "sprite";
+  readonly style: "sprite";
   readonly imageId: string;
   readonly transform: Matrix;
 }
 
 export const isDrawingRepresentationSprite = (
   obj: DrawingRepresentation
-): obj is DrawingRepresentationSprite =>
-  obj.drawingRepresentationType === "sprite";
+): obj is DrawingRepresentationSprite => obj.style === "sprite";
 
 /**
  * `DrawingRepresentationSprite` represent multiple AABB.
  * NOTE: Axes is axes of game, not rendering.
  */
 export interface DrawingRepresentationRectangles extends DrawingRepresentation {
-  readonly drawingRepresentationType: "rectangles";
+  readonly style: "rectangles";
   readonly rectangles: readonly Box2d[];
   readonly lineColor: number;
   readonly lineThickness: number;
@@ -42,14 +40,13 @@ export interface DrawingRepresentationRectangles extends DrawingRepresentation {
 
 export const isDrawingRepresentationRectangles = (
   obj: DrawingRepresentation
-): obj is DrawingRepresentationRectangles =>
-  obj.drawingRepresentationType === "rectangles";
+): obj is DrawingRepresentationRectangles => obj.style === "rectangles";
 
 /**
  * `DrawingRepresentationLines` represent multiple lines.
  */
 export interface DrawingRepresentationLines extends DrawingRepresentation {
-  readonly drawingRepresentationType: "lines";
+  readonly style: "lines";
   readonly lines: readonly [Vector, Vector][];
   readonly lineColor: number;
   readonly lineThickness: number;
@@ -57,5 +54,4 @@ export interface DrawingRepresentationLines extends DrawingRepresentation {
 
 export const isDrawingRepresentationLines = (
   obj: DrawingRepresentation
-): obj is DrawingRepresentationLines =>
-  obj.drawingRepresentationType === "lines";
+): obj is DrawingRepresentationLines => obj.style === "lines";
