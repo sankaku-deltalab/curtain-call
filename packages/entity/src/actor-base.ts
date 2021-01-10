@@ -33,7 +33,7 @@ export type ActorEvent = Readonly<{
   preUpdate: [WorldBase, number];
   updated: [WorldBase, number];
   postUpdate: [WorldBase, number];
-  overlapped: [WorldBase, ReadonlySet<ActorBase>];
+  overlapped: [WorldBase, readonly ActorBase[]];
   movementFinished: [WorldBase, Movement];
   takenDamage: [WorldBase, number, ActorBase, readonly string[]];
   dead: [WorldBase, ActorBase, readonly string[]];

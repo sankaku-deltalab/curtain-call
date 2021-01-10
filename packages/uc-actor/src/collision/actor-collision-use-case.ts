@@ -97,7 +97,7 @@ export class ActorCollisionUseCase {
   emitEventWhenOverlapped(
     event: EventEmitter<ActorEvent>,
     world: WorldBase,
-    others: ReadonlySet<ActorBase>
+    others: readonly ActorBase[]
   ): void {
     event.emit("overlapped", world, others);
   }
