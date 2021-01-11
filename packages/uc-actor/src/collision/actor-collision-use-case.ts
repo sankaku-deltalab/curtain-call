@@ -51,6 +51,20 @@ export class ActorCollisionUseCase {
   }
 
   /**
+   * Create initial collision data for actor.
+   *
+   * @returns Initial collision data.
+   */
+  createInitialCollisionData(): ActorCollisionData {
+    return {
+      enabled: true,
+      shapes: [],
+      group: { category: 0, mask: 0 },
+      isExcess: false,
+    };
+  }
+
+  /**
    * Enable collision.
    */
   enable(data: ActorCollisionData): void {

@@ -15,12 +15,7 @@ import {
 type ActorHasTrans = Pick<ActorBase, "transformation">;
 
 export class CollisionActor {
-  private readonly collisionData: ActorCollisionData = {
-    enabled: true,
-    shapes: [],
-    group: { category: 0, mask: 0 },
-    isExcess: false,
-  };
+  private readonly collisionData: ActorCollisionData;
   private readonly collisionUseCase: ActorCollisionUseCase;
   private sharedEvent?: EventEmitter<ActorEvent>;
   private actorHasTrans?: ActorHasTrans;
@@ -28,14 +23,15 @@ export class CollisionActor {
   constructor(collisionUseCase?: ActorCollisionUseCase) {
     if (!collisionUseCase) throw new Error("DI failed");
     this.collisionUseCase = collisionUseCase;
+    this.collisionData = collisionUseCase.createInitialCollisionData();
   }
 
-  get event(): EventEmitter<ActorEvent> {
+  private get event(): EventEmitter<ActorEvent> {
     if (!this.sharedEvent) throw new Error("not initialized");
     return this.sharedEvent;
   }
 
-  get parent(): ActorHasTrans {
+  private get parent(): ActorHasTrans {
     if (!this.actorHasTrans) throw new Error("not initialized");
     return this.actorHasTrans;
   }

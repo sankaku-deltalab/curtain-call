@@ -14,6 +14,16 @@ const collisionShapeMockClass = jest.fn<CollisionShape, [readonly Box2d[]]>(
 );
 
 describe("@curtain-call/ActorCollisionUseCase", () => {
+  it("can create initial collision data", () => {
+    const uc = new ActorCollisionUseCase();
+    expect(uc.createInitialCollisionData()).toEqual({
+      enabled: true,
+      shapes: [],
+      group: { category: 0, mask: 0 },
+      isExcess: false,
+    });
+  });
+
   it("can init collision", () => {
     const uc = new ActorCollisionUseCase();
     const data = {
