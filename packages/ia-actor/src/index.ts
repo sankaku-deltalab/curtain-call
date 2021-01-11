@@ -1,1 +1,1 @@
-export * from "./ia-actor";
+export * from "./actor";

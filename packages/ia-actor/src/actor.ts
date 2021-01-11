@@ -15,7 +15,7 @@ import {
   Timer,
 } from "@curtain-call/entity";
 import { EventEmitter, CollisionShape } from "@curtain-call/uc-actor";
-import { CollisionActor } from "./actur-subsystem";
+import { CollisionActor } from "./actor-subsystem";
 
 export class Actor implements ActorBase {
   private readonly collisionActor: CollisionActor;
