@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */ // TODO: Delete this disabling later
-import { Vector, Matrix } from "trans-vector2d";
+import { Vector, Matrix, MatrixLike } from "trans-vector2d";
 import {
   ActorBase,
   WorldBase,
@@ -19,23 +19,30 @@ import {
   CollisionShape,
   DisplayObject,
 } from "@curtain-call/uc-actor";
-import { CollisionActor, DrawingActor } from "./actor-subsystem";
+import {
+  CollisionActor,
+  DrawingActor,
+  TransformActor,
+} from "./actor-subsystem";
 
 export class Actor implements ActorBase {
   private readonly collisionActor: CollisionActor;
   private readonly drawingActor: DrawingActor;
+  private readonly transformActor: TransformActor;
   private readonly event: EventEmitter<ActorEvent>;
 
   constructor(
     event?: EventEmitter<ActorEvent>,
     collisionActor?: CollisionActor,
-    drawingActor?: DrawingActor
+    drawingActor?: DrawingActor,
+    transformActor?: TransformActor
   ) {
-    if (!(event && collisionActor && drawingActor))
+    if (!(event && collisionActor && drawingActor && transformActor))
       throw new Error("DI failed");
     this.event = event;
     this.collisionActor = collisionActor.initCollisionActor(this, this.event);
     this.drawingActor = drawingActor?.initDrawingActor(this);
+    this.transformActor = transformActor;
   }
 
   /**
@@ -96,13 +103,15 @@ export class Actor implements ActorBase {
     throw new Error("not implemented");
   }
 
+  // transformation
+
   /**
    * Get global position of this.
    *
    * @returns Global position.
    */
   position(): Vector {
-    throw new Error("not implemented");
+    return this.transformActor.position();
   }
 
   /**
@@ -111,7 +120,7 @@ export class Actor implements ActorBase {
    * @returns Global rotation.
    */
   rotation(): number {
-    throw new Error("not implemented");
+    return this.transformActor.rotation();
   }
 
   /**
@@ -120,7 +129,7 @@ export class Actor implements ActorBase {
    * @returns Global scaling.
    */
   scale(): Vector {
-    throw new Error("not implemented");
+    return this.transformActor.scale();
   }
 
   /**
@@ -129,7 +138,17 @@ export class Actor implements ActorBase {
    * @returns Global transformation matrix.
    */
   transformation(): Matrix {
-    throw new Error("not implemented");
+    return this.transformActor.transformation();
+  }
+
+  /**
+   * Set local transformation.
+   *
+   * @param newTrans New transformation.
+   */
+  setLocalTransformation(newTrans: MatrixLike): this {
+    this.transformActor.setLocalTransformation(newTrans);
+    return this;
   }
 
   /**
