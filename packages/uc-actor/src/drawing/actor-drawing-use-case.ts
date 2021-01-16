@@ -33,12 +33,13 @@ export class ActorDrawingUseCase {
     return { visible: true, displayObjects: new Set() };
   }
 
-  addDisplayObject(data: DisplayObjectData, obj: DisplayObject): void {
-    data.displayObjects.add(obj);
-  }
-
-  removeDisplayObject(data: DisplayObjectData, obj: DisplayObject): void {
-    data.displayObjects.delete(obj);
+  initDisplayObject(
+    data: DisplayObjectData,
+    args: { displayObjects: Iterable<DisplayObject> }
+  ): void {
+    Array.from(args.displayObjects).forEach((obj) =>
+      data.displayObjects.add(obj)
+    );
   }
 
   setVisibility(data: DisplayObjectData, visibility: boolean): void {

@@ -22,48 +22,31 @@ describe("@curtain-call/ActorDrawingUseCase", () => {
     });
   });
 
-  it("can add display object", () => {
+  it("can init display object", () => {
     const uc = new ActorDrawingUseCase();
     const data: DisplayObjectData = {
       visible: true,
       displayObjects: new Set(),
     };
 
-    const obj = new displayObjectMockClass();
-    uc.addDisplayObject(data, obj);
+    const obj1 = new displayObjectMockClass();
+    const obj2 = new displayObjectMockClass();
+    uc.initDisplayObject(data, { displayObjects: [obj1, obj2] });
 
     expect(data).toEqual({
       visible: true,
-      displayObjects: new Set([obj]),
-    });
-  });
-
-  it("can remove display object", () => {
-    const uc = new ActorDrawingUseCase();
-    const data: DisplayObjectData = {
-      visible: true,
-      displayObjects: new Set(),
-    };
-
-    const obj = new displayObjectMockClass();
-    uc.addDisplayObject(data, obj);
-    uc.removeDisplayObject(data, obj);
-
-    expect(data).toEqual({
-      visible: true,
-      displayObjects: new Set([]),
+      displayObjects: new Set([obj1, obj2]),
     });
   });
 
   it("can change visibility", () => {
     const uc = new ActorDrawingUseCase();
+    const obj = new displayObjectMockClass();
     const data: DisplayObjectData = {
       visible: true,
-      displayObjects: new Set(),
+      displayObjects: new Set([obj]),
     };
 
-    const obj = new displayObjectMockClass();
-    uc.addDisplayObject(data, obj);
     uc.setVisibility(data, false);
 
     expect(data).toEqual({
@@ -74,13 +57,12 @@ describe("@curtain-call/ActorDrawingUseCase", () => {
 
   it("update contained display objects", () => {
     const uc = new ActorDrawingUseCase();
+    const obj = new displayObjectMockClass();
     const data: DisplayObjectData = {
       visible: true,
-      displayObjects: new Set(),
+      displayObjects: new Set([obj]),
     };
 
-    const obj = new displayObjectMockClass();
-    uc.addDisplayObject(data, obj);
     const deltaSec = 12;
     uc.updateDisplayObjects(data, deltaSec);
 
