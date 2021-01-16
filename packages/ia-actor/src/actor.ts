@@ -14,20 +14,28 @@ import {
   ActorExtension,
   Timer,
 } from "@curtain-call/entity";
-import { EventEmitter, CollisionShape } from "@curtain-call/uc-actor";
-import { CollisionActor } from "./actor-subsystem";
+import {
+  EventEmitter,
+  CollisionShape,
+  DisplayObject,
+} from "@curtain-call/uc-actor";
+import { CollisionActor, DrawingActor } from "./actor-subsystem";
 
 export class Actor implements ActorBase {
   private readonly collisionActor: CollisionActor;
+  private readonly drawingActor: DrawingActor;
   private readonly event: EventEmitter<ActorEvent>;
 
   constructor(
     event?: EventEmitter<ActorEvent>,
-    collisionActor?: CollisionActor
+    collisionActor?: CollisionActor,
+    drawingActor?: DrawingActor
   ) {
-    if (!(event && collisionActor)) throw new Error("DI failed");
+    if (!(event && collisionActor && drawingActor))
+      throw new Error("DI failed");
     this.event = event;
     this.collisionActor = collisionActor.initCollisionActor(this, this.event);
+    this.drawingActor = drawingActor?.initDrawingActor(this);
   }
 
   /**
@@ -134,13 +142,36 @@ export class Actor implements ActorBase {
     throw new Error("not implemented");
   }
 
+  // drawing
+
+  /**
+   * Init displaying.
+   *
+   * @param args
+   * @returns this.
+   */
+  initDisplaying(args: { displayObjects: Iterable<DisplayObject> }): this {
+    this.drawingActor.initDisplaying(args);
+    return this;
+  }
+
+  /**
+   * Set actor visibility.
+   *
+   * @param visibility
+   */
+  setVisibility(visibility: boolean): this {
+    this.drawingActor.setVisibility(visibility);
+    return this;
+  }
+
   /**
    * Calc drawing objects of this.
    *
    * @returns Sprites.
    */
   calcDrawingRepresentations(): readonly Readonly<DrawingRepresentation>[] {
-    throw new Error("not implemented");
+    return this.drawingActor.calcDrawingRepresentations();
   }
 
   // collision
@@ -234,6 +265,7 @@ export class Actor implements ActorBase {
    */
   update(world: WorldBase, deltaSec: number): void {
     throw new Error("not implemented");
+    this.drawingActor.updateDisplayObjects(deltaSec);
   }
 
   /**
