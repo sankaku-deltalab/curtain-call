@@ -13,6 +13,15 @@ const displayObjectMockClass = jest.fn<DisplayObject, []>(() => ({
 }));
 
 describe("@curtain-call/ActorDrawingUseCase", () => {
+  it("can create initial data", () => {
+    const data = new ActorDrawingUseCase().createInitialData();
+
+    expect(data).toEqual({
+      visible: true,
+      displayObjects: new Set(),
+    });
+  });
+
   it("can add display object", () => {
     const uc = new ActorDrawingUseCase();
     const data: DisplayObjectData = {

@@ -29,6 +29,10 @@ export interface DisplayObjectData {
 }
 
 export class ActorDrawingUseCase {
+  createInitialData(): DisplayObjectData {
+    return { visible: true, displayObjects: new Set() };
+  }
+
   addDisplayObject(data: DisplayObjectData, obj: DisplayObject): void {
     data.displayObjects.add(obj);
   }
