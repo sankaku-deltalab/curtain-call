@@ -1,6 +1,6 @@
 import { Vector, VectorLike } from "trans-vector2d";
 import { ActorBase } from "./actor-base";
-import { Box2d } from "./interfaces";
+import { Box2d, DrawingRepresentation } from "./interfaces";
 import { WorldExtension } from "./world-extension";
 
 export type WorldEvent = Readonly<{
@@ -75,6 +75,13 @@ export interface WorldBase {
       gameUnitPerPixel: number;
     }
   ): this;
+
+  /**
+   * Calc drawing objects.
+   *
+   * @returns Sprites.
+   */
+  calcDrawingRepresentations(): readonly Readonly<DrawingRepresentation>[];
 
   /**
    * Update this and contained actors.

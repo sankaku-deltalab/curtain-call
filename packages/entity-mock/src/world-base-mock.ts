@@ -9,6 +9,7 @@ export const worldBaseMockClass = jest.fn<WorldBase, [Partial<WorldBase>]>(
         once: jest.fn(),
         off: jest.fn(),
         setDrawAreaUpdater: jest.fn(),
+        calcDrawingRepresentations: jest.fn(),
         update: jest.fn(),
         addActor: jest.fn(),
         removeActor: jest.fn(),
