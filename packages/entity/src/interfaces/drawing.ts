@@ -1,27 +1,25 @@
 import { Matrix, Vector } from "trans-vector2d";
 import { Box2d } from "./misc";
 
+export type DrawingObjectId = string | symbol;
+export type DrawingStyle = string | symbol;
+
 /**
  * `DrawingRepresentation` represent drawing thing.
  */
-export interface DrawingRepresentation {
+export type DrawingRepresentation<
+  T extends DrawingStyle = DrawingStyle,
+  U extends Record<string, unknown> = {}
+> = {
   /** `objectId` is used for linking between in-game drawing thing and in-rendering drawing thing for speed. */
-  readonly objectId: string;
-  readonly style: string;
+  readonly objectId: DrawingObjectId;
+  readonly style: T;
+  readonly props: U;
   readonly zIndex: number;
-}
+};
 
-/**
- * `ContainerDrawing` represent any multiple drawing thing.
- */
-export interface ContainerDrawing extends DrawingRepresentation {
-  readonly style: "container";
-  readonly children: readonly DrawingRepresentation[];
-}
-
-export const isContainerDrawing = (
-  obj: DrawingRepresentation
-): obj is ContainerDrawing => obj.style === "container";
+export type ImageId = string | symbol;
+export type ImageState = string | symbol;
 
 /**
  * `SpriteLikeDrawing` represent image like object.
@@ -30,13 +28,15 @@ export const isContainerDrawing = (
  * - State
  * - Animation time
  */
-export interface SpriteLikeDrawing extends DrawingRepresentation {
-  style: "sprite";
-  imageId: string;
-  state: string;
-  elapsedSec: number;
-  transform: Matrix;
-}
+export type SpriteLikeDrawing = DrawingRepresentation<
+  "sprite",
+  {
+    imageId: ImageId;
+    state: ImageState;
+    elapsedSec: number;
+    transform: Matrix;
+  }
+>;
 
 export const isSpriteLikeDrawing = (
   obj: DrawingRepresentation
@@ -46,13 +46,15 @@ export const isSpriteLikeDrawing = (
  * `RectanglesDrawing` represent multiple AABB.
  * NOTE: Axes is axes of game, not rendering.
  */
-export interface RectanglesDrawing extends DrawingRepresentation {
-  style: "rectangles";
-  rectangles: readonly Box2d[];
-  lineColor: number;
-  lineThickness: number;
-  fillColor: number;
-}
+export type RectanglesDrawing = DrawingRepresentation<
+  "rectangles",
+  {
+    rectangles: readonly Readonly<Box2d>[];
+    lineColor: number;
+    lineThickness: number;
+    fillColor: number;
+  }
+>;
 
 export const isRectanglesDrawing = (
   obj: DrawingRepresentation
@@ -61,12 +63,14 @@ export const isRectanglesDrawing = (
 /**
  * `LinesDrawing` represent multiple lines.
  */
-export interface LinesDrawing extends DrawingRepresentation {
-  style: "lines";
-  lines: readonly [Vector, Vector][];
-  lineColor: number;
-  lineThickness: number;
-}
+export type LinesDrawing = DrawingRepresentation<
+  "lines",
+  {
+    lines: readonly Readonly<[Vector, Vector]>[];
+    lineColor: number;
+    lineThickness: number;
+  }
+>;
 
 export const isLinesDrawing = (
   obj: DrawingRepresentation
