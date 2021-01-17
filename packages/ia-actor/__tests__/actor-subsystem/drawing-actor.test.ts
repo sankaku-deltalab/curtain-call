@@ -71,6 +71,7 @@ describe("@curtain-call/DrawingActor", () => {
       objectId: "abc",
       style: "edf",
       zIndex: 123,
+      props: {},
     };
     uc.calcDrawingRepresentationOfActor = jest.fn().mockReturnValue([rep]);
 
