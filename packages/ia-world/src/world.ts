@@ -8,13 +8,15 @@ import {
   Box2d,
   DrawingRepresentation,
 } from "@curtain-call/entity";
-import { DrawingWorld } from "./world-subsystem";
+import { CollisionWorld, DrawingWorld } from "./world-subsystem";
 
 export class World implements WorldBase {
+  private readonly collisionWorld: CollisionWorld;
   private readonly drawingWorld: DrawingWorld;
 
-  constructor(drawingWorld?: DrawingWorld) {
-    if (!drawingWorld) throw new Error("DI failed");
+  constructor(collisionWorld?: CollisionWorld, drawingWorld?: DrawingWorld) {
+    if (!(collisionWorld && drawingWorld)) throw new Error("DI failed");
+    this.collisionWorld = collisionWorld.initCollisionWorld(this);
     this.drawingWorld = drawingWorld.initDrawingWorld(this);
   }
 
@@ -107,6 +109,7 @@ export class World implements WorldBase {
    */
   update(deltaSec: number): void {
     throw new Error("Not implemented");
+    this.collisionWorld.update();
   }
 
   /**
