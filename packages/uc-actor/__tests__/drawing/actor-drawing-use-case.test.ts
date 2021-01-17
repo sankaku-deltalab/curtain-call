@@ -74,6 +74,7 @@ describe("@curtain-call/ActorDrawingUseCase", () => {
       objectId: "uuid4 value",
       style: "test type",
       zIndex: 12,
+      props: {},
     };
     const obj = new displayObjectMockClass();
     obj.calcDrawingRepresentation = jest.fn().mockReturnValue([objRep]);
