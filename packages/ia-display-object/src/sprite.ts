@@ -43,6 +43,7 @@ export class Sprite implements DisplayObject {
         zIndex: this.zIndex,
         imageId: this.imageId,
         transform: parentTransform.globalize(this.offset),
+        props: {},
       },
     ];
   }

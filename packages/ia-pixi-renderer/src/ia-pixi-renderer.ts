@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { DrawingRepresentation } from "@curtain-call/entity";
+import { DrawingRepresentation, DrawingObjectId } from "@curtain-call/entity";
 import {
   Renderer,
   DrawingRepresentationSprite,
@@ -12,9 +12,9 @@ import {
 export class RendererPixi implements Renderer {
   private rendererPixi?: PIXI.Renderer;
   private readonly loader = new PIXI.Loader();
-  private readonly images = new Map<string, string>();
-  private unusedSprites = new Map<string, PIXI.Sprite>();
-  private usedSprites = new Map<string, PIXI.Sprite>();
+  private readonly images = new Map<DrawingObjectId, string>();
+  private unusedSprites = new Map<DrawingObjectId, PIXI.Sprite>();
+  private usedSprites = new Map<DrawingObjectId, PIXI.Sprite>();
 
   /**
    * Init renderer.
@@ -82,7 +82,7 @@ export class RendererPixi implements Renderer {
     if (sprite.parent !== parent) parent.addChild(sprite);
   }
 
-  private popSprite(objectId: string, imageId: string): PIXI.Sprite {
+  private popSprite(objectId: DrawingObjectId, imageId: string): PIXI.Sprite {
     const textureUrl = this.images.get(imageId);
     if (textureUrl === undefined) throw new Error("Unknown imageId");
 
