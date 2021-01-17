@@ -22,6 +22,9 @@ export const worldBaseMockClass = jest.fn<WorldBase, [Partial<WorldBase>]>(
         removeTimeScaling: jest.fn(),
         getExtensions: jest.fn(),
         getOneExtension: jest.fn(),
+        setRandomGenerator: jest.fn(),
+        getRandomGenerator: jest.fn(),
+        createRandomGenerator: jest.fn(),
       },
       option
     )

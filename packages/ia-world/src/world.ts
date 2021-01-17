@@ -7,17 +7,25 @@ import {
   ActorBase,
   Box2d,
   DrawingRepresentation,
+  RandomGenerator,
 } from "@curtain-call/entity";
-import { CollisionWorld, DrawingWorld } from "./world-subsystem";
+import { CollisionWorld, DrawingWorld, RandomWorld } from "./world-subsystem";
 
 export class World implements WorldBase {
   private readonly collisionWorld: CollisionWorld;
   private readonly drawingWorld: DrawingWorld;
+  private readonly randomWorld: RandomWorld;
 
-  constructor(collisionWorld?: CollisionWorld, drawingWorld?: DrawingWorld) {
-    if (!(collisionWorld && drawingWorld)) throw new Error("DI failed");
+  constructor(
+    collisionWorld?: CollisionWorld,
+    drawingWorld?: DrawingWorld,
+    randomWorld?: RandomWorld
+  ) {
+    if (!(collisionWorld && drawingWorld && randomWorld))
+      throw new Error("DI failed");
     this.collisionWorld = collisionWorld.initCollisionWorld(this);
     this.drawingWorld = drawingWorld.initDrawingWorld(this);
+    this.randomWorld = randomWorld;
   }
 
   /**
@@ -220,5 +228,34 @@ export class World implements WorldBase {
    */
   removeTimeScaling(causer: unknown): void {
     throw new Error("Not implemented");
+  }
+
+  /**
+   * Set random generator.
+   *
+   * @param generator
+   */
+  setRandomGenerator(generator: RandomGenerator): void {
+    this.setRandomGenerator(generator);
+  }
+
+  /**
+   * Get random generator.
+   * Returned generator would be set by `setRandomGenerator`.
+   *
+   * @returns Random generator.
+   */
+  getRandomGenerator(): RandomGenerator {
+    return this.getRandomGenerator();
+  }
+
+  /**
+   * Create random generator.
+   * When called this method, internal state of this would be changed.
+   *
+   * @returns New random generator.
+   */
+  createRandomGenerator(): RandomGenerator {
+    return this.createRandomGenerator();
   }
 }

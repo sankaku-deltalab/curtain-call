@@ -1,6 +1,6 @@
 import { Vector, VectorLike } from "trans-vector2d";
 import { ActorBase } from "./actor-base";
-import { Box2d, DrawingRepresentation } from "./interfaces";
+import { Box2d, DrawingRepresentation, RandomGenerator } from "./interfaces";
 import { WorldExtension } from "./world-extension";
 
 export type WorldEvent = Readonly<{
@@ -177,4 +177,27 @@ export interface WorldBase {
    * @param causer Time scaling causer. One causer can add one scaling.
    */
   removeTimeScaling(causer: unknown): void;
+
+  /**
+   * Set random generator.
+   *
+   * @param generator
+   */
+  setRandomGenerator(generator: RandomGenerator): void;
+
+  /**
+   * Get random generator.
+   * Returned generator would be set by `setRandomGenerator`.
+   *
+   * @returns Random generator.
+   */
+  getRandomGenerator(): RandomGenerator;
+
+  /**
+   * Create random generator.
+   * When called this method, internal state of this would be changed.
+   *
+   * @returns New random generator.
+   */
+  createRandomGenerator(): RandomGenerator;
 }
