@@ -6,9 +6,18 @@ import {
   WorldExtension,
   ActorBase,
   Box2d,
+  DrawingRepresentation,
 } from "@curtain-call/entity";
+import { DrawingWorld } from "./world-subsystem";
 
 export class World implements WorldBase {
+  private readonly drawingWorld: DrawingWorld;
+
+  constructor(drawingWorld?: DrawingWorld) {
+    if (!drawingWorld) throw new Error("DI failed");
+    this.drawingWorld = drawingWorld.initDrawingWorld(this);
+  }
+
   /**
    * Add event listener.
    *
@@ -49,6 +58,8 @@ export class World implements WorldBase {
     throw new Error("Not implemented");
   }
 
+  // drawing
+
   /**
    * Set canvas drawing method.
    *
@@ -78,6 +89,15 @@ export class World implements WorldBase {
     }
   ): this {
     throw new Error("Not implemented");
+  }
+
+  /**
+   * Calc drawing objects.
+   *
+   * @returns Sprites.
+   */
+  calcDrawingRepresentations(): readonly Readonly<DrawingRepresentation>[] {
+    return this.drawingWorld.calcDrawingRepresentations();
   }
 
   /**
