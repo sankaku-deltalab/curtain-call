@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { container } from "tsyringe";
+import { container } from "@curtain-call/shared-dependencies";
 import { WorldCore, InjectTokens } from "../src";
 
 describe("@curtain-call/entity.WorldCore", () => {

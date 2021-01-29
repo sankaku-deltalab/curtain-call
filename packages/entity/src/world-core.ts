@@ -1,4 +1,4 @@
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from "@curtain-call/shared-dependencies";
 import { InjectTokens } from "./inject-tokens";
 
 export type WorldId = symbol;
