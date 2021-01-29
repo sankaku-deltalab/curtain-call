@@ -7,7 +7,7 @@ import {
   CollisionShape,
   CollisionGroup,
 } from "../common";
-import { injectTokens } from "../inject-token";
+import { injectTokens } from "../inject-tokens";
 
 export interface EventEmitterFactory {
   create<T extends Record<string, unknown[]>>(): EventEmitter<T>;

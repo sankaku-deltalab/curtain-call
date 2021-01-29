@@ -2,7 +2,7 @@ import { PredefinedPromise } from "predefined-promise";
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
 import { CollisionStorage, CollisionEvent } from "../common";
-import { injectTokens } from "../inject-token";
+import { injectTokens } from "../inject-tokens";
 
 /**
  * User use collision for game sequence.

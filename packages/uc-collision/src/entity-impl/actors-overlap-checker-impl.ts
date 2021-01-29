@@ -6,7 +6,7 @@ import {
   Box2d,
   CollisionGroup,
 } from "../common";
-import { injectTokens } from "../inject-token";
+import { injectTokens } from "../inject-tokens";
 
 export interface TransformationStorage {
   getTransformation(

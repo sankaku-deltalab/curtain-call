@@ -1,4 +1,4 @@
 export * from "./entity-impl";
 export * from "./use-cases";
 export * from "./common";
-export * from "./inject-token";
+export * from "./inject-tokens";
