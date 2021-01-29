@@ -1,5 +1,5 @@
 import { inject, injectable } from "@curtain-call/shared-dependencies";
-import { InjectTokens } from "./inject-tokens";
+import { injectTokens } from "./inject-tokens";
 
 export type WorldId = symbol;
 export type ActorId = symbol;
@@ -95,25 +95,25 @@ export interface ActorsExtensionUpdater {
 @injectable()
 export class WorldCore {
   constructor(
-    @inject(InjectTokens.WorldsTimeScale)
+    @inject(injectTokens.WorldsTimeScale)
     private readonly worldsTimeScale: WorldsTimeScale,
-    @inject(InjectTokens.ActorsContainer)
+    @inject(injectTokens.ActorsContainer)
     private readonly actorsContainer: ActorsContainer,
-    @inject(InjectTokens.ActorsTimeScale)
+    @inject(injectTokens.ActorsTimeScale)
     private readonly actorsTimeScale: ActorsTimeScale,
-    @inject(InjectTokens.ActorsMover)
+    @inject(injectTokens.ActorsMover)
     private readonly actorsMover: ActorsMover,
-    @inject(InjectTokens.ActorsOverlapChecker)
+    @inject(injectTokens.ActorsOverlapChecker)
     private readonly actorsOverlapChecker: ActorsOverlapChecker,
-    @inject(InjectTokens.Renderer)
+    @inject(injectTokens.Renderer)
     private readonly renderer: Renderer,
-    @inject(InjectTokens.WorldsExtensionUpdater)
+    @inject(injectTokens.WorldsExtensionUpdater)
     private readonly worldsExtensionUpdater: WorldsExtensionUpdater,
-    @inject(InjectTokens.ActorsExtensionUpdater)
+    @inject(injectTokens.ActorsExtensionUpdater)
     private readonly actorsExtensionUpdater: ActorsExtensionUpdater,
-    @inject(InjectTokens.WorldsTimerUpdater)
+    @inject(injectTokens.WorldsTimerUpdater)
     private readonly worldsTimerUpdater: WorldsTimerUpdater,
-    @inject(InjectTokens.ActorsTimerUpdater)
+    @inject(injectTokens.ActorsTimerUpdater)
     private readonly actorsTimerUpdater: ActorsTimerUpdater
   ) {}
 

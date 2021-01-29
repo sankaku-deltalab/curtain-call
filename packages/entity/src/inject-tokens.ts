@@ -1,4 +1,4 @@
-export const InjectTokens = {
+export const injectTokens = {
   WorldsTimeScale: "WorldsTimeScale",
   ActorsContainer: "ActorsContainer",
   ActorsTimeScale: "ActorsTimeScale",
