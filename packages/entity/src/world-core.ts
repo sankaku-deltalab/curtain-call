@@ -79,6 +79,10 @@ export interface ActorsExtensionUpdater {
   ): void;
 }
 
+export interface InputConsumer {
+  consumeInput(world: WorldId, actors: readonly ActorId[]): void;
+}
+
 /**
  * `WorldCore` is "synchronizer" of actors.
  *
@@ -114,13 +118,18 @@ export class WorldCore {
     @inject(injectTokens.WorldsTimerUpdater)
     private readonly worldsTimerUpdater: WorldsTimerUpdater,
     @inject(injectTokens.ActorsTimerUpdater)
-    private readonly actorsTimerUpdater: ActorsTimerUpdater
+    private readonly actorsTimerUpdater: ActorsTimerUpdater,
+    @inject(injectTokens.InputConsumer)
+    private readonly inputConsumer: InputConsumer
   ) {}
 
   update(world: WorldId, deltaSec: Seconds): void {
     this.actorsContainer.refresh(world);
 
     const actorIds = Array.from(this.actorsContainer.getActiveActors(world));
+
+    this.inputConsumer.consumeInput(world, actorIds);
+
     const { worldDeltaSec, actorsDeltaSec } = this.calcDeltaTimes(
       world,
       actorIds,

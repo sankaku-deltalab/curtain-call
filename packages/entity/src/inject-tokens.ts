@@ -9,4 +9,5 @@ export const injectTokens = {
   ActorsExtensionUpdater: "ActorsExtensionUpdater",
   WorldsTimerUpdater: "worldsTimerUpdater",
   ActorsTimerUpdater: "actorsTimerUpdater",
+  InputConsumer: "InputConsumer",
 } as const;
