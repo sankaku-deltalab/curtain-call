@@ -79,6 +79,27 @@ export interface ActorsExtensionUpdater {
   ): void;
 }
 
+export interface ActorsUpdateEventEmitter {
+  notifyPreUpdate(
+    actors: readonly ActorId[],
+    deltaSec: ReadonlyMap<ActorId, Seconds>
+  ): void;
+  notifyUpdate(
+    actors: readonly ActorId[],
+    deltaSec: ReadonlyMap<ActorId, Seconds>
+  ): void;
+  notifyPostUpdate(
+    actors: readonly ActorId[],
+    deltaSec: ReadonlyMap<ActorId, Seconds>
+  ): void;
+}
+
+export interface WorldsUpdateEventEmitter {
+  notifyPreUpdate(world: WorldId, deltaSec: Seconds): void;
+  notifyUpdate(world: WorldId, deltaSec: Seconds): void;
+  notifyPostUpdate(world: WorldId, deltaSec: Seconds): void;
+}
+
 export interface InputConsumer {
   consumeInput(world: WorldId, actors: readonly ActorId[]): void;
 }
@@ -120,7 +141,11 @@ export class WorldCore {
     @inject(injectTokens.ActorsTimerUpdater)
     private readonly actorsTimerUpdater: ActorsTimerUpdater,
     @inject(injectTokens.InputConsumer)
-    private readonly inputConsumer: InputConsumer
+    private readonly inputConsumer: InputConsumer,
+    @inject(injectTokens.WorldsUpdateEventEmitter)
+    private readonly worldsUpdateEventEmitter: WorldsUpdateEventEmitter,
+    @inject(injectTokens.ActorsUpdateEventEmitter)
+    private readonly actorsUpdateEventEmitter: ActorsUpdateEventEmitter
   ) {}
 
   update(world: WorldId, deltaSec: Seconds): void {
@@ -138,25 +163,16 @@ export class WorldCore {
 
     this.executeTimersIfTimeWasFilled(world, actorIds);
 
-    this.notifyPreUpdateToExtensions(
-      world,
-      actorIds,
-      worldDeltaSec,
-      actorsDeltaSec
-    );
+    this.notifyPreUpdating(world, actorIds, worldDeltaSec, actorsDeltaSec);
 
     this.actorsMover.update(actorIds, actorsDeltaSec);
     this.actorsOverlapChecker.checkOverlap(actorIds);
     this.renderer.update(actorIds, actorsDeltaSec);
 
     this.updateExtensions(world, actorIds, worldDeltaSec, actorsDeltaSec);
+    this.actorsUpdateEventEmitter.notifyUpdate(actorIds, actorsDeltaSec);
 
-    this.notifyPostUpdateToExtensions(
-      world,
-      actorIds,
-      worldDeltaSec,
-      actorsDeltaSec
-    );
+    this.notifyPostUpdating(world, actorIds, worldDeltaSec, actorsDeltaSec);
 
     this.updateTimers(world, actorIds, worldDeltaSec, actorsDeltaSec);
 
@@ -189,14 +205,16 @@ export class WorldCore {
     this.actorsTimerUpdater.executeTimersIfTimeWasFilled(actors);
   }
 
-  private notifyPreUpdateToExtensions(
+  private notifyPreUpdating(
     world: WorldId,
     actors: readonly ActorId[],
     worldDeltaSec: Seconds,
     actorsDeltaSec: ReadonlyMap<ActorId, Seconds>
   ): void {
     this.worldsExtensionUpdater.notifyPreUpdate(world, worldDeltaSec);
+    this.worldsUpdateEventEmitter.notifyPreUpdate(world, worldDeltaSec);
     this.actorsExtensionUpdater.notifyPreUpdate(actors, actorsDeltaSec);
+    this.actorsUpdateEventEmitter.notifyPreUpdate(actors, actorsDeltaSec);
   }
 
   private updateExtensions(
@@ -209,14 +227,16 @@ export class WorldCore {
     this.actorsExtensionUpdater.update(actors, actorsDeltaSec);
   }
 
-  private notifyPostUpdateToExtensions(
+  private notifyPostUpdating(
     world: WorldId,
     actors: readonly ActorId[],
     worldDeltaSec: Seconds,
     actorsDeltaSec: ReadonlyMap<ActorId, Seconds>
   ): void {
-    this.worldsExtensionUpdater.notifyPreUpdate(world, worldDeltaSec);
-    this.actorsExtensionUpdater.notifyPreUpdate(actors, actorsDeltaSec);
+    this.worldsExtensionUpdater.notifyPostUpdate(world, worldDeltaSec);
+    this.worldsUpdateEventEmitter.notifyPostUpdate(world, worldDeltaSec);
+    this.actorsExtensionUpdater.notifyPostUpdate(actors, actorsDeltaSec);
+    this.actorsUpdateEventEmitter.notifyPostUpdate(actors, actorsDeltaSec);
   }
 
   private updateTimers(
