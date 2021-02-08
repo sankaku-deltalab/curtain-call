@@ -1,6 +1,8 @@
+import { injectable } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
 import { CollisionStorage, CollisionState } from "@curtain-call/uc-collision";
 
+@injectable()
 export class CollisionStorageImpl implements CollisionStorage {
   private readonly storage = new Map<ActorId, Readonly<CollisionState>>();
 
