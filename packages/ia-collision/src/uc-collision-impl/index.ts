@@ -1,1 +1,1 @@
-export * from "./ia-collision";
+export * from "./collision-storage-impl";
