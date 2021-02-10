@@ -37,7 +37,6 @@
     "@curtain-call/entity": "^0.15.0",
     "@curtain-call/shared-dependencies": "^0.15.0",
     "@curtain-call/uc-collision": "^0.15.0",
-    "@curtain-call/uc-transformation": "^0.15.0",
-    "eventemitter3": "^4.0.7"
+    "@curtain-call/uc-transformation": "^0.15.0"
   }
 }

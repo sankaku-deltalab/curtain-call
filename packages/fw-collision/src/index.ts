@@ -1,1 +1,1 @@
-export * from "./fw-collision";
+export * from "./uc-collision-impl";
