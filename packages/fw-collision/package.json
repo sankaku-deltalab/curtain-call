@@ -29,6 +29,7 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "@types/box-intersect": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "typescript": "^4.1.3"
   },
@@ -37,6 +38,7 @@
     "@curtain-call/ia-collision": "^0.15.0",
     "@curtain-call/shared-dependencies": "^0.15.0",
     "@curtain-call/uc-collision": "^0.15.0",
+    "box-intersect": "^1.0.2",
     "eventemitter3": "^4.0.7"
   }
 }
