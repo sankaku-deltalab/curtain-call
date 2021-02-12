@@ -1,1 +1,1 @@
-export * from "./uc-world";
+export * from "./entity-impl";
