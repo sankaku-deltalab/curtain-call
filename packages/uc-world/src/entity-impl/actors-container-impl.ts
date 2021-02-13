@@ -1,15 +1,14 @@
-import { injectable } from "@curtain-call/shared-dependencies";
+import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId, WorldId, ActorsContainer } from "@curtain-call/entity";
+import { ActorToWorldMapping } from "../common";
+import { injectTokens } from "../inject-tokens";
 
 @injectable()
 export class ActorsContainerImpl implements ActorsContainer {
-  private readonly stageSet = new Map<WorldId, Set<ActorId>>();
-  private readonly activeSet = new Map<WorldId, Set<ActorId>>();
-
-  stage(world: WorldId, actor: ActorId): void {
-    const set = this.getActorSetFromStage(world);
-    set.add(actor);
-  }
+  constructor(
+    @inject(injectTokens.ActorToWorldMapping)
+    private readonly actorToWorldMapping: ActorToWorldMapping
+  ) {}
 
   /**
    * 1. Move actors to "active" set from "stage" set.
@@ -17,31 +16,10 @@ export class ActorsContainerImpl implements ActorsContainer {
    * 3. Destroy removed actors if should destroy it.
    */
   refresh(world: WorldId): void {
-    const staged = this.getActorSetFromStage(world);
-    const storage = this.getActorSetFromActive(world);
-    staged.forEach((ac) => storage.add(ac));
-    staged.clear();
+    this.actorToWorldMapping.refresh(world);
   }
 
   getActiveActors(world: WorldId): ReadonlySet<ActorId> {
-    return this.getActorSetFromActive(world);
-  }
-
-  private getActorSetFromStage(worldId: WorldId): Set<ActorId> {
-    const set = this.stageSet.get(worldId);
-    if (set) return set;
-
-    const newSet = new Set<ActorId>();
-    this.stageSet.set(worldId, newSet);
-    return newSet;
-  }
-
-  private getActorSetFromActive(worldId: WorldId): Set<ActorId> {
-    const set = this.activeSet.get(worldId);
-    if (set) return set;
-
-    const newSet = new Set<ActorId>();
-    this.activeSet.set(worldId, newSet);
-    return newSet;
+    return this.actorToWorldMapping.getActiveActors(world);
   }
 }
