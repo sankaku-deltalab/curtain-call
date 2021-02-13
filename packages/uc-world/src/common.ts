@@ -1,5 +1,10 @@
-import { injectable } from "@curtain-call/shared-dependencies";
+import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId, WorldId } from "@curtain-call/entity";
+import { injectTokens } from "./inject-tokens";
+
+export interface ActorDestroyer {
+  destroy(actor: ActorId): void;
+}
 
 @injectable()
 export class ActorToWorldMapping {
@@ -7,6 +12,11 @@ export class ActorToWorldMapping {
   private readonly activeSet = new Map<WorldId, Set<ActorId>>();
   private readonly removingSet = new Map<WorldId, Set<ActorId>>();
   private readonly actorToWorld = new Map<ActorId, WorldId>();
+
+  constructor(
+    @inject(injectTokens.ActorDestroyer)
+    private readonly actorDestroyer: ActorDestroyer
+  ) {}
 
   stage(world: WorldId, actor: ActorId): void {
     const set = this.getActorSetFromStage(world);
@@ -31,6 +41,9 @@ export class ActorToWorldMapping {
     removing.forEach((actor) => {
       actives.delete(actor);
       this.actorToWorld.delete(actor);
+    });
+    removing.forEach((actor) => {
+      this.actorDestroyer.destroy(actor);
     });
     removing.clear();
   }
