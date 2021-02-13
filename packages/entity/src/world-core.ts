@@ -6,7 +6,6 @@ export type ActorId = symbol;
 export type Seconds = number;
 
 export interface ActorsContainer {
-  stage(world: WorldId, actor: ActorId): void;
   /**
    * 1. Move actors to "active" set from "stage" set.
    * 2. Remove actors if should remove it.
