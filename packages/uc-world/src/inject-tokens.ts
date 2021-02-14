@@ -1,5 +1,5 @@
 export const injectTokens = {
   ActorToWorldMapping: "ActorToWorldMapping",
-  ActorDestroyer: "ActorDestroyer",
+  ActorDestroyingRequester: "ActorDestroyingRequester",
   WorldCore: "WorldCore",
 } as const;
