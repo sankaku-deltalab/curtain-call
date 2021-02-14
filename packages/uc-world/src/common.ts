@@ -15,7 +15,9 @@ export class ActorToWorldMapping {
 
   constructor(
     @inject(injectTokens.ActorDestroyingRequester)
-    private readonly actorDestroyingRequester: ActorDestroyingRequester
+    private readonly actorDestroyingRequester: ActorDestroyingRequester,
+    @inject(injectTokens.ActorDestroyingEnablerForWorld)
+    private readonly actorDestroyingEnablerForWorld: ActorDestroyingEnablerForWorld
   ) {}
 
   stage(world: WorldId, actor: ActorId): void {
@@ -43,7 +45,10 @@ export class ActorToWorldMapping {
       this.actorToWorld.delete(actor);
     });
     removing.forEach((actor) => {
-      this.actorDestroyingRequester.requestDestroy(actor);
+      const shouldDestroy = this.actorDestroyingEnablerForWorld.actorShouldDestroyWhenRemovedFromWorld(
+        actor
+      );
+      if (shouldDestroy) this.actorDestroyingRequester.requestDestroy(actor);
     });
     removing.clear();
   }
@@ -78,5 +83,18 @@ export class ActorToWorldMapping {
     const newSet = new Set<ActorId>();
     worldActors.set(worldId, newSet);
     return newSet;
+  }
+}
+
+@injectable()
+export class ActorDestroyingEnablerForWorld {
+  private readonly actorsDoNotDestroy = new Set<ActorId>();
+
+  protectActorFromDestroyingWhenRemovedFromWorld(actor: ActorId): void {
+    this.actorsDoNotDestroy.add(actor);
+  }
+
+  actorShouldDestroyWhenRemovedFromWorld(actor: ActorId): boolean {
+    return !this.actorsDoNotDestroy.has(actor);
   }
 }
