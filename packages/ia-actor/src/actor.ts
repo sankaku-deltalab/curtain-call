@@ -66,6 +66,11 @@ export class Actor implements ActorBase {
     return this;
   }
 
+  destroySelf(): void {
+    // TODO: Remove self from world if still self in world
+    // TODO: Delete collision data
+  }
+
   // actor
 
   getActor(actorId: ActorId): Actor {
