@@ -29,6 +29,7 @@
     "url": "https://github.com/sankaku-deltalab/curtain-call/issues"
   },
   "devDependencies": {
+    "reflect-metadata": "^0.1.13",
     "typescript": "^4.1.5"
   },
   "types": "dist/index.d.ts",
