@@ -20,6 +20,10 @@ export class ActorAddingToWorldUC {
     this.actorToWorldMapping.remove(world, actor);
   }
 
+  getWorldContainsActor(actor: ActorId): WorldId | undefined {
+    return this.actorToWorldMapping.getWorldContainsActor(actor);
+  }
+
   protectActorFromDestroyingWhenRemovedFromWorld(actor: ActorId): void {
     this.actorDestroyingEnablerForWorld.protectActorFromDestroyingWhenRemovedFromWorld(
       actor
