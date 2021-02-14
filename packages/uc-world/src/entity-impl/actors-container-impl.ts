@@ -1,13 +1,15 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId, WorldId, ActorsContainer } from "@curtain-call/entity";
-import { ActorToWorldMapping } from "../common";
+import { RefreshActorsInWorldUC, ActorAddingToWorldUC } from "../use-cases";
 import { injectTokens } from "../inject-tokens";
 
 @injectable()
 export class ActorsContainerImpl implements ActorsContainer {
   constructor(
-    @inject(injectTokens.ActorToWorldMapping)
-    private readonly actorToWorldMapping: ActorToWorldMapping
+    @inject(injectTokens.RefreshActorsInWorldUC)
+    private readonly refreshActorsInWorldUC: RefreshActorsInWorldUC,
+    @inject(injectTokens.ActorAddingToWorldUC)
+    private readonly actorAddingToWorldUC: ActorAddingToWorldUC
   ) {}
 
   /**
@@ -16,10 +18,10 @@ export class ActorsContainerImpl implements ActorsContainer {
    * 3. Destroy removed actors if should destroy it.
    */
   refresh(world: WorldId): void {
-    this.actorToWorldMapping.refresh(world);
+    this.refreshActorsInWorldUC.refreshActorsInWorld(world);
   }
 
   getActiveActors(world: WorldId): ReadonlySet<ActorId> {
-    return this.actorToWorldMapping.getActiveActors(world);
+    return this.actorAddingToWorldUC.getActiveActorsInWorld(world);
   }
 }

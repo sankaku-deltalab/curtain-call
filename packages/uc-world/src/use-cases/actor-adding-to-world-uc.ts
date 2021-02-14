@@ -24,6 +24,10 @@ export class ActorAddingToWorldUC {
     return this.actorToWorldMapping.getWorldContainsActor(actor);
   }
 
+  getActiveActorsInWorld(world: WorldId): ReadonlySet<ActorId> {
+    return this.actorToWorldMapping.getActiveActors(world);
+  }
+
   protectActorFromDestroyingWhenRemovedFromWorld(actor: ActorId): void {
     this.actorDestroyingEnablerForWorld.protectActorFromDestroyingWhenRemovedFromWorld(
       actor

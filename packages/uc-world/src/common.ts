@@ -6,12 +6,6 @@ export interface ActorDestroyingRequester {
 
 export interface ActorToWorldMapping {
   stage(world: WorldId, actor: ActorId): void;
-  /**
-   * 1. Move actors to "active" set from "stage" set.
-   * 2. Remove actors if should remove it.
-   * 3. Destroy removed actors if should destroy it.
-   */
-  refresh(world: WorldId): void;
 
   getActiveActors(world: WorldId): ReadonlySet<ActorId>;
 
