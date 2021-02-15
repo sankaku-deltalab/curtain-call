@@ -10,6 +10,9 @@ export class ActorToWorldMappingImpl implements ActorToWorldMapping {
   private readonly actorToWorld = new Map<ActorId, WorldId>();
 
   stage(world: WorldId, actor: ActorId): void {
+    if (this.actorToWorld.has(actor))
+      throw new Error("Actor is already added to other world");
+
     const set = this.getActorSetFromStage(world);
     set.add(actor);
     this.actorToWorld.set(actor, world);
