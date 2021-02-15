@@ -12,7 +12,7 @@ export class ActorToWorldMappingImpl implements ActorToWorldMapping {
   stage(world: WorldId, actor: ActorId): void {
     const set = this.getActorSetFromStage(world);
     set.add(actor);
-    this.actorToWorld.set(world, actor);
+    this.actorToWorld.set(actor, world);
   }
 
   getActiveActors(world: WorldId): ReadonlySet<ActorId> {
