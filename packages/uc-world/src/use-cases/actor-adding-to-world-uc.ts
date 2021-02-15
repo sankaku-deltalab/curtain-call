@@ -16,7 +16,7 @@ export class ActorAddingToWorldUC {
     this.actorToWorldMapping.stage(world, actor);
   }
 
-  removeActorToWorld(world: WorldId, actor: ActorId): void {
+  removeActorFromWorld(world: WorldId, actor: ActorId): void {
     this.actorToWorldMapping.remove(world, actor);
   }
 
