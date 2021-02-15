@@ -1,6 +1,7 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
 import { ActorBase, ActorStorage } from "@curtain-call/uc-actor";
+import { ActorAddingToWorldUC } from "@curtain-call/uc-world";
 import {
   CollisionShape,
   CollisionGroup,
@@ -26,6 +27,8 @@ export class Actor implements ActorBase {
   constructor(
     @inject(injectTokens.ActorStorage)
     private readonly actorStorage: ActorStorage<Actor>,
+    @inject(injectTokens.ActorAddingToWorldUC)
+    private readonly actorAddingToWorldUC: ActorAddingToWorldUC,
     @inject(injectTokens.CollisionModifyUC)
     private readonly collisionModifyUC: CollisionModifyUC,
     @inject(injectTokens.CollisionManipulationUC)
@@ -67,7 +70,9 @@ export class Actor implements ActorBase {
   }
 
   destroySelf(): void {
-    // TODO: Remove self from world if still self in world
+    if (this.actorAddingToWorldUC.getWorldContainsActor(this.id)) {
+      throw new Error("Do not delete actor while actor in world");
+    }
     // TODO: Delete collision data
   }
 
