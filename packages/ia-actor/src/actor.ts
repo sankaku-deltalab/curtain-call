@@ -73,7 +73,7 @@ export class Actor implements ActorBase {
     if (this.actorAddingToWorldUC.getWorldContainsActor(this.id)) {
       throw new Error("Do not delete actor while actor in world");
     }
-    // TODO: Delete collision data
+    this.collisionModifyUC.deleteCollision(this.id);
   }
 
   // actor

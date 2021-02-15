@@ -44,6 +44,10 @@ export class CollisionModifyUC {
     this.collisionStorage.addCollision(actorId, state);
   }
 
+  deleteCollision(actorId: ActorId): void {
+    this.collisionStorage.deleteCollision(actorId);
+  }
+
   setCollisionEnable(actorId: ActorId, enable: boolean): void {
     const state = this.collisionStorage.getCollision(actorId);
     this.collisionStorage.updateCollision(actorId, {
