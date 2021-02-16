@@ -1,12 +1,10 @@
-import { injectable, inject } from "@curtain-call/shared-dependencies";
+import {
+  injectable,
+  inject,
+  EventEmitter,
+} from "@curtain-call/shared-dependencies";
 import { WorldId, WorldCore, Seconds } from "@curtain-call/entity";
 import { injectTokens } from "../inject-tokens";
-
-export interface EventEmitter<T extends Record<string, unknown[]>> {
-  emit<V extends keyof T>(name: V, ...args: T[V]): void;
-  on<V extends keyof T>(name: V, cb: (...args: T[V]) => void): void;
-  off<V extends keyof T>(name: V, cb: (...args: T[V]) => void): void;
-}
 
 export type WorldUpdateEvent = {
   preUpdate: [Seconds];
@@ -30,6 +28,24 @@ export class UpdateWorldUC {
 
   updateWorld(world: WorldId, deltaSec: Seconds): void {
     this.worldCore.update(world, deltaSec);
+  }
+
+  emitPreUpdateEvent(world: WorldId, deltaSec: Seconds): void {
+    this.worldUpdateEventEmitterStorage
+      .getEventEmitter(world)
+      .emit("preUpdate", deltaSec);
+  }
+
+  emitUpdateEvent(world: WorldId, deltaSec: Seconds): void {
+    this.worldUpdateEventEmitterStorage
+      .getEventEmitter(world)
+      .emit("updated", deltaSec);
+  }
+
+  emitPostUpdateEvent(world: WorldId, deltaSec: Seconds): void {
+    this.worldUpdateEventEmitterStorage
+      .getEventEmitter(world)
+      .emit("postUpdate", deltaSec);
   }
 
   addEventListener<V extends keyof WorldUpdateEvent>(

@@ -9,4 +9,5 @@ export const injectTokens = {
   WorldStorage: "WorldStorage",
   WorldCore: "WorldCore",
   WorldUpdateEventEmitterStorage: "WorldUpdateEventEmitterStorage",
+  UpdateWorldUC: "UpdateWorldUC",
 } as const;
