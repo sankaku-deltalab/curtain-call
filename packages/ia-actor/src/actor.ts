@@ -1,7 +1,10 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
-import { ActorBase, ActorStorage } from "@curtain-call/uc-actor";
-import { ActorAddingToWorldUC } from "@curtain-call/uc-world";
+import {
+  ActorBase,
+  DestroyActorUC,
+  ActorStorage,
+} from "@curtain-call/uc-actor";
 import {
   CollisionShape,
   CollisionGroup,
@@ -27,12 +30,12 @@ export class Actor implements ActorBase {
   constructor(
     @inject(injectTokens.ActorStorage)
     private readonly actorStorage: ActorStorage<Actor>,
-    @inject(injectTokens.ActorAddingToWorldUC)
-    private readonly actorAddingToWorldUC: ActorAddingToWorldUC,
     @inject(injectTokens.CollisionModifyUC)
     private readonly collisionModifyUC: CollisionModifyUC,
     @inject(injectTokens.CollisionManipulationUC)
-    private readonly collisionManipulationUC: CollisionManipulationUC
+    private readonly collisionManipulationUC: CollisionManipulationUC,
+    @inject(injectTokens.DestroyActorUC)
+    private readonly destroyActorUC: DestroyActorUC
   ) {}
 
   private idMaybeNotSet?: ActorId;
@@ -70,10 +73,7 @@ export class Actor implements ActorBase {
   }
 
   destroySelf(): void {
-    if (this.actorAddingToWorldUC.getWorldContainsActor(this.id)) {
-      throw new Error("Do not delete actor while actor in world");
-    }
-    this.collisionModifyUC.deleteCollision(this.id);
+    this.destroyActorUC.destroyActor(this.id);
   }
 
   // actor
