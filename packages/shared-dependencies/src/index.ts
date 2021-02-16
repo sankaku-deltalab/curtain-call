@@ -1,8 +1,3 @@
 export * from "trans-vector2d";
-export {
-  inject,
-  injectable,
-  autoInjectable,
-  singleton,
-  container,
-} from "tsyringe";
+export * from "./event-emitter-factory";
+export * from "./tsyringe-dependencies";
