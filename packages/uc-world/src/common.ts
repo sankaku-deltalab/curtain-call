@@ -18,6 +18,8 @@ export interface ActorToWorldMapping {
   setActiveActors(world: WorldId, actors: Set<ActorId>): void;
 
   getWorldContainsActor(actor: ActorId): WorldId | undefined;
+
+  removeWorld(world: WorldId): void;
 }
 
 export interface ActorDestroyingEnablerForWorld {
