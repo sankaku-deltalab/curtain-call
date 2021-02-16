@@ -2,7 +2,6 @@ import { injectable, inject } from "@curtain-call/shared-dependencies";
 import {
   ActorId,
   WorldId,
-  Seconds,
   WorldsUpdateEventEmitter,
 } from "@curtain-call/entity";
 import {
@@ -69,11 +68,5 @@ export class World {
 
   addActor(actor: ActorId): void {
     this.actorAddingToWorldUC.addActorToWorld(this.id, actor);
-  }
-
-  // world
-
-  update(deltaSec: Seconds): void {
-    this.updateWorldUC.updateWorld(this.id, deltaSec);
   }
 }
