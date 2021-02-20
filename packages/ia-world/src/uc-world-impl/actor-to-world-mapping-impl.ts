@@ -66,10 +66,14 @@ export class ActorToWorldMappingImpl implements ActorToWorldMapping {
   removeWorld(world: WorldId): void {
     [this.stagedActors, this.activeActors, this.removingActors].forEach(
       (map) => {
+        const actors = map.get(world);
+        if (!actors) return;
+        actors.forEach((actor) => {
+          this.actorToWorld.delete(actor);
+        });
         map.delete(world);
       }
     );
-    this.actorToWorld.delete(world);
   }
 
   private getActorSetFromStage(worldId: WorldId): Set<ActorId> {

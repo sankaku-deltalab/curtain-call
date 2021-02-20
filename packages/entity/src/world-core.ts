@@ -1,8 +1,7 @@
 import { inject, injectable } from "@curtain-call/shared-dependencies";
+import { WorldId, ActorId } from "./main-object-ids";
 import { injectTokens } from "./inject-tokens";
 
-export type WorldId = symbol;
-export type ActorId = symbol;
 export type Seconds = number;
 
 export interface ActorsContainer {
