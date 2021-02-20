@@ -6,4 +6,5 @@ export const injectTokens = {
   DestroyActorUC: "DestroyActorUC",
   CollisionModifyUC: "CollisionModifyUC",
   CollisionManipulationUC: "CollisionManipulationUC",
+  EventEmitterFactory: "EventEmitterFactory",
 } as const;
