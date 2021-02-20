@@ -5,4 +5,5 @@ export const injectTokens = {
   WorldsUpdateEventEmitter: "WorldsUpdateEventEmitter",
   DIContainer: "DIContainer",
   World: "World",
+  EventEmitterFactory: "EventEmitterFactory",
 } as const;

@@ -4,3 +4,4 @@ export * from "./actor-to-world-mapping-impl";
 export * from "./world-factory-impl";
 export * from "./world-id-generator-impl";
 export * from "./world-storage-impl";
+export * from "./world-update-event-emitter-storage-impl";
