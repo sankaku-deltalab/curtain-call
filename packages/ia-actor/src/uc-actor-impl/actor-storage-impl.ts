@@ -35,4 +35,8 @@ export class ActorStorageImpl implements ActorStorage {
     if (!state) throw new Error("Actor is not added");
     return state;
   }
+
+  hasActor(actorId: ActorId): boolean {
+    return this.storage.has(actorId);
+  }
 }

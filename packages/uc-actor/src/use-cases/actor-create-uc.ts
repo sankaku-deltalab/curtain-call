@@ -32,4 +32,8 @@ export class ActorCreateUC {
     this.actorComponentDestroyer.destroyComponents(actor);
     this.actorStorage.removeActor(actor);
   }
+
+  hasActor(actorId: ActorId): boolean {
+    return this.actorStorage.hasActor(actorId);
+  }
 }

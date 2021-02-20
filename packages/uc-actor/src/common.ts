@@ -16,5 +16,6 @@ export type ActorEvent = ActorUpdateEvent;
 export interface ActorStorage {
   addActor(actor: ActorId): void;
   removeActor(actorId: ActorId): void;
+  hasActor(actorId: ActorId): boolean;
   getActor(actor: ActorId): Readonly<ActorState>;
 }
