@@ -4,45 +4,26 @@ import {
   EventEmitter,
 } from "@curtain-call/shared-dependencies";
 import { ActorId, Seconds } from "@curtain-call/entity";
+import { ActorStorage, ActorUpdateEvent } from "../common";
 import { injectTokens } from "../inject-tokens";
-
-export type ActorUpdateEvent = {
-  preUpdate: [Seconds];
-  updated: [Seconds];
-  postUpdate: [Seconds];
-};
-
-export interface ActorUpdateEventEmitterStorage {
-  getEventEmitter(actor: ActorId): EventEmitter<ActorUpdateEvent>;
-  deleteEventEmitter(actor: ActorId): void;
-}
 
 @injectable()
 export class UpdateActorUC {
   constructor(
-    @inject(injectTokens.ActorUpdateEventEmitterStorage)
-    private readonly ActorUpdateEventEmitterStorage: ActorUpdateEventEmitterStorage
+    @inject(injectTokens.ActorStorage)
+    private readonly actorStorage: ActorStorage
   ) {}
 
   emitPreUpdateEvent(actor: ActorId, deltaSec: Seconds): void {
-    this.ActorUpdateEventEmitterStorage.getEventEmitter(actor).emit(
-      "preUpdate",
-      deltaSec
-    );
+    this.getEmitter(actor).emit("preUpdate", deltaSec);
   }
 
   emitUpdateEvent(actor: ActorId, deltaSec: Seconds): void {
-    this.ActorUpdateEventEmitterStorage.getEventEmitter(actor).emit(
-      "updated",
-      deltaSec
-    );
+    this.getEmitter(actor).emit("updated", deltaSec);
   }
 
   emitPostUpdateEvent(actor: ActorId, deltaSec: Seconds): void {
-    this.ActorUpdateEventEmitterStorage.getEventEmitter(actor).emit(
-      "postUpdate",
-      deltaSec
-    );
+    this.getEmitter(actor).emit("postUpdate", deltaSec);
   }
 
   addEventListener<V extends keyof ActorUpdateEvent>(
@@ -50,7 +31,7 @@ export class UpdateActorUC {
     name: V,
     cb: (...args: ActorUpdateEvent[V]) => void
   ): void {
-    this.ActorUpdateEventEmitterStorage.getEventEmitter(actor).on(name, cb);
+    this.getEmitter(actor).on(name, cb);
   }
 
   removeEventListener<V extends keyof ActorUpdateEvent>(
@@ -58,6 +39,11 @@ export class UpdateActorUC {
     name: V,
     cb: (...args: ActorUpdateEvent[V]) => void
   ): void {
-    this.ActorUpdateEventEmitterStorage.getEventEmitter(actor).off(name, cb);
+    this.getEmitter(actor).off(name, cb);
+  }
+
+  private getEmitter(actor: ActorId): EventEmitter<ActorUpdateEvent> {
+    const state = this.actorStorage.getActor(actor);
+    return state.eventEmitter;
   }
 }

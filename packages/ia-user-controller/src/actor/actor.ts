@@ -1,23 +1,25 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
 import {
-  ActorBase,
-  DestroyActorUC,
-  ActorStorage,
+  ActorCreateUC,
+  ActorEvent,
+  UpdateActorUC,
 } from "@curtain-call/uc-actor";
 import {
+  CollisionEvent,
   CollisionShape,
   CollisionGroup,
   CollisionModifyUC,
   CollisionManipulationUC,
 } from "@curtain-call/uc-collision";
-import { injectTokens } from "./inject-tokens";
+import { injectTokens } from "../inject-tokens";
 
-export type ActorEvent = {
-  overlap: [readonly ActorId[]];
-};
+export type ActorInstanceEvent = ActorEvent & CollisionEvent;
 
 const eventNameMapping = {
+  preUpdate: "actor",
+  updated: "actor",
+  postUpdate: "actor",
   overlap: "collision",
 } as const;
 
@@ -26,16 +28,16 @@ export interface ActorIdGenerator {
 }
 
 @injectable()
-export class Actor implements ActorBase {
+export class Actor {
   constructor(
-    @inject(injectTokens.ActorStorage)
-    private readonly actorStorage: ActorStorage<Actor>,
+    @inject(injectTokens.ActorCreateUC)
+    private readonly actorCreateUC: ActorCreateUC,
+    @inject(injectTokens.UpdateActorUC)
+    private readonly updateActorUC: UpdateActorUC,
     @inject(injectTokens.CollisionModifyUC)
     private readonly collisionModifyUC: CollisionModifyUC,
     @inject(injectTokens.CollisionManipulationUC)
-    private readonly collisionManipulationUC: CollisionManipulationUC,
-    @inject(injectTokens.DestroyActorUC)
-    private readonly destroyActorUC: DestroyActorUC
+    private readonly collisionManipulationUC: CollisionManipulationUC
   ) {}
 
   private idMaybeNotSet?: ActorId;
@@ -52,34 +54,41 @@ export class Actor implements ActorBase {
 
   // mixed
 
-  on<V extends keyof ActorEvent>(
+  on<V extends string & keyof ActorInstanceEvent>(
     name: V,
-    cb: (...args: ActorEvent[V]) => void
+    cb: (...args: ActorInstanceEvent[V]) => void
   ): this {
+    // Bad typing
     if (eventNameMapping[name] === "collision") {
-      this.collisionManipulationUC.addEventListener(this.id, name, cb);
+      const name2 = name as "overlap";
+      const cb2 = cb as (...args: ActorInstanceEvent["overlap"]) => void;
+      this.collisionManipulationUC.addEventListener(this.id, name2, cb2);
+    } else if (eventNameMapping[name] === "actor") {
+      const name2 = name as "updated";
+      const cb2 = cb as (...args: ActorInstanceEvent["updated"]) => void;
+      this.updateActorUC.addEventListener(this.id, name2, cb2);
     }
     return this;
   }
 
-  off<V extends keyof ActorEvent>(
+  off<V extends keyof ActorInstanceEvent>(
     name: V,
-    cb: (...args: ActorEvent[V]) => void
+    cb: (...args: ActorInstanceEvent[V]) => void
   ): this {
     if (eventNameMapping[name] === "collision") {
-      this.collisionManipulationUC.removeEventListener(this.id, name, cb);
+      const name2 = name as "overlap";
+      const cb2 = cb as (...args: ActorInstanceEvent["overlap"]) => void;
+      this.collisionManipulationUC.removeEventListener(this.id, name2, cb2);
+    } else if (eventNameMapping[name] === "actor") {
+      const name2 = name as "updated";
+      const cb2 = cb as (...args: ActorInstanceEvent["updated"]) => void;
+      this.updateActorUC.removeEventListener(this.id, name2, cb2);
     }
     return this;
   }
 
   destroySelf(): void {
-    this.destroyActorUC.destroyActor(this.id);
-  }
-
-  // actor
-
-  getActor(actorId: ActorId): Actor {
-    return this.actorStorage.getActor(actorId);
+    this.actorCreateUC.destroyActor(this.id);
   }
 
   // collision

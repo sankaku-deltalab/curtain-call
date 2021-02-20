@@ -1,23 +1,38 @@
+import {
+  injectable,
+  inject,
+  EventEmitterFactory,
+} from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
-import { ActorStorage, ActorBase } from "@curtain-call/uc-actor";
+import { ActorStorage, ActorState } from "@curtain-call/uc-actor";
+import { injectTokens } from "../inject-tokens";
+import { ActorEvent } from "@curtain-call/uc-actor/dist/common";
 
-export class ActorStorageImpl<TActor extends ActorBase>
-  implements ActorStorage<TActor> {
-  private readonly storage = new Map<ActorId, TActor>();
+@injectable()
+export class ActorStorageImpl implements ActorStorage {
+  private readonly storage = new Map<ActorId, ActorState>();
 
-  addActor(actor: TActor): void {
-    if (this.storage.has(actor.id)) throw new Error("Actor was already added");
-    this.storage.set(actor.id, actor);
+  constructor(
+    @inject(injectTokens.EventEmitterFactory)
+    private readonly eventEmitterFactory: EventEmitterFactory
+  ) {}
+
+  addActor(actor: ActorId): void {
+    if (this.storage.has(actor)) throw new Error("Actor was already added");
+    const state: ActorState = {
+      eventEmitter: this.eventEmitterFactory.create<ActorEvent>(),
+    };
+    this.storage.set(actor, state);
   }
 
-  removeActor(actorId: ActorId): void {
-    if (!this.storage.has(actorId)) throw new Error("Actor is not added");
-    this.storage.delete(actorId);
+  removeActor(actor: ActorId): void {
+    if (!this.storage.has(actor)) throw new Error("Actor is not added");
+    this.storage.delete(actor);
   }
 
-  getActor(actorId: ActorId): TActor {
-    const actor = this.storage.get(actorId);
-    if (!actor) throw new Error("Actor is not added");
-    return actor;
+  getActor(actor: ActorId): Readonly<ActorState> {
+    const state = this.storage.get(actor);
+    if (!state) throw new Error("Actor is not added");
+    return state;
   }
 }

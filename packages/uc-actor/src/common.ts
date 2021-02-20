@@ -1,11 +1,20 @@
-import { ActorId } from "@curtain-call/entity";
+import { EventEmitter } from "@curtain-call/shared-dependencies";
+import { ActorId, Seconds } from "@curtain-call/entity";
 
-export interface ActorBase {
-  readonly id: ActorId;
-}
+export type ActorState = {
+  eventEmitter: EventEmitter<ActorUpdateEvent>;
+};
 
-export interface ActorStorage<TActor extends ActorBase> {
-  addActor(actor: TActor): void;
+export type ActorUpdateEvent = {
+  preUpdate: [Seconds];
+  updated: [Seconds];
+  postUpdate: [Seconds];
+};
+
+export type ActorEvent = ActorUpdateEvent;
+
+export interface ActorStorage {
+  addActor(actor: ActorId): void;
   removeActor(actorId: ActorId): void;
-  getActor(actorId: ActorId): TActor;
+  getActor(actor: ActorId): Readonly<ActorState>;
 }

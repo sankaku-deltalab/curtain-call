@@ -1,28 +1,35 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
-import { ActorBase, ActorStorage } from "../common";
+import { ActorStorage } from "../common";
 import { injectTokens } from "../inject-tokens";
 
-export interface ActorFactory<TActor extends ActorBase> {
-  createActor(): TActor;
+export interface ActorIdGenerator {
+  create(): ActorId;
+}
+
+export interface ActorComponentDestroyer {
+  destroyComponents(actorId: ActorId): void;
 }
 
 @injectable()
-export class ActorCreateUC<TActor extends ActorBase> {
+export class ActorCreateUC {
   constructor(
-    @inject(injectTokens.ActorFactory)
-    private readonly actorFactory: ActorFactory<TActor>,
+    @inject(injectTokens.ActorIdGenerator)
+    private readonly actorIdGenerator: ActorIdGenerator,
     @inject(injectTokens.ActorStorage)
-    private readonly actorStorage: ActorStorage<TActor>
+    private readonly actorStorage: ActorStorage,
+    @inject(injectTokens.ActorComponentDestroyer)
+    private readonly actorComponentDestroyer: ActorComponentDestroyer
   ) {}
 
-  createActor(): TActor {
-    const actor = this.actorFactory.createActor();
+  createActor(): ActorId {
+    const actor = this.actorIdGenerator.create();
     this.actorStorage.addActor(actor);
     return actor;
   }
 
-  removeActor(actorId: ActorId): void {
-    this.actorStorage.removeActor(actorId);
+  destroyActor(actor: ActorId): void {
+    this.actorComponentDestroyer.destroyComponents(actor);
+    this.actorStorage.removeActor(actor);
   }
 }

@@ -1,12 +1,12 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
-import { ActorDestroyer } from "@curtain-call/uc-actor";
+import { ActorComponentDestroyer } from "@curtain-call/uc-actor";
 import { ActorAddingToWorldUC } from "@curtain-call/uc-world";
 import { CollisionModifyUC } from "@curtain-call/uc-collision";
 import { injectTokens } from "../inject-tokens";
 
 @injectable()
-export class ActorDestroyerImpl implements ActorDestroyer {
+export class ActorComponentDestroyerImpl implements ActorComponentDestroyer {
   constructor(
     @inject(injectTokens.ActorAddingToWorldUC)
     private readonly actorAddingToWorldUC: ActorAddingToWorldUC,
@@ -14,7 +14,7 @@ export class ActorDestroyerImpl implements ActorDestroyer {
     private readonly collisionModifyUC: CollisionModifyUC
   ) {}
 
-  destroyActor(actor: ActorId): void {
+  destroyComponents(actor: ActorId): void {
     if (this.actorAddingToWorldUC.getWorldContainsActor(actor)) {
       throw new Error("Do not delete actor while actor in world");
     }

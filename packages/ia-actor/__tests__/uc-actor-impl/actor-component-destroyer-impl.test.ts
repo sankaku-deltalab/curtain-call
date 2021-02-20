@@ -1,16 +1,16 @@
 import "reflect-metadata";
 import { container } from "@curtain-call/shared-dependencies";
-import { DestroyActorUC, injectTokens } from "../../src";
+import { ActorComponentDestroyerImpl, injectTokens } from "../../src";
 
-describe("@curtain-call/uc-actor.DestroyActorUC", () => {
+describe("@curtain-call/ia-actor.ActorComponentDestroyerImpl", () => {
   it("can create from tsyringe container", () => {
     const subContainer = container.createChildContainer();
     Object.values(injectTokens).forEach((token) => {
       subContainer.register(token, { useValue: jest.fn() });
     });
 
-    const uc = subContainer.resolve(DestroyActorUC);
+    const impl = subContainer.resolve(ActorComponentDestroyerImpl);
 
-    expect(uc).toBeInstanceOf(DestroyActorUC);
+    expect(impl).toBeInstanceOf(ActorComponentDestroyerImpl);
   });
 });

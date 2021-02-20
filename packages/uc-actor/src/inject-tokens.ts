@@ -1,7 +1,6 @@
 export const injectTokens = {
-  ActorFactory: "ActorFactory",
+  ActorIdGenerator: "ActorIdGenerator",
   ActorStorage: "ActorStorage",
-  ActorDestroyer: "ActorDestroyer",
-  ActorUpdateEventEmitterStorage: "ActorUpdateEventEmitterStorage",
+  ActorComponentDestroyer: "ActorComponentDestroyer",
   UpdateActorUC: "UpdateActorUC",
 } as const;
