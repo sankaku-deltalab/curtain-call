@@ -1,5 +1,5 @@
 import { inject, injectable } from "@curtain-call/shared-dependencies";
-import { WorldId, ActorId } from "./main-object-ids";
+import { WorldId, ActorId, EngineId } from "./main-object-ids";
 import { injectTokens } from "./inject-tokens";
 
 export type Seconds = number;
@@ -40,7 +40,7 @@ export interface Renderer {
     actors: readonly ActorId[],
     deltaSec: ReadonlyMap<ActorId, Seconds>
   ): void;
-  render(world: WorldId, actors: readonly ActorId[]): void;
+  render(engine: EngineId, world: WorldId, actors: readonly ActorId[]): void;
 }
 
 export interface WorldsTimerUpdater {
@@ -146,7 +146,7 @@ export class WorldCore {
     private readonly actorsUpdateEventEmitter: ActorsUpdateEventEmitter
   ) {}
 
-  update(world: WorldId, deltaSec: Seconds): void {
+  update(engine: EngineId, world: WorldId, deltaSec: Seconds): void {
     this.actorsContainer.refresh(world);
 
     const actorIds = Array.from(this.actorsContainer.getActiveActors(world));
@@ -176,7 +176,7 @@ export class WorldCore {
 
     this.worldsTimeScale.update(world, deltaSec);
 
-    this.renderer.render(world, actorIds);
+    this.renderer.render(engine, world, actorIds);
   }
 
   private calcDeltaTimes(

@@ -3,7 +3,7 @@ import {
   inject,
   EventEmitter,
 } from "@curtain-call/shared-dependencies";
-import { WorldId, WorldCore, Seconds } from "@curtain-call/entity";
+import { WorldId, WorldCore, Seconds, EngineId } from "@curtain-call/entity";
 import { WorldEvent, WorldStorage, WorldUpdateEvent } from "../common";
 import { injectTokens } from "../inject-tokens";
 
@@ -16,8 +16,8 @@ export class UpdateWorldUC {
     private readonly worldStorage: WorldStorage
   ) {}
 
-  updateWorld(world: WorldId, deltaSec: Seconds): void {
-    this.worldCore.update(world, deltaSec);
+  updateWorld(engine: EngineId, world: WorldId, deltaSec: Seconds): void {
+    this.worldCore.update(engine, world, deltaSec);
   }
 
   emitPreUpdateEvent(world: WorldId, deltaSec: Seconds): void {
