@@ -1,4 +1,4 @@
-import { ActorId, Seconds } from "@curtain-call/entity";
+import { ActorId, EngineId, Seconds } from "@curtain-call/entity";
 
 export interface SpriteLike<
   TCategoryProps extends Record<string, unknown> = {},
@@ -20,4 +20,14 @@ export interface DrawingObjectStorage {
   deleteDrawingObject(actor: ActorId): void;
   getState(actor: ActorId): Readonly<DrawingObjectState>;
   setState(actor: ActorId, newObject: DrawingObjectState): void;
+}
+
+export interface RendererInstance {
+  render(sprites: readonly Readonly<SpriteLike>[]): void;
+}
+
+export interface RendererInstanceStorage {
+  addRendererInstance(engine: EngineId, instance: RendererInstance): void;
+  removeRendererInstance(engine: EngineId): void;
+  getRendererInstance(engine: EngineId): Readonly<RendererInstance>;
 }
