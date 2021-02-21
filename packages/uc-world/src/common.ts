@@ -1,4 +1,5 @@
-import { ActorId, WorldId } from "@curtain-call/entity";
+import { EventEmitter } from "@curtain-call/shared-dependencies";
+import { ActorId, WorldId, Seconds } from "@curtain-call/entity";
 
 export interface ActorDestroyingRequester {
   requestDestroy(actor: ActorId): void;
@@ -25,4 +26,23 @@ export interface ActorToWorldMapping {
 export interface ActorDestroyingEnablerForWorld {
   actorShouldDestroyWhenRemovedFromWorld(actor: ActorId): boolean;
   protectActorFromDestroyingWhenRemovedFromWorld(actor: ActorId): void;
+}
+
+export type WorldState = {
+  eventEmitter: EventEmitter<WorldEvent>;
+};
+
+export type WorldUpdateEvent = {
+  preUpdate: [Seconds];
+  updated: [Seconds];
+  postUpdate: [Seconds];
+};
+
+export type WorldEvent = WorldUpdateEvent;
+
+export interface WorldStorage {
+  addWorld(world: WorldId): void;
+  removeWorld(world: WorldId): void;
+  hasWorld(world: WorldId): boolean;
+  getWorld(world: WorldId): Readonly<WorldState>;
 }

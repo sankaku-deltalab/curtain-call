@@ -1,17 +1,11 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
-import {
-  ActorId,
-  WorldId,
-  WorldsUpdateEventEmitter,
-} from "@curtain-call/entity";
+import { ActorId, WorldId } from "@curtain-call/entity";
 import {
   ActorAddingToWorldUC,
   UpdateWorldUC,
-  WorldUpdateEvent,
+  WorldEvent,
 } from "@curtain-call/uc-world";
-import { injectTokens } from "./inject-tokens";
-
-export type WorldEvent = WorldUpdateEvent;
+import { injectTokens } from "../inject-tokens";
 
 const eventNameMapping = {
   preUpdate: "worldUpdateEvent",
@@ -25,9 +19,7 @@ export class World {
     @inject(injectTokens.ActorAddingToWorldUC)
     private readonly actorAddingToWorldUC: ActorAddingToWorldUC,
     @inject(injectTokens.UpdateWorldUC)
-    private readonly updateWorldUC: UpdateWorldUC,
-    @inject(injectTokens.WorldsUpdateEventEmitter)
-    private readonly worldsUpdateEventEmitter: WorldsUpdateEventEmitter
+    private readonly updateWorldUC: UpdateWorldUC
   ) {}
 
   private idMaybeNotSet?: WorldId;

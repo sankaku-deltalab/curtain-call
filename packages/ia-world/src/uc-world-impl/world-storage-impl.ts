@@ -1,24 +1,41 @@
-import { injectable } from "@curtain-call/shared-dependencies";
+import {
+  injectable,
+  inject,
+  EventEmitterFactory,
+} from "@curtain-call/shared-dependencies";
 import { WorldId } from "@curtain-call/entity";
-import { WorldStorage } from "@curtain-call/uc-world";
-import { World } from "../world";
+import { WorldStorage, WorldState, WorldEvent } from "@curtain-call/uc-world";
+import { injectTokens } from "../inject-tokens";
 
 @injectable()
-export class WorldStorageImpl implements WorldStorage<World> {
-  private readonly worlds = new Map<WorldId, World>();
+export class WorldStorageImpl implements WorldStorage {
+  private readonly storage = new Map<WorldId, WorldState>();
 
-  addWorld(worldInstance: World): void {
-    if (this.worlds.has(worldInstance.id))
-      throw new Error("World is already added");
+  constructor(
+    @inject(injectTokens.EventEmitterFactory)
+    private readonly eventEmitterFactory: EventEmitterFactory
+  ) {}
 
-    this.worlds.set(worldInstance.id, worldInstance);
-  }
-
-  getWorldInstance(world: WorldId): World | undefined {
-    return this.worlds.get(world);
+  addWorld(world: WorldId): void {
+    if (this.storage.has(world)) throw new Error("World was already added");
+    const state: WorldState = {
+      eventEmitter: this.eventEmitterFactory.create<WorldEvent>(),
+    };
+    this.storage.set(world, state);
   }
 
   removeWorld(world: WorldId): void {
-    this.worlds.delete(world);
+    if (!this.storage.has(world)) throw new Error("World is not added");
+    this.storage.delete(world);
+  }
+
+  hasWorld(world: WorldId): boolean {
+    return this.storage.has(world);
+  }
+
+  getWorld(world: WorldId): Readonly<WorldState> {
+    const state = this.storage.get(world);
+    if (!state) throw new Error("World is not added");
+    return state;
   }
 }

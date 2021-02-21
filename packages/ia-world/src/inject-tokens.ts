@@ -1,6 +1,6 @@
 export const injectTokens = {
   ActorAddingToWorldUC: "ActorAddingToWorldUC",
-  DestroyActorUC: "DestroyActorUC",
+  ActorCreateUC: "DestroyActorUC",
   UpdateWorldUC: "UpdateWorldUC",
   WorldsUpdateEventEmitter: "WorldsUpdateEventEmitter",
   DIContainer: "DIContainer",

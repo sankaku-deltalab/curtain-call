@@ -5,4 +5,8 @@ export const injectTokens = {
   UpdateActorUC: "UpdateActorUC",
   CollisionModifyUC: "CollisionModifyUC",
   CollisionManipulationUC: "CollisionManipulationUC",
+  ActorAddingToWorldUC: "ActorAddingToWorldUC",
+  UpdateWorldUC: "UpdateWorldUC",
+  CreateWorldUC: "CreateWorldUC",
+  World: "World",
 } as const;
