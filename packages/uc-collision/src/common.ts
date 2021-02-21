@@ -43,9 +43,10 @@ export type CollisionState = Readonly<{
 }>;
 
 export interface CollisionStorage {
-  addCollision(actorId: ActorId, state: CollisionState): void;
-  deleteCollision(actorId: ActorId): void;
-  updateCollision(actorId: ActorId, state: CollisionState): void;
+  updateCollision(
+    actorId: ActorId,
+    state: Omit<CollisionState, "eventEmitter">
+  ): void;
   getCollision(actorId: ActorId): Readonly<CollisionState>;
   getCollisions(
     actorIds: readonly ActorId[]

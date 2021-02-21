@@ -54,9 +54,14 @@ export class ActorAllStorage {
     return this.storage.has(actor);
   }
 
-  get(actor: ActorId): ActorAllState {
+  get(actor: ActorId): Readonly<ActorAllState> {
     const state = this.storage.get(actor);
     if (!state) throw new Error("Actor is not created");
     return state;
+  }
+
+  set(actor: ActorId, state: ActorAllState): void {
+    if (!this.storage.has(actor)) throw new Error("Actor is not created");
+    this.storage.set(actor, state);
   }
 }

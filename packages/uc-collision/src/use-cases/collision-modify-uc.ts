@@ -41,11 +41,7 @@ export class CollisionModifyUC {
       isExcess: args.isExcess,
       eventEmitter: this.eventEmitterFactory.create(),
     };
-    this.collisionStorage.addCollision(actorId, state);
-  }
-
-  deleteCollision(actorId: ActorId): void {
-    this.collisionStorage.deleteCollision(actorId);
+    this.collisionStorage.updateCollision(actorId, state);
   }
 
   setCollisionEnable(actorId: ActorId, enable: boolean): void {

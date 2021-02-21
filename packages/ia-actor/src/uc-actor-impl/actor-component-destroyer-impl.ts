@@ -18,6 +18,5 @@ export class ActorComponentDestroyerImpl implements ActorComponentDestroyer {
     if (this.actorAddingToWorldUC.getWorldContainsActor(actor)) {
       throw new Error("Do not delete actor while actor in world");
     }
-    this.collisionModifyUC.deleteCollision(actor);
   }
 }
