@@ -46,7 +46,9 @@ export class ActorAllStorage {
   }
 
   delete(actor: ActorId): void {
-    if (!this.storage.has(actor)) throw new Error("Actor is not created");
+    const state = this.storage.get(actor);
+    if (!state) throw new Error("Actor is not created");
+    state.eventEmitter.clear();
     this.storage.delete(actor);
   }
 
