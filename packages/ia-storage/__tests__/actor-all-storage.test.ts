@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { container } from "@curtain-call/shared-dependencies";
-import { ActorStorageImpl, injectTokens } from "../../src";
+import { ActorAllStorage, injectTokens } from "../src";
 
 describe("@curtain-call/ia-storage.ActorStorageImpl", () => {
   it("can create from tsyringe container", () => {
@@ -9,8 +9,8 @@ describe("@curtain-call/ia-storage.ActorStorageImpl", () => {
       subContainer.register(token, { useValue: jest.fn() });
     });
 
-    const impl = subContainer.resolve(ActorStorageImpl);
+    const impl = subContainer.resolve(ActorAllStorage);
 
-    expect(impl).toBeInstanceOf(ActorStorageImpl);
+    expect(impl).toBeInstanceOf(ActorAllStorage);
   });
 });
