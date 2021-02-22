@@ -16,8 +16,6 @@ export type DrawingObjectState = {
 };
 
 export interface DrawingObjectStorage {
-  createDrawingObject(actor: ActorId, initialState: DrawingObjectState): void;
-  deleteDrawingObject(actor: ActorId): void;
   getState(actor: ActorId): Readonly<DrawingObjectState>;
   setState(actor: ActorId, newObject: DrawingObjectState): void;
 }
