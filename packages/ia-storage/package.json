@@ -38,6 +38,7 @@
     "@curtain-call/shared-dependencies": "^0.15.0",
     "@curtain-call/uc-actor": "^0.15.0",
     "@curtain-call/uc-collision": "^0.15.0",
+    "@curtain-call/uc-engine": "^0.15.0",
     "@curtain-call/uc-rendering": "^0.15.0",
     "@curtain-call/uc-transformation": "^0.15.0",
     "@curtain-call/uc-world": "^0.15.0"
