@@ -9,4 +9,6 @@ export const injectTokens = {
   UpdateWorldUC: "UpdateWorldUC",
   CreateWorldUC: "CreateWorldUC",
   World: "World",
+  EngineCreationUC: "EngineCreationUC",
+  RegisterRendererUC: "RegisterRendererUC",
 } as const;
