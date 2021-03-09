@@ -26,5 +26,6 @@ export interface RendererInstance {
 
 export interface RendererInstanceStorage {
   setRendererInstance(engine: EngineId, instance: RendererInstance): void;
+  deleteRendererInstance(engine: EngineId): void;
   getRendererInstance(engine: EngineId): Readonly<RendererInstance>;
 }

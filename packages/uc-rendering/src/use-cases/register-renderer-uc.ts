@@ -13,4 +13,8 @@ export class RegisterRendererUC {
   registerRenderer(engine: EngineId, rendererInstance: RendererInstance): void {
     this.rendererInstanceStorage.setRendererInstance(engine, rendererInstance);
   }
+
+  unregisterRenderer(engine: EngineId): void {
+    this.rendererInstanceStorage.deleteRendererInstance(engine);
+  }
 }

@@ -16,10 +16,20 @@ export class RendererInstanceStorageImpl implements RendererInstanceStorage {
 
   setRendererInstance(engine: EngineId, instance: RendererInstance): void {
     const oldState = this.engineAllStorage.get(engine);
-    if (!oldState.renderer) throw new Error("Renderer instance is already set");
+    if (oldState.renderer) throw new Error("Renderer instance is already set");
     const newState: EngineAllState = {
       ...oldState,
       renderer: instance,
+    };
+    this.engineAllStorage.set(engine, newState);
+  }
+
+  deleteRendererInstance(engine: EngineId): void {
+    const oldState = this.engineAllStorage.get(engine);
+    if (!oldState.renderer) throw new Error("Renderer instance is not set");
+    const newState: EngineAllState = {
+      ...oldState,
+      renderer: undefined,
     };
     this.engineAllStorage.set(engine, newState);
   }
