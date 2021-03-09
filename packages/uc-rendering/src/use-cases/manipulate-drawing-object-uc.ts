@@ -1,10 +1,7 @@
 import { injectable, inject } from "@curtain-call/shared-dependencies";
 import { ActorId } from "@curtain-call/entity";
-import {
-  DrawingObjectStorage,
-  DrawingObjectState,
-  SpriteLike,
-} from "../common";
+import { DrawingObjectStorage, DrawingObjectState } from "../common";
+import { SpriteLike } from "../sprite-like";
 import { injectTokens } from "../inject-tokens";
 
 @injectable()
