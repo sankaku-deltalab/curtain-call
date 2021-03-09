@@ -1,14 +1,5 @@
-import { ActorId, EngineId, Seconds } from "@curtain-call/entity";
-
-export interface SpriteLike<
-  TCategoryProps extends Record<string, unknown> = {},
-  TUniqueProps extends Record<string, unknown> = {}
-> {
-  categoryProps: Readonly<TCategoryProps>;
-  props: Readonly<TUniqueProps>;
-  elapsedSec: Seconds;
-  visible: boolean;
-}
+import { ActorId, EngineId } from "@curtain-call/entity";
+import { SpriteLike } from "./sprite-like";
 
 export type DrawingObjectState = {
   sprites: readonly SpriteLike[];
