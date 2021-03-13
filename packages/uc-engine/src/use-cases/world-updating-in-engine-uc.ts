@@ -4,7 +4,11 @@ import { EngineWorldMapping } from "../common";
 import { injectTokens } from "../inject-tokens";
 
 export interface WorldUpdater {
-  updateWorlds(world: readonly WorldId[], engineDeltaSec: Seconds): void;
+  updateWorlds(
+    engine: EngineId,
+    world: readonly WorldId[],
+    engineDeltaSec: Seconds
+  ): void;
 }
 
 @injectable()
@@ -18,6 +22,6 @@ export class WorldUpdatingInEngineUC {
 
   updateWorldInEngine(engine: EngineId, deltaSec: Seconds): void {
     const worlds = this.engineWorldMapping.getWorldsFromEngine(engine);
-    this.worldUpdater.updateWorlds(worlds, deltaSec);
+    this.worldUpdater.updateWorlds(engine, worlds, deltaSec);
   }
 }
