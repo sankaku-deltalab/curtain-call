@@ -1,16 +1,16 @@
 import "reflect-metadata";
 import { container } from "@curtain-call/shared-dependencies";
-import { EngineCreationUC, injectTokens } from "../../src";
+import { EngineAddingWorldUC, injectTokens } from "../../src";
 
-describe("@curtain-call/uc-engine.EngineCreationUC", () => {
+describe("@curtain-call/uc-engine.EngineAddingWorldUC", () => {
   it("can create from tsyringe container", () => {
     const subContainer = container.createChildContainer();
     Object.values(injectTokens).forEach((token) => {
       subContainer.register(token, { useValue: jest.fn() });
     });
 
-    const uc = subContainer.resolve(EngineCreationUC);
+    const uc = subContainer.resolve(EngineAddingWorldUC);
 
-    expect(uc).toBeInstanceOf(EngineCreationUC);
+    expect(uc).toBeInstanceOf(EngineAddingWorldUC);
   });
 });
