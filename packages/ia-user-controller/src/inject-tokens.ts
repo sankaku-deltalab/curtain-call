@@ -11,4 +11,6 @@ export const injectTokens = {
   World: "World",
   EngineCreationUC: "EngineCreationUC",
   RegisterRendererUC: "RegisterRendererUC",
+  WorldUpdatingInEngineUC: "WorldUpdatingInEngineUC",
+  EngineInput: "EngineInput",
 } as const;
