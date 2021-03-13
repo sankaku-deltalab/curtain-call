@@ -1,9 +1,10 @@
 import { injectable } from "@curtain-call/shared-dependencies";
-import { EngineId } from "@curtain-call/entity";
+import { EngineId, WorldId } from "@curtain-call/entity";
 import { RendererInstance } from "@curtain-call/uc-rendering";
 
 export type EngineAllState = {
   renderer?: RendererInstance;
+  containingWorlds: Set<WorldId>;
 };
 
 @injectable()
@@ -14,6 +15,7 @@ export class EngineAllStorage {
     if (this.storage.has(engine)) throw new Error("Engine is already created");
     const state: EngineAllState = {
       renderer: undefined,
+      containingWorlds: new Set(),
     };
     this.storage.set(engine, state);
   }
