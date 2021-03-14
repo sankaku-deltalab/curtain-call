@@ -2,6 +2,7 @@ export * from "./uc-actor-impl";
 export * from "./uc-engine-impl";
 export * from "./uc-collision-impl";
 export * from "./uc-rendering-impl";
+export * from "./uc-world-impl";
 export * from "./actor-all-storage";
 export * from "./engine-all-storage";
 export * from "./inject-tokens";

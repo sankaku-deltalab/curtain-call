@@ -5,9 +5,7 @@ export const injectTokens = {
   RefreshActorsInWorldUC: "RefreshActorsInWorldUC",
   ActorAddingToWorldUC: "ActorAddingToWorldUC",
   WorldIdGenerator: "WorldIdGenerator",
-  WorldFactory: "WorldFactory",
   WorldStorage: "WorldStorage",
   WorldCore: "WorldCore",
-  WorldUpdateEventEmitterStorage: "WorldUpdateEventEmitterStorage",
   UpdateWorldUC: "UpdateWorldUC",
 } as const;
