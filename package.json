@@ -15,7 +15,13 @@
     "test": "run-s test:clean test:jest",
     "test:clean": "rimraf coverage",
     "test:jest": "jest --coverage",
-    "lint": "eslint --ext .ts packages/ --fix"
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
   },
   "repository": {
     "type": "git",
@@ -25,13 +31,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
-    "@typescript-eslint/typescript-estree": "^4.27.0",
     "edit-json-file": "^1.6.0",
-    "eslint": "^7.29.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
     "esm": "^3.2.25",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
@@ -39,12 +39,13 @@
     "lerna": "^4.0.0",
     "lint-staged": "^11.0.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.4"
+    "typescript": "^4.0.3",
+    "gts": "^3.1.0",
+    "@types/node": "^14.11.2"
   },
   "dependencies": {
-    "@types/node": "^15.12.4"
+    "@types/node": "^14.11.2"
   }
 }
